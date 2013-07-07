@@ -1,3 +1,5 @@
+context("Gradients")
+
 test_that("sigmoidGrad is accurate", {
   expect_equal(sigmoidGrad(s = .5), 1/4)
   expect_equal(sigmoidGrad(s = 1), 0)
