@@ -9,11 +9,13 @@ test_that("sigmoidGrad is accurate", {
 })
 
 
-#need to think about how the rectifier is implemented...
-# test_that("rectifiedGrad is accurate", {
-#   x = seq(-10, 10, by = .01)
-#   expect_true(
-#     all(rectifiedGrad(x, 2.01) == (x > 2.01))
-#   )
-#   rectify()
-# })
+test_that("rectifiedGrad is accurate", {
+  x = matrix(seq(-10, 10, length = 1E3), ncol = 2)
+  expect_true(
+    all(rectifiedGrad(x) == (x > 0))
+  )
+  expect_equal(
+    rectifiedGrad(x) * 2E-6,
+    rectify(x + 1E-6) - rectify(x - 1E-6)
+  )
+})

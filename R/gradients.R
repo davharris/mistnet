@@ -6,6 +6,6 @@ sigmoidGrad = function(s){
   s * (1 - s)
 }
 
-rectifiedGrad = function(x, b){
-  x > b
+rectifiedGrad = function(x){
+  x > 0
 }
