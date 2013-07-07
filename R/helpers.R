@@ -7,3 +7,5 @@ crossEntropy = function(y, yhat){
 }
 
 sigmoid = function(x) 1 / (1 + exp(-x))
+
+# Note: rectify is defined in src/rectify.cpp
