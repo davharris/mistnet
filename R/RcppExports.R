@@ -5,3 +5,7 @@ rcpp_add_biases <- function(m, v) {
     .Call('marsrover_rcpp_add_biases', PACKAGE = 'marsrover', m, v)
 }
 
+rectify <- function(m) {
+    .Call('marsrover_rectify', PACKAGE = 'marsrover', m)
+}
+

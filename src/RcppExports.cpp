@@ -16,3 +16,13 @@ BEGIN_RCPP
     return Rcpp::wrap(__result);
 END_RCPP
 }
+// rectify
+NumericMatrix rectify(NumericMatrix m);
+RcppExport SEXP marsrover_rectify(SEXP mSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope __rngScope;
+    NumericMatrix m = Rcpp::as<NumericMatrix >(mSEXP);
+    NumericMatrix __result = rectify(m);
+    return Rcpp::wrap(__result);
+END_RCPP
+}
