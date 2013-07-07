@@ -1,12 +1,13 @@
 Package: marsrover
 Type: Package
 Title: What the package does (short line)
-Version: 1.0
+Version: 0.0.1
 Date: 2013-07-06
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
+Author: David J. Harris
+Maintainer: David J. Harris <DavHarris@UCDavis.edu>
 Description: More about what it does (maybe more than one
       line)
-License: What Licence is it under ?
+License: GPL 2.0
 Depends: Rcpp (>= 0.10.3)
+Imports: testthat
 LinkingTo: Rcpp
