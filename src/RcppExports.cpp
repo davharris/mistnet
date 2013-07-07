@@ -5,12 +5,14 @@
 
 using namespace Rcpp;
 
-// rcpp_hello_world
-List rcpp_hello_world();
-RcppExport SEXP marsrover_rcpp_hello_world() {
+// rcpp_add_biases
+NumericMatrix rcpp_add_biases(NumericMatrix m, NumericVector v);
+RcppExport SEXP marsrover_rcpp_add_biases(SEXP mSEXP, SEXP vSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope __rngScope;
-    List __result = rcpp_hello_world();
+    NumericMatrix m = Rcpp::as<NumericMatrix >(mSEXP);
+    NumericVector v = Rcpp::as<NumericVector >(vSEXP);
+    NumericMatrix __result = rcpp_add_biases(m, v);
     return Rcpp::wrap(__result);
 END_RCPP
 }

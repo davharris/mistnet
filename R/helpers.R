@@ -1,5 +1,5 @@
 `%plus%` = function(matrix, vector){
-  t(t(matrix) + vector)
+  rcpp_add_biases(matrix, vector)
 }
 
 rectify = function(x) pmax(x, 0)
