@@ -2,8 +2,8 @@ crossEntropyGrad = function(y, yhat){
   -y / yhat
 }
 
-sigmoidGrad = function(x){
-  x * (1 - x)
+sigmoidGrad = function(s){
+  s * (1 - s)
 }
 
 rectifiedGrad = function(x, b){
