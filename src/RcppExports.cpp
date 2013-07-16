@@ -9,20 +9,30 @@ using namespace Rcpp;
 NumericMatrix rcpp_add_biases(NumericMatrix m, NumericVector v);
 RcppExport SEXP marsrover_rcpp_add_biases(SEXP mSEXP, SEXP vSEXP) {
 BEGIN_RCPP
-    Rcpp::RNGScope __rngScope;
-    NumericMatrix m = Rcpp::as<NumericMatrix >(mSEXP);
-    NumericVector v = Rcpp::as<NumericVector >(vSEXP);
-    NumericMatrix __result = rcpp_add_biases(m, v);
-    return Rcpp::wrap(__result);
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        NumericMatrix m = Rcpp::as<NumericMatrix >(mSEXP);
+        NumericVector v = Rcpp::as<NumericVector >(vSEXP);
+        NumericMatrix __result = rcpp_add_biases(m, v);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
 END_RCPP
 }
 // rectify
 NumericMatrix rectify(NumericMatrix m);
 RcppExport SEXP marsrover_rectify(SEXP mSEXP) {
 BEGIN_RCPP
-    Rcpp::RNGScope __rngScope;
-    NumericMatrix m = Rcpp::as<NumericMatrix >(mSEXP);
-    NumericMatrix __result = rectify(m);
-    return Rcpp::wrap(__result);
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        NumericMatrix m = Rcpp::as<NumericMatrix >(mSEXP);
+        NumericMatrix __result = rectify(m);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
 END_RCPP
 }
