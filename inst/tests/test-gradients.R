@@ -21,7 +21,7 @@ test_that("rectifiedGrad is accurate", {
     rectify(x + 1E-6) - rectify(x - 1E-6)
   )
 })
-<<<<<<< HEAD
+
 
 
 
@@ -44,5 +44,3 @@ delta = 0.5 / eps * (o.plus - o.minus)
 grad = sigmoidGrad(s = o) * repvec(rowSums(h), ncol(w2))
 
 all.equal(delta, grad)
-=======
->>>>>>> a105340e5d86fb1c2c0de78bd9815c16cd5e7558
