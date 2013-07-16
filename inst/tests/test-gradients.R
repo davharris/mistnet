@@ -30,14 +30,16 @@ n = 37
 n.hid = 13
 n.out = 17
 h = matrix(rnorm(n.hid * n), nrow = n)
+b2 = rnorm(n.out)
+
 
 w2 = matrix(rnorm(n.hid * n.out), nrow = n.hid, ncol = n.out)
 w2.plus = w2 + eps
 w2.minus = w2 - eps
 
-o = sigmoid(h %*% w2)
-o.plus = sigmoid(h %*% w2.plus)
-o.minus = sigmoid(h %*% w2.minus)
+o = sigmoid(h %*% w2 %plus% b2)
+o.plus = sigmoid(h %*% w2.plus %plus% b2)
+o.minus = sigmoid(h %*% w2.minus %plus% b2)
 
 delta = 0.5 / eps * (o.plus - o.minus)
 
