@@ -43,6 +43,6 @@ o.minus = sigmoid(h %*% w2.minus %plus% b2)
 
 delta = 0.5 / eps * (o.plus - o.minus)
 
-grad = sigmoidGrad(s = o) * repvec(rowSums(h), ncol(w2))
+grad = sigmoidGrad(s = o) * repvec(rowSums(h), n.out)
 
 all.equal(delta, grad)
