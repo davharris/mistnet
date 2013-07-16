@@ -9,3 +9,7 @@ rectify <- function(m) {
     .Call('marsrover_rectify', PACKAGE = 'marsrover', m)
 }
 
+repvec <- function(v, n) {
+    .Call('marsrover_repvec', PACKAGE = 'marsrover', v, n)
+}
+
