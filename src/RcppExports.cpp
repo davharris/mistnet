@@ -34,6 +34,7 @@ BEGIN_RCPP
     }
     UNPROTECT(1);
     return __sexp_result;
+<<<<<<< HEAD
 END_RCPP
 }
 // repvec
@@ -50,5 +51,7 @@ BEGIN_RCPP
     }
     UNPROTECT(1);
     return __sexp_result;
+=======
+>>>>>>> a105340e5d86fb1c2c0de78bd9815c16cd5e7558
 END_RCPP
 }
