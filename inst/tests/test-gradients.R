@@ -24,26 +24,31 @@ test_that("rectifiedGrad is accurate", {
 
 
 
-test_that("passGradThroughSigmoid is accurate", {
-  eps = 1E-7
-  n = 37
-  n.hid = 13
-  n.out = 17
-  h = matrix(rnorm(n.hid * n), nrow = n)
-  b2 = rnorm(n.out)
+eps = 1E-7
+n = 37
+n.out = 17
+n.hid = 13
+y = matrix(rbinom(n * n.out, size = 1, prob = .5), ncol = n.out)
+
+test_that("output layer gradient is accurate", {
   
+  # activation
+  a = matrix(rnorm(n * n.out), nrow = n)
   
-  w2 = matrix(rnorm(n.hid * n.out), nrow = n.hid, ncol = n.out)
-  w2.plus = w2 + eps
-  w2.minus = w2 - eps
+  # output
+  o = sigmoid(a)
+  o.plus = sigmoid(a + eps)
+  o.minus = sigmoid(a - eps)
   
-  o = sigmoid(h %*% w2 %plus% b2)
-  o.plus = sigmoid(h %*% w2.plus %plus% b2)
-  o.minus = sigmoid(h %*% w2.minus %plus% b2)
+  error = crossEntropy(y = y, yhat = o)
+  error.plus = crossEntropy(y = y, yhat = o.plus)
+  error.minus = crossEntropy(y = y, yhat = o.minus)
   
-  delta = 0.5 / eps * (o.plus - o.minus)
+  error.grad = .5 / eps * (error.plus - error.minus)
   
-  grad = passGradThroughSigmoid(output=o, previous.output=h, n.out = n.out)
-  
-  all.equal(delta, grad)
+  expect_equal(
+    - crossEntropyGrad(y = y, yhat = o) * sigmoidGrad(s = o),
+    error.grad
+  )
 })
+
