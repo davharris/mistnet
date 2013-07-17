@@ -24,25 +24,26 @@ test_that("rectifiedGrad is accurate", {
 
 
 
-
-eps = 1E-7
-n = 37
-n.hid = 13
-n.out = 17
-h = matrix(rnorm(n.hid * n), nrow = n)
-b2 = rnorm(n.out)
-
-
-w2 = matrix(rnorm(n.hid * n.out), nrow = n.hid, ncol = n.out)
-w2.plus = w2 + eps
-w2.minus = w2 - eps
-
-o = sigmoid(h %*% w2 %plus% b2)
-o.plus = sigmoid(h %*% w2.plus %plus% b2)
-o.minus = sigmoid(h %*% w2.minus %plus% b2)
-
-delta = 0.5 / eps * (o.plus - o.minus)
-
-grad = sigmoidGrad(s = o) * repvec(rowSums(h), n.out)
-
-all.equal(delta, grad)
+test_that("passGradThroughSigmoid is accurate", {
+  eps = 1E-7
+  n = 37
+  n.hid = 13
+  n.out = 17
+  h = matrix(rnorm(n.hid * n), nrow = n)
+  b2 = rnorm(n.out)
+  
+  
+  w2 = matrix(rnorm(n.hid * n.out), nrow = n.hid, ncol = n.out)
+  w2.plus = w2 + eps
+  w2.minus = w2 - eps
+  
+  o = sigmoid(h %*% w2 %plus% b2)
+  o.plus = sigmoid(h %*% w2.plus %plus% b2)
+  o.minus = sigmoid(h %*% w2.minus %plus% b2)
+  
+  delta = 0.5 / eps * (o.plus - o.minus)
+  
+  grad = passGradThroughSigmoid(output=o, previous.output=h, n.out = n.out)
+  
+  all.equal(delta, grad)
+})
