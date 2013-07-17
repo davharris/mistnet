@@ -52,3 +52,22 @@ test_that("output layer gradient is accurate", {
   )
 })
 
+test_that("gradients can be passed through matrix multiplies",{
+  h = matrix(rnorm(n * n.hid), nrow = n)
+  b2 = rnorm(n.out)
+  
+  w2 = matrix(rnorm(n.hid * n.out), nrow = n.hid)
+  w2.plus  = w2 + eps
+  w2.minus = w2 - eps
+  
+  a = h %*% w2 %plus% b2
+  a.plus =  h %*% w2.plus %plus% b2
+  a.minus = h %*% w2.minus %plus% b2
+  
+  grad = .5/eps * (a.plus - a.minus)
+  
+  x = repvec(rowSums(h), n.out)
+  
+  expect_equal(grad, x)
+})
+
