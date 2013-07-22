@@ -8,6 +8,7 @@ Maintainer: David J. Harris <DavHarris@UCDavis.edu>
 Description: More about what it does (maybe more than one
       line)
 License: GPL 2.0
-Depends: Rcpp (>= 0.10.3)
-Imports: testthat
+Depends: Rcpp (>= 0.10.3), 
+  testthat, 
+  devtools
 LinkingTo: Rcpp
