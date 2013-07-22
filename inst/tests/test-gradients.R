@@ -52,22 +52,50 @@ test_that("output layer gradient is accurate", {
   )
 })
 
-test_that("gradients can be passed through matrix multiplies",{
-  h = matrix(rnorm(n * n.hid), nrow = n)
+test_that("backprop works",{
+  h = matrix(rnorm(n * n.hid), nrow = n) / 10
   b2 = rnorm(n.out)
   
-  w2 = matrix(rnorm(n.hid * n.out), nrow = n.hid)
-  w2.plus  = w2 + eps
-  w2.minus = w2 - eps
+  w2 = w2.plus = w2.minus = matrix(rnorm(n.hid * n.out), nrow = n.hid)
   
-  a = h %*% w2 %plus% b2
-  a.plus =  h %*% w2.plus %plus% b2
-  a.minus = h %*% w2.minus %plus% b2
+  target.hidden = sample.int(n.hid, 1)
   
-  grad = .5/eps * (a.plus - a.minus)
+  w2.plus[target.hidden , ]  = w2[target.hidden , ] + eps / 2
+  w2.minus[target.hidden , ] = w2[target.hidden , ] - eps / 2
   
-  x = repvec(rowSums(h), n.out)
+  o = sigmoid(h %*% w2 %plus% b2)
+  o.plus =  sigmoid(h %*% w2.plus %plus% b2)
+  o.minus = sigmoid(h %*% w2.minus %plus% b2)
   
-  expect_equal(grad, x)
+  error = crossEntropy(y = y, yhat = o)
+  error.plus = crossEntropy(y = y, yhat = o.plus)
+  error.minus = crossEntropy(y = y, yhat = o.minus)
+  
+  observed.grad = sapply(
+    1:n, 
+    function(i){
+      (error.plus - error.minus)[i, ] / eps
+    }
+  )
+  predicted.grad = -sapply(
+    1:n, function(i){
+      crossEntropyGrad(y = y, yhat = o)[i, ] * 
+        sigmoidGrad(s = o)[i, ] * 
+        h[i, target.hidden] 
+    }
+  )
+  
+  expect_equal(observed.grad, predicted.grad, tolerance = eps)
+  
+  
+  x = -t(
+    vapply(
+      1:n.out,
+      function(i){
+        (crossEntropyGrad(y = y, yhat = o)[, i] * sigmoidGrad(s = o)[, i]) %*% h
+      },
+      FUN.VALUE = numeric(n.hid)
+    )
+  )
+  expect_equal(x[ , target.hidden], rowSums(predicted.grad))
 })
-
