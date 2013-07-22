@@ -88,14 +88,13 @@ test_that("backprop works",{
   expect_equal(observed.grad, predicted.grad, tolerance = eps)
   
   
-  x = -t(
-    vapply(
-      1:n.out,
-      function(i){
-        (crossEntropyGrad(y = y, yhat = o)[, i] * sigmoidGrad(s = o)[, i]) %*% h
-      },
-      FUN.VALUE = numeric(n.hid)
-    )
+  x = passGradThroughSigmoid(
+    n.hid = n.hid, 
+    n.out = n.out, 
+    y = y, 
+    o = o, 
+    h = h
   )
+  
   expect_equal(x[ , target.hidden], rowSums(predicted.grad))
 })
