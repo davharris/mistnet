@@ -20,11 +20,12 @@ rectifiedGrad = function(x){
 }
 
 passGradThroughSigmoid = function(n.hid, n.out, y, o, h){
+  delta = crossEntropyGrad(y = y, yhat = o) * sigmoidGrad(s = o)
   -t(
     vapply(
       1:n.out,
       function(i){
-        (crossEntropyGrad(y = y, yhat = o)[, i] * sigmoidGrad(s = o)[, i]) %*% h
+        delta[, i] %*% h
       },
       FUN.VALUE = numeric(n.hid)
     )
