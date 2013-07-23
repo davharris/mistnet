@@ -19,14 +19,11 @@ rectifiedGrad = function(x){
   x > 0
 }
 
-passGradThroughSigmoid = function(n.hid, n.out, y, o, h){
-  delta = crossEntropyGrad(y = y, yhat = o) * sigmoidGrad(s = o)
+matrixMultiplyGrad = function(n.hid, n.out, delta, h){
   -t(
     vapply(
       1:n.out,
-      function(i){
-        delta[, i] %*% h
-      },
+      function(i){delta[, i] %*% h},
       FUN.VALUE = numeric(n.hid)
     )
   )
