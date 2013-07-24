@@ -4,9 +4,10 @@ using namespace Rcpp;
 
 // [[Rcpp::export]]
 NumericMatrix rcpp_add_biases(NumericMatrix m, NumericVector v) {
+  NumericMatrix out = m;
   for(int i = 0; i< m.ncol(); i++){
       // might be possible to speed this up with +=
-      m(_, i) = m(_, i) + v[i];
+      out(_, i) = m(_, i) + v[i];
     };
-  return m;
+  return out;
 }

@@ -6,6 +6,12 @@ crossEntropy = function(y, yhat){
   y * log(yhat) + (1 - y) * log(1 - yhat)
 }
 
-sigmoid = function(x) 1 / (1 + exp(-x))
+sigmoid = function(x){
+  if(is.matrix(x)){
+    return(sigmoidMatrix(x))
+  }else{
+    return(sigmoidVector(x))
+  }
+}
 
 # Note: rectify is defined in src/rectify.cpp

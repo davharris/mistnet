@@ -52,3 +52,33 @@ BEGIN_RCPP
     return __sexp_result;
 END_RCPP
 }
+// sigmoidVector
+NumericVector sigmoidVector(NumericVector v);
+RcppExport SEXP marsrover_sigmoidVector(SEXP vSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        NumericVector v = Rcpp::as<NumericVector >(vSEXP);
+        NumericVector __result = sigmoidVector(v);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
+// sigmoidMatrix
+NumericMatrix sigmoidMatrix(NumericMatrix m);
+RcppExport SEXP marsrover_sigmoidMatrix(SEXP mSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        NumericMatrix m = Rcpp::as<NumericMatrix >(mSEXP);
+        NumericMatrix __result = sigmoidMatrix(m);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}

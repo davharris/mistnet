@@ -13,3 +13,11 @@ repvec <- function(v, n) {
     .Call('marsrover_repvec', PACKAGE = 'marsrover', v, n)
 }
 
+sigmoidVector <- function(v) {
+    .Call('marsrover_sigmoidVector', PACKAGE = 'marsrover', v)
+}
+
+sigmoidMatrix <- function(m) {
+    .Call('marsrover_sigmoidMatrix', PACKAGE = 'marsrover', m)
+}
+
