@@ -74,14 +74,14 @@ for(i in 1:maxit){
   b1 = b1 - colMeans(delta1) * lr
   b3 = b3 - colMeans(delta3) * lr
   
-  dw1 = dw1/mini.n * lr - w1 * 1E-5
-  w1 = w1 + dw1
+  dw1 = dw1/mini.n - w1 * 1E-4
+  w1 = w1 + dw1 * lr
   
-  dw2 = dw2/mini.n * lr
-  w2 = w2 + t(dw2) - w2 * 1E-4
+  dw2 = t(dw2)/mini.n - w2 * 1E-3
+  w2 = w2 + dw2 * lr
   
-  dw3 = dw3/mini.n * lr
-  w3 = w3 + t(dw3) - w3 * 1E-4
+  dw3 = t(dw3)/mini.n - w3 * 1E-3
+  w3 = w3 + dw3 * lr
   
   if(i%%100 == 0){
     error = crossEntropy(y = batch.y, yhat = yhat)
