@@ -1,3 +1,4 @@
+library(ggplot2)
 load("../scrf/birds.Rdata")
 
 y = route.presence.absence[in.train, ]
@@ -70,18 +71,18 @@ for(i in 1:maxit){
   w2 = w2 + t(dw2) - w2 * .00001
   
   
-  errors[i] = mean(error)
   if(i%%100 == 0){
     error = crossEntropy(y = batch.y, yhat = yhat)
+    errors[i/100] = mean(error)
     message(i)
   }
-  if(is.na(errors[i])){stop("NAs")}
+  if(is.na(dw1[[1]])){stop("NAs")}
 }
 
 Rprof(NULL)
 summaryRprof()
 
-plot(errors, type = "l")
+plot(1:length(errors) * 100, errors, type = "l")
 
 
 
