@@ -3,12 +3,12 @@ load("../scrf/birds.Rdata")
 y = route.presence.absence[in.train, ]
 x = scale(env)[in.train, ]
 n.out = ncol(y)
-n.hid = 5
+n.hid = 10
 n.in = ncol(x)
 n = nrow(y)
 mini.n = 100
 
-lr = .1
+lr = .05
 
 w1 = matrix(0, nrow = ncol(x), ncol = n.hid)
 w1[,] = runif(length(w1), -.001, .001)
@@ -22,11 +22,13 @@ b2 = qlogis(colMeans(y))
 
 
 
-maxit = 100000
+maxit = 10000
 
-errors = rep(NA, maxit)
+errors = rep(NA, maxit/100)
 dw1 = 0
 dw2 = 0
+
+Rprof()
 
 for(i in 1:maxit){
   
@@ -36,7 +38,7 @@ for(i in 1:maxit){
   
   h = sigmoid(batch.x %*% w1 %plus% b1)
   yhat = sigmoid(h %*% w2 %plus% b2)
-  error = crossEntropy(y = batch.y, yhat = yhat)
+  
   
   delta2 = crossEntropyGrad(y = batch.y, yhat = yhat) * 
     sigmoidGrad(s = yhat)
@@ -69,8 +71,15 @@ for(i in 1:maxit){
   
   
   errors[i] = mean(error)
+  if(i%%100 == 0){
+    error = crossEntropy(y = batch.y, yhat = yhat)
+    message(i)
+  }
   if(is.na(errors[i])){stop("NAs")}
 }
+
+Rprof(NULL)
+summaryRprof()
 
 plot(errors, type = "l")
 
@@ -78,19 +87,6 @@ plot(errors, type = "l")
 
 h = sigmoid(scale(env) %*% w1 %plus% b1)
 yhat = sigmoid(h %*% w2 %plus% b2)
-
-z = apply(h, 2, round)
-
-color = factor(
-  apply(z, 1, function(x) paste0(x, collapse = ""))
-)
-qplot(
-  latlon[,1], 
-  latlon[,2], 
-  color = color, 
-  cex = 2
-) + coord_equal() + 
-  scale_color_brewer(type = "qual")
 
 qplot(
   latlon[,1], 
@@ -100,23 +96,19 @@ qplot(
 ) + coord_equal()
 
 
--2 * mean(
-  rowSums(
-    dbinom(
-      route.presence.absence[in.test, ], 
-      prob = yhat[in.test, ],
-      size = 1, 
-      log = TRUE
-    )
-  )
-)
+-2 * mean(rowSums(dbinom(
+  route.presence.absence[in.test, ], 
+  prob = yhat[in.test, ],
+  size = 1, 
+  log = TRUE
+)))
 
 
 colnames(w2) = colnames(route.presence.absence)
 
 scaled.w = apply(w2, 2, function(x) x / sqrt(sum(x^2)))
 
-x = scaled.w[1, ]
-y = scaled.w[3, ]
-plot(x, y, type = "n")
-text(x, y, label = colnames(route.presence.absence))
+plot.x = scaled.w[1 , ]
+plot.y = scaled.w[2 , ]
+plot(plot.x, plot.y, type = "n")
+text(plot.x, plot.y, label = colnames(route.presence.absence))
