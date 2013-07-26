@@ -85,7 +85,7 @@ for(i in 1:maxit){
   
   if(i%%100 == 0){
     error = crossEntropy(y = batch.y, yhat = yhat)
-    errors[i/100] = mean(error)
+    errors[i/100] = mean(rowSums(error))
     message(i)
   }
   if(is.na(dw1[[1]])){stop("NAs")}
@@ -109,8 +109,11 @@ qplot(
   latlon[,2], 
   color = color, 
   cex = 2
-) + coord_equal() + scale_color_gradient2()
+) + 
+  coord_equal() + 
+  scale_color_gradient2(limits = range(predict(prcomp(bottleneck.h))))
 
 
 
 hist(w2 %*% w3)
+
