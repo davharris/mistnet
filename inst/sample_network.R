@@ -31,6 +31,9 @@ w3[,] = rnorm(length(w3), sd = .2) * (sample.int(2, length(w3), replace = TRUE) 
 b1 = rep(0, n.hid)
 b3 = qlogis(colMeans(y))
 
+
+dw1 = dw2 = dw3 = 0
+
 maxit = 5000
 
 errors = rep(NA, maxit/100)
@@ -51,7 +54,7 @@ for(i in 1:maxit){
   delta3 = crossEntropyGrad(y = batch.y, yhat = yhat) * 
     sigmoidGrad(s = yhat)
   
-  dw3 = matrixMultiplyGrad(
+  w3grad = matrixMultiplyGrad(
     n.hid = n.bottleneck, 
     n.out = n.out, 
     delta = delta3,
@@ -59,7 +62,7 @@ for(i in 1:maxit){
   )
     
   delta2 = delta3 %*% t(w3)
-  dw2 = matrixMultiplyGrad(
+  w2grad = matrixMultiplyGrad(
     n.hid = n.hid, 
     n.out = n.bottleneck, 
     delta = delta2,
@@ -67,7 +70,7 @@ for(i in 1:maxit){
   )
   
   delta1 = sigmoidGrad(s = h) * (delta2 %*% t(w2))
-  dw1 = t(
+  w1grad = t(
     matrixMultiplyGrad(
       n.hid = n.in, 
       n.out = n.hid, 
@@ -76,16 +79,16 @@ for(i in 1:maxit){
     )
   )
   
+  dw1 =   w1grad / mini.n - w1 * 1E-3 + dw1 * .5
+  dw2 = t(w2grad)/ mini.n - w2 * 1E-2 + dw2 * .5
+  dw3 = t(w3grad)/ mini.n - w3 * 1E-2 + dw3 * .5
+  
+  
   b1 = b1 - colMeans(delta1) * lr
   b3 = b3 - colMeans(delta3) * lr
   
-  dw1 = dw1/mini.n - w1 * 1E-3
   w1 = w1 + dw1 * lr
-  
-  dw2 = t(dw2)/mini.n - w2 * 1E-2
   w2 = w2 + dw2 * lr
-  
-  dw3 = t(dw3)/mini.n - w3 * 1E-2
   w3 = w3 + dw3 * lr
   
   if(i%%100 == 0){
