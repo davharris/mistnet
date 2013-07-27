@@ -9,18 +9,18 @@ n.hid = 50
 n.bottleneck = 10
 n.in = ncol(x)
 n = nrow(y)
-mini.n = 100
+mini.n = 50
 
 lr = .05
 
 w1 = matrix(0, nrow = ncol(x), ncol = n.hid)
-w1[,] = rt(length(w1), 2)/10
+w1[,] = rnorm(length(w1), sd = .2) * (sample.int(2, length(w1), replace = TRUE) - 1L)
 
 w2 = matrix(0, nrow = n.hid, ncol = n.bottleneck)
-w2[,] = rt(length(w2), 2)/10
+w2[,] = rnorm(length(w2), sd = .2) * (sample.int(2, length(w2), replace = TRUE) - 1L)
 
 w3 = matrix(0, nrow = n.bottleneck, ncol = n.out)
-w3[,] = runif(length(w3), -.01, .1)
+w3[,] = rnorm(length(w3), sd = .2) * (sample.int(2, length(w3), replace = TRUE) - 1L)
 
 
 b1 = rep(0, n.hid)
