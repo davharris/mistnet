@@ -1,9 +1,14 @@
 devtools::load_all()
 library(ggplot2)
+library(fastICA)
 load("../scrf/birds.Rdata")
 
+ica = fastICA(poly(scale(env), degree = 2), n.comp = 20)
+
+projected.env = ica$S
+
 y = route.presence.absence[in.train, ]
-x = scale(env)[in.train, ]
+x = projected.env[in.train, ]
 n.out = ncol(y)
 n.hid = 50
 n.bottleneck = 10
@@ -26,7 +31,7 @@ w3[,] = rnorm(length(w3), sd = .2) * (sample.int(2, length(w3), replace = TRUE) 
 b1 = rep(0, n.hid)
 b3 = qlogis(colMeans(y))
 
-maxit = 10000
+maxit = 5000
 
 errors = rep(NA, maxit/100)
 
@@ -74,13 +79,13 @@ for(i in 1:maxit){
   b1 = b1 - colMeans(delta1) * lr
   b3 = b3 - colMeans(delta3) * lr
   
-  dw1 = dw1/mini.n - w1 * 1E-4
+  dw1 = dw1/mini.n - w1 * 1E-3
   w1 = w1 + dw1 * lr
   
-  dw2 = t(dw2)/mini.n - w2 * 1E-3
+  dw2 = t(dw2)/mini.n - w2 * 1E-2
   w2 = w2 + dw2 * lr
   
-  dw3 = t(dw3)/mini.n - w3 * 1E-3
+  dw3 = t(dw3)/mini.n - w3 * 1E-2
   w3 = w3 + dw3 * lr
   
   if(i%%100 == 0){
@@ -98,7 +103,7 @@ plot(1:length(errors) * 100, errors, type = "l")
 
 
 
-h = sigmoid(scale(env) %*% w1 %plus% b1)
+h = sigmoid(projected.env %*% w1 %plus% b1)
 bottleneck.h = h %*% w2
 yhat = sigmoid(bottleneck.h %*% w3 %plus% b3)
 
@@ -113,7 +118,6 @@ qplot(
   coord_equal() + 
   scale_color_gradient2(limits = range(predict(prcomp(bottleneck.h))))
 
+plot(prcomp(bottleneck.h))
 
-
-hist(w2 %*% w3)
-
+hist(bottleneck.h %*% w3)
