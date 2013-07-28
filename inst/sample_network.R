@@ -14,12 +14,12 @@ n.hid = 50
 n.bottleneck = 10
 n.in = ncol(x)
 n = nrow(y)
-mini.n = 25
+mini.n = 2
 
 momentum = 0.5
 n.importance.samples = 20
 random.effect.sd = 0.2
-lr = .01
+lr = .001
 
 w1 = matrix(0, nrow = ncol(x), ncol = n.hid)
 w1[,] = rnorm(length(w1), sd = .2) * (sample.int(2, length(w1), replace = TRUE) - 1L)
@@ -44,7 +44,7 @@ w1grads = array(dim = c(nrow(w1),ncol(w1),n.importance.samples))
 w2grads = array(dim = c(nrow(w2),ncol(w2),n.importance.samples))
 w3grads = array(dim = c(nrow(w3),ncol(w3),n.importance.samples))
 
-maxit = 2000
+maxit = 20000
 
 errors = rep(NA, maxit/100)
 importance.errors = matrix(NA, nrow = mini.n, ncol = n.importance.samples)
@@ -119,6 +119,7 @@ for(i in 1:maxit){
   w2 = w2 + dw2 * lr
   w3 = w3 + dw3 * lr
   
+  
   if(i%%100 == 0){
     errors[i/100] = sum(colMeans(importance.errors) * importance.weights)
     message(i)
@@ -130,11 +131,11 @@ for(i in 1:maxit){
 # Rprof(NULL)
 # summaryRprof()
 
-niter = 100
-yhats = array(dim = c(nrow(route.presence.absence), ncol(route.presence.absence), niter))
+niter = 1000
+yhats = array(dim = c(nrow(route.presence.absence[in.test, ]), ncol(route.presence.absence), niter))
 dimnames(yhats) = list(NULL, colnames(route.presence.absence), NULL)
 
-h = sigmoid(projected.env %*% w1 %plus% b1)
+h = sigmoid(projected.env[in.test, ] %*% w1 %plus% b1)
 
 for(i in 1:niter){
   bottleneck.h = h %*% w2 %plus% rnorm(n.bottleneck, sd = random.effect.sd)
@@ -143,18 +144,18 @@ for(i in 1:niter){
 
 yhat = apply(yhats, 2, rowMeans)
 
-h = sigmoid(projected.env %*% w1 %plus% b1)
+h = sigmoid(projected.env[in.test, ] %*% w1 %plus% b1)
 bottleneck.h = h %*% w2
 yhat.mle = sigmoid(bottleneck.h %*% w3 %plus% b3)
 colnames(yhat.mle) = colnames(route.presence.absence)
 
 
-mean(colSums(crossEntropy(route.presence.absence[in.test], yhat.mle[in.test, ])))
-mean(colSums(crossEntropy(route.presence.absence[in.test], yhat[in.test, ])))
+mean(colSums(crossEntropy(route.presence.absence[in.test, ], yhat.mle)))
+mean(colSums(crossEntropy(route.presence.absence[in.test, ], yhat)))
 
-spp = c("Horned Lark", "Pine Siskin")
-apply(t(yhats[sitenum,spp,]), 2, sd)
+spp = c("Chipping Sparrow", "Pine Siskin")
 sitenum = 3
+apply(t(yhats[sitenum,spp,]), 2, sd)
 plot(
   t(yhats[sitenum,spp,]), 
   xlim = c(0, 1), 
