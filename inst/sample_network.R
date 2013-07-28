@@ -8,17 +8,18 @@ ica = fastICA(poly(scale(env), degree = 2), n.comp = 20)
 projected.env = ica$S
 
 y = route.presence.absence[in.train, ]
-x = cbind(projected.env[in.train, ], 0)
+x = projected.env[in.train, ]
 n.out = ncol(y)
 n.hid = 50
 n.bottleneck = 10
 n.in = ncol(x)
 n = nrow(y)
-mini.n = 2
+mini.n = 25
 
 momentum = 0.5
 n.importance.samples = 20
-lr = .005
+random.effect.sd = 0.2
+lr = .01
 
 w1 = matrix(0, nrow = ncol(x), ncol = n.hid)
 w1[,] = rnorm(length(w1), sd = .2) * (sample.int(2, length(w1), replace = TRUE) - 1L)
@@ -43,7 +44,7 @@ w1grads = array(dim = c(nrow(w1),ncol(w1),n.importance.samples))
 w2grads = array(dim = c(nrow(w2),ncol(w2),n.importance.samples))
 w3grads = array(dim = c(nrow(w3),ncol(w3),n.importance.samples))
 
-maxit = 10000
+maxit = 2000
 
 errors = rep(NA, maxit/100)
 importance.errors = matrix(NA, nrow = mini.n, ncol = n.importance.samples)
@@ -61,9 +62,8 @@ for(i in 1:maxit){
   
   for(j in 1:n.importance.samples){
     
-    batch.x[ , ncol(batch.x)] = rnorm(1)
     h = sigmoid(batch.x %*% w1 %plus% b1)
-    bottleneck.h = h %*% w2
+    bottleneck.h = h %*% w2 %plus% rnorm(n.bottleneck, sd = random.effect.sd)
     yhat = sigmoid(bottleneck.h %*% w3 %plus% b3)
     
     importance.errors[ , j] = rowSums(crossEntropy(y = batch.y, yhat = yhat))
@@ -109,7 +109,7 @@ for(i in 1:maxit){
   }
   
   dw1 = w1grad / mini.n - w1 * 1E-3 + dw1 * momentum
-  dw2 = w2grad / mini.n - w2 * 1E-2 + dw2 * momentum
+  dw2 = w2grad / mini.n - w2 * 1E-1 + dw2 * momentum
   dw3 = w3grad / mini.n - w3 * 1E-2 + dw3 * momentum
   
   b1 = b1 - colMeans(delta1) * lr
@@ -122,6 +122,7 @@ for(i in 1:maxit){
   if(i%%100 == 0){
     errors[i/100] = sum(colMeans(importance.errors) * importance.weights)
     message(i)
+    momentum = pmin(1 - 10/(10 + i/100), .8)
   }
   if(is.na(dw1[[1]])){stop("NAs")}
 }
@@ -133,26 +134,26 @@ niter = 100
 yhats = array(dim = c(nrow(route.presence.absence), ncol(route.presence.absence), niter))
 dimnames(yhats) = list(NULL, colnames(route.presence.absence), NULL)
 
+h = sigmoid(projected.env %*% w1 %plus% b1)
+
 for(i in 1:niter){
-  h = sigmoid(cbind(projected.env, rnorm(1)) %*% w1 %plus% b1)
-  bottleneck.h = h %*% w2
+  bottleneck.h = h %*% w2 %plus% rnorm(n.bottleneck, sd = random.effect.sd)
   yhats[,,i] = sigmoid(bottleneck.h %*% w3 %plus% b3)
 }
 
 yhat = apply(yhats, 2, rowMeans)
 
-h = sigmoid(cbind(projected.env, 0) %*% w1 %plus% b1)
+h = sigmoid(projected.env %*% w1 %plus% b1)
 bottleneck.h = h %*% w2
 yhat.mle = sigmoid(bottleneck.h %*% w3 %plus% b3)
 colnames(yhat.mle) = colnames(route.presence.absence)
-
-yhats[,,i] = sigmoid(bottleneck.h %*% w3 %plus% b3)
 
 
 mean(colSums(crossEntropy(route.presence.absence[in.test], yhat.mle[in.test, ])))
 mean(colSums(crossEntropy(route.presence.absence[in.test], yhat[in.test, ])))
 
-spp = c("Veery", "Horned Lark")
+spp = c("Horned Lark", "Pine Siskin")
+apply(t(yhats[sitenum,spp,]), 2, sd)
 sitenum = 3
 plot(
   t(yhats[sitenum,spp,]), 
