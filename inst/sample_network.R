@@ -17,7 +17,7 @@ n = nrow(y)
 mini.n = 2
 
 momentum = 0.5
-n.importance.samples = 10
+n.importance.samples = 20
 lr = .01
 
 w1 = matrix(0, nrow = ncol(x), ncol = n.hid)
@@ -43,7 +43,7 @@ w1grads = array(dim = c(nrow(w1),ncol(w1),n.importance.samples))
 w2grads = array(dim = c(nrow(w2),ncol(w2),n.importance.samples))
 w3grads = array(dim = c(nrow(w3),ncol(w3),n.importance.samples))
 
-maxit = 5000
+maxit = 10000
 
 errors = rep(NA, maxit/100)
 importance.errors = matrix(NA, nrow = mini.n, ncol = n.importance.samples)
@@ -128,22 +128,29 @@ for(i in 1:maxit){
 # Rprof(NULL)
 # summaryRprof()
 
-h = sigmoid(cbind(projected.env, 0) %*% w1 %plus% b1)
-bottleneck.h = h %*% w2
-yhat = sigmoid(bottleneck.h %*% w3 %plus% b3)
+niter = 100
+yhats = array(dim = c(nrow(route.presence.absence), ncol(route.presence.absence), niter))
+dimnames(yhats) = list(NULL, colnames(route.presence.absence), NULL)
+
+for(i in 1:niter){
+  h = sigmoid(cbind(projected.env, rnorm(1)) %*% w1 %plus% b1)
+  bottleneck.h = h %*% w2
+  yhats[,,i] = sigmoid(bottleneck.h %*% w3 %plus% b3)
+}
+
+yhat = apply(yhats, 2, rowMeans)
+
+mean(colSums(crossEntropy(route.presence.absence[in.test], yhat[in.test, ])))
+
+plot(
+  t(yhats[1,c("Gadwall", "Black-capped Chickadee"),]), 
+  xlim = c(0, 1), 
+  ylim = c(0,1), 
+  xaxs = "i", 
+  yaxs = "i", 
+  cex = .5
+)
 
 
-color = predict(prcomp(bottleneck.h))[,1]
-qplot(
-  latlon[,1], 
-  latlon[,2], 
-  color = color, 
-  cex = 2
-) + 
-  coord_equal() + 
-  scale_color_gradient2(limits = range(predict(prcomp(bottleneck.h))))
 
-plot(prcomp(bottleneck.h))
-
-hist(bottleneck.h %*% w3)
 plot(1:length(errors) * 100, errors, type = "l")
