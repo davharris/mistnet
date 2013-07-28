@@ -18,7 +18,7 @@ mini.n = 2
 
 momentum = 0.5
 n.importance.samples = 20
-lr = .01
+lr = .005
 
 w1 = matrix(0, nrow = ncol(x), ncol = n.hid)
 w1[,] = rnorm(length(w1), sd = .2) * (sample.int(2, length(w1), replace = TRUE) - 1L)
@@ -51,6 +51,7 @@ importance.errors = matrix(NA, nrow = mini.n, ncol = n.importance.samples)
 #Rprof()
 
 for(i in 1:maxit){
+  
   
   in.batch = sample.int(n, mini.n)
   batch.x = x[in.batch, ]
@@ -140,17 +141,29 @@ for(i in 1:niter){
 
 yhat = apply(yhats, 2, rowMeans)
 
+h = sigmoid(cbind(projected.env, 0) %*% w1 %plus% b1)
+bottleneck.h = h %*% w2
+yhat.mle = sigmoid(bottleneck.h %*% w3 %plus% b3)
+colnames(yhat.mle) = colnames(route.presence.absence)
+
+yhats[,,i] = sigmoid(bottleneck.h %*% w3 %plus% b3)
+
+
+mean(colSums(crossEntropy(route.presence.absence[in.test], yhat.mle[in.test, ])))
 mean(colSums(crossEntropy(route.presence.absence[in.test], yhat[in.test, ])))
 
+spp = c("Veery", "Horned Lark")
+sitenum = 3
 plot(
-  t(yhats[1,c("Gadwall", "Black-capped Chickadee"),]), 
+  t(yhats[sitenum,spp,]), 
   xlim = c(0, 1), 
   ylim = c(0,1), 
   xaxs = "i", 
   yaxs = "i", 
   cex = .5
 )
-
-
+abline(0,1)
+points(matrix(yhat[sitenum, spp], ncol = 2), col = 4)
+points(matrix(yhat.mle[sitenum, spp], ncol = 2), col = 2)
 
 plot(1:length(errors) * 100, errors, type = "l")
