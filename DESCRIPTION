@@ -6,9 +6,17 @@ Date: 2013-07-06
 Author: David J. Harris
 Maintainer: David J. Harris <DavHarris@UCDavis.edu>
 Description: More about what it does (maybe more than one
-      line)
+    line)
 License: GPL 2.0
-Depends: Rcpp (>= 0.10.3), 
-  testthat, 
-  devtools
+Depends:
+    Rcpp (>= 0.10.3),
+    testthat,
+    devtools
 LinkingTo: Rcpp
+Collate:
+    'RcppExports.R'
+    'gradients.R'
+    'helpers.R'
+    'initializeMars.R'
+    'prior.R'
+    'layer.R'
