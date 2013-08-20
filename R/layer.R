@@ -1,13 +1,38 @@
-layer = setClass(
+#' @include prior.R
+layer = setRefClass(
   Class = "layer",
-  slots = list(
+  fields = list(
     coefficients = "matrix",
-    state = "matrix",
+    input = "matrix",
+    activation = "matrix",
+    output = "matrix",
     llik.grad.estimate = "matrix",
     grad.step = "matrix",
+    input.dim = "integer",
+    output.dim = "integer",
     learning.rate = "numeric",
     momentum = "numeric",
-    regularize = "function"
+    nonlinearity = "function",
+    getNonlinearityGrad = "function",
+    prior = "prior"
   ),
-  sealed = TRUE
+  methods = list(
+    forwardPass = function(input){
+      input <<- input
+      activation <<- input %*% coefficients
+      output <<- .self$nonlinearity(activation)
+    },
+    backwardPass = function(error.gradient){
+      llik.grad.estimate <<- matrixMultiplyGrad(
+        n.hid = input.dim,
+        n.out = output.dim,
+        delta = getNonlinearityGrad(),
+        h = input
+      )
+    },
+    updateCoefficients = function(){
+      
+    }
+  )
 )
+
