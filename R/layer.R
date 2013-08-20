@@ -31,7 +31,9 @@ layer = setRefClass(
       )
     },
     updateCoefficients = function(){
-      
+      grad = llik.gradient.estimate + prior$getLogGrad(coefficients) 
+      grad.step <<- grad * learning.rate + momentum * grad.step
+      coefficients <<- coefficients + grad.step
     }
   )
 )
