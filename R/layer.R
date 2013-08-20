@@ -3,10 +3,12 @@ layer = setRefClass(
   Class = "layer",
   fields = list(
     coefficients = "matrix",
+    biases = "numeric",
     input = "matrix",
     activation = "matrix",
     output = "matrix",
-    llik.grad.estimate = "matrix",
+    error.grad = "matrix",
+    coef.grad = "matrix",
     grad.step = "matrix",
     input.dim = "integer",
     output.dim = "integer",
@@ -19,19 +21,23 @@ layer = setRefClass(
   methods = list(
     forwardPass = function(input){
       input <<- input
-      activation <<- input %*% coefficients
+      activation <<- input %*% coefficients %plus% biases
       output <<- .self$nonlinearity(activation)
     },
-    backwardPass = function(error.gradient){
-      llik.grad.estimate <<- matrixMultiplyGrad(
+    backwardPass = function(next.error.grad){
+      error.grad <<- `*`(
+        getNonlinearityGrad(),
+        tcrossprod(next.error.grad, coefficients)
+      )
+      coef.grad <<- matrixMultiplyGrad(
         n.hid = input.dim,
         n.out = output.dim,
-        delta = getNonlinearityGrad(),
+        delta = error.gradient,
         h = input
       )
     },
     updateCoefficients = function(){
-      grad = llik.gradient.estimate + prior$getLogGrad(coefficients) 
+      grad = coef.grad + prior$getLogGrad(coefficients) 
       grad.step <<- grad * learning.rate + momentum * grad.step
       coefficients <<- coefficients + grad.step
     }
