@@ -56,7 +56,7 @@ createLayer = function(
   momentum,
   prior,
   dataset.size,
-  nonlinearity
+  nonlinearity.name
 ){
   layer$new(
     coefficients = matrix(0, nrow = dim[[1]], ncol = dim[[2]]),
@@ -65,7 +65,8 @@ createLayer = function(
     dim = dim,
     learning.rate = learning.rate,
     momentum = momentum,
-    nonlinearity = nonlinearity,
+    nonlinearity = get(nonlinearity.name, mode = "function"),
+    nonlinearityGrad = get(paste0(nonlinearity.name, "Grad"), mode = "function"),
     prior = prior,
     dataset.size = dataset.size
   )

@@ -7,7 +7,7 @@ sigmoidGrad = function(x){
   s * (1 - s)
 }
 
-rectifiedGrad = function(x){
+rectifyGrad = function(x){
   x > 0
 }
 
