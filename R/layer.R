@@ -30,10 +30,10 @@ layer = setRefClass(
         tcrossprod(next.error.grad, coefficients)
       )
       llik.grad <<- matrixMultiplyGrad(
-        n.hid = dim[[1]],
+        n.in = dim[[1]],
         n.out = dim[[2]],
-        delta = error.gradient,
-        h = input
+        error.grad = error.grad,
+        input = input
       )
     },
     
