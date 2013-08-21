@@ -14,7 +14,8 @@ layer = setRefClass(
     momentum = "numeric",
     nonlinearity = "function",
     getNonlinearityGrad = "function",
-    prior = "prior"
+    prior = "prior",
+    dataset.size = "numeric"
   ),
   
   methods = list(
@@ -38,7 +39,7 @@ layer = setRefClass(
     },
     
     updateCoefficients = function(){
-      grad = llik.grad + prior$getLogGrad(coefficients) 
+      grad = llik.grad + prior$getLogGrad(coefficients) / dataset.size
       grad.step <<- grad * learning.rate + momentum * grad.step
       coefficients <<- coefficients + grad.step
       
