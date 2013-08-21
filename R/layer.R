@@ -5,6 +5,7 @@ layer = setRefClass(
     coefficients = "matrix",
     biases = "numeric",
     input = "matrix",
+    activation = "matrix",
     output = "matrix",
     error.grad = "matrix",
     llik.grad = "matrix",
@@ -22,7 +23,8 @@ layer = setRefClass(
     
     forwardPass = function(input){
       input <<- input
-      output <<- .self$nonlinearity((input %*% coefficients) %plus% biases)
+      activation <<- (input %*% coefficients) %plus% biases
+      output <<- .self$nonlinearity(activation)
     },
     
     backwardPass = function(next.error.grad){
