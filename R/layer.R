@@ -7,10 +7,9 @@ layer = setRefClass(
     input = "matrix",
     output = "matrix",
     error.grad = "matrix",
-    coef.grad = "matrix",
+    llik.grad = "matrix",
     grad.step = "matrix",
-    input.dim = "integer",
-    output.dim = "integer",
+    dim = "integer",
     learning.rate = "numeric",
     momentum = "numeric",
     nonlinearity = "function",
@@ -30,16 +29,16 @@ layer = setRefClass(
         getNonlinearityGrad(),
         tcrossprod(next.error.grad, coefficients)
       )
-      coef.grad <<- matrixMultiplyGrad(
-        n.hid = input.dim,
-        n.out = output.dim,
+      llik.grad <<- matrixMultiplyGrad(
+        n.hid = dim[[1]],
+        n.out = dim[[2]],
         delta = error.gradient,
         h = input
       )
     },
     
     updateCoefficients = function(){
-      grad = coef.grad + prior$getLogGrad(coefficients) 
+      grad = llik.grad + prior$getLogGrad(coefficients) 
       grad.step <<- grad * learning.rate + momentum * grad.step
       coefficients <<- coefficients + grad.step
       
