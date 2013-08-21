@@ -21,7 +21,7 @@ layer = setRefClass(
   methods = list(
     forwardPass = function(input){
       input <<- input
-      activation <<- input %*% coefficients %plus% biases
+      activation <<- (input %*% coefficients) %plus% biases
       output <<- .self$nonlinearity(activation)
     },
     backwardPass = function(next.error.grad){
