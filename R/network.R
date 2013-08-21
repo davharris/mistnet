@@ -20,7 +20,10 @@ network = setRefClass(
       }
     },
     feedForward = function(){
+      # First layer gets its inputs from x
       layers[[1]]$forwardPass(x[minibatch.ids, ])
+      
+      # Subsequent layers get their inputs from previous layers
       for(i in 2:n.layers){
         layers[[i]]$forwardPass(layers[[i - 1]]$output)
       }
