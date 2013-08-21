@@ -17,11 +17,14 @@ layer = setRefClass(
     getNonlinearityGrad = "function",
     prior = "prior"
   ),
+  
   methods = list(
+    
     forwardPass = function(input){
       input <<- input
       output <<- .self$nonlinearity((input %*% coefficients) %plus% biases)
     },
+    
     backwardPass = function(next.error.grad){
       error.grad <<- `*`(
         getNonlinearityGrad(),
@@ -34,6 +37,7 @@ layer = setRefClass(
         h = input
       )
     },
+    
     updateCoefficients = function(){
       grad = coef.grad + prior$getLogGrad(coefficients) 
       grad.step <<- grad * learning.rate + momentum * grad.step
