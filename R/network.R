@@ -26,11 +26,21 @@ network = setRefClass(
       }
     },
     backprop = function(){
+      
+      # Final layer just sees error from the loss gradient
       layers[[n.layers]]$backwardPass(
         lossGradient(y = y[minibatch.ids, ], yhat = layers[[n.layers]]$output)
       )
+      
+      # Earlier layers' error gradients are filtered through the coefficients of
+      # the layer above.
       for(i in (n.layers - 1):1){
-        layers[[i]]$backwardPass(layers[[i + 1]]$error.grad)
+        layers[[i]]$backwardPass(
+          tcrossprod(
+            layers[[i + 1]]$error.grad, 
+            layers[[i + 1]]$coefficients
+          )
+        )
       }
     },
     updateCoefficients = function(){

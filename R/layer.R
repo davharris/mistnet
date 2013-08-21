@@ -27,11 +27,8 @@ layer = setRefClass(
       output <<- .self$nonlinearity(activation)
     },
     
-    backwardPass = function(next.error.grad){
-      error.grad <<- `*`(
-        nonlinearityGrad(activation),
-        tcrossprod(next.error.grad, coefficients)
-      )
+    backwardPass = function(incoming.error.grad){
+      error.grad <<- nonlinearityGrad(activation) * incoming.error.grad
       llik.grad <<- matrixMultiplyGrad(
         n.in = dim[[1]],
         n.out = dim[[2]],
