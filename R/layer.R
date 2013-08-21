@@ -14,7 +14,7 @@ layer = setRefClass(
     learning.rate = "numeric",
     momentum = "numeric",
     nonlinearity = "function",
-    getNonlinearityGrad = "function",
+    nonlinearityGrad = "function",
     prior = "prior",
     dataset.size = "numeric"
   ),
@@ -29,7 +29,7 @@ layer = setRefClass(
     
     backwardPass = function(next.error.grad){
       error.grad <<- `*`(
-        getNonlinearityGrad(),
+        nonlinearityGrad(activation),
         tcrossprod(next.error.grad, coefficients)
       )
       llik.grad <<- matrixMultiplyGrad(
