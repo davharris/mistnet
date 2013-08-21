@@ -50,3 +50,23 @@ layer = setRefClass(
   )
 )
 
+createLayer = function(
+  dim,
+  learning.rate,
+  momentum,
+  prior,
+  dataset.size,
+  nonlinearity
+){
+  layer$new(
+    coefficients = matrix(0, nrow = dim[[1]], ncol = dim[[2]]),
+    biases = rep(0, dim[[2]]),
+    grad.step = matrix(0, nrow = dim[[1]], ncol = dim[[2]]),
+    dim = dim,
+    learning.rate = learning.rate,
+    momentum = momentum,
+    nonlinearity = nonlinearity,
+    prior = prior,
+    dataset.size = dataset.size
+  )
+}
