@@ -40,6 +40,8 @@ layer = setRefClass(
       grad = coef.grad + prior$getLogGrad(coefficients) 
       grad.step <<- grad * learning.rate + momentum * grad.step
       coefficients <<- coefficients + grad.step
+      
+      # TODO: Update biases
     }
   )
 )
