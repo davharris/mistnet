@@ -1,12 +1,12 @@
 context("Gradients")
 
 test_that("sigmoidGrad is accurate", {
-  expect_equal(sigmoidGrad(s = .5), 1/4)
-  expect_equal(sigmoidGrad(s = 1), 0)
-  expect_equal(sigmoidGrad(s = 0), 0)
+  expect_equal(sigmoidGrad(x = 0), 1/4)
+  expect_equal(sigmoidGrad(x = Inf), 0)
+  expect_equal(sigmoidGrad(x = -Inf), 0)
   expect_equal(
     sigmoid(1 + 1E-6) - sigmoid(1 - 1E-6), 
-    sigmoidGrad(sigmoid(1)) * 2E-6
+    sigmoidGrad(x = 1) * 2E-6
   )
 })
 
@@ -47,7 +47,7 @@ test_that("output layer gradient is accurate", {
   error.grad = .5 / eps * (error.plus - error.minus)
   
   expect_equal(
-    - crossEntropyGrad(y = y, yhat = o) * sigmoidGrad(s = o),
+    - crossEntropyGrad(y = y, yhat = o) * sigmoidGrad(x = a),
     error.grad
   )
 })
@@ -63,7 +63,8 @@ test_that("backprop works",{
   w2.plus[target.hidden , ]  = w2[target.hidden , ] + eps / 2
   w2.minus[target.hidden , ] = w2[target.hidden , ] - eps / 2
   
-  o = sigmoid(h %*% w2 %plus% b2)
+  a = h %*% w2 %plus% b2
+  o = sigmoid(a)
   o.plus =  sigmoid(h %*% w2.plus %plus% b2)
   o.minus = sigmoid(h %*% w2.minus %plus% b2)
   
@@ -80,14 +81,14 @@ test_that("backprop works",{
   predicted.grad = -sapply(
     1:n, function(i){
       crossEntropyGrad(y = y, yhat = o)[i, ] * 
-        sigmoidGrad(s = o)[i, ] * 
+        sigmoidGrad(x = a)[i, ] * 
         h[i, target.hidden] 
     }
   )
   
   expect_equal(observed.grad, predicted.grad, tolerance = eps)
   
-  delta = crossEntropyGrad(y = y, yhat = o) * sigmoidGrad(s = o)
+  delta = crossEntropyGrad(y = y, yhat = o) * sigmoidGrad(x = a)
   
   x = matrixMultiplyGrad(
     n.in = n.hid, 
