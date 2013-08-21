@@ -41,6 +41,14 @@ network = setRefClass(
     predict = function(newdata){
       feedForward(newdata)
       return(output)
+    },
+    fit = function(iterations){
+      for(i in 1:iterations){
+        newMinibatch()
+        feedForward()
+        backprop()
+        updateCoefficients()
+      }
     }
   )
 )
