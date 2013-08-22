@@ -55,6 +55,13 @@ createLayer = function(
   dataset.size,
   nonlinearity.name
 ){
+  if(learning.rate > 1 | learning.rate <= 0){
+    stop("learning.rate must be greater than 0 and less than or equal to one")
+  }
+  if(momentum >=1 | momentum < 0){
+    stop("momentum cannot be negative and must be less than one")
+  }
+  
   layer$new(
     coefficients = matrix(0, nrow = dim[[1]], ncol = dim[[2]]),
     biases = rep(0, dim[[2]]),
