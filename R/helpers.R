@@ -7,11 +7,9 @@ crossEntropy = function(y, yhat){
 }
 
 sigmoid = function(x){
-  if(is.matrix(x)){
-    return(sigmoidMatrix(x))
-  }else{
-    return(sigmoidVector(x))
-  }
+  # Benchmarking suggests that this is 20% faster than plogis()  
+  storage.mode(x) = "numeric"
+  binomial()$linkinv(x)
 }
 
 # Note: rectify is defined in src/rectify.cpp

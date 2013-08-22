@@ -20,3 +20,4 @@ Collate:
     'initializeMars.R'
     'prior.R'
     'layer.R'
+    'network.R'
