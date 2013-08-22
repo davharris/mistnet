@@ -97,5 +97,5 @@ test_that("backprop works",{
     input = h
   )
   
-  expect_equal(x[ , target.hidden], rowSums(observed.grad), tolerance = eps)
+  expect_equal(x[target.hidden, ], rowSums(observed.grad), tolerance = eps)
 })
