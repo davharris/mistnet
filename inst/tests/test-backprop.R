@@ -76,3 +76,59 @@ test_that("Backpropagation works",{
     grad[1,1]
   )
 })
+
+
+test_that("Single-layer networks work",{
+  eps = 1E-5
+  x = matrix(rnorm(600), nrow = 30)
+  y = matrix(rnorm(300), nrow = 30)
+  net = network$new(
+    x = x,
+    y = y,
+    layers = list(
+      createLayer(
+        dim = c(ncol(x), ncol(y)),
+        learning.rate = 1,
+        momentum = 0.5,
+        prior = gaussian.prior$new(mean = 0, var = 1),
+        dataset.size = 100,
+        nonlinearity.name = "sigmoid"
+      )
+    ),
+    n.layers = 1L,
+    minibatch.size = 20L,
+    loss = crossEntropy,
+    lossGradient = crossEntropyGrad
+  )
+  
+  starting.coef = matrix(
+    rnorm(length(net$layers[[1]]$coefficients)),
+    nrow = net$layers[[1]]$dim[[1]]
+  )
+  
+  net$layers[[1]]$coefficients = starting.coef
+  
+  
+  net$newMinibatch()
+  net$feedForward()
+  net$backprop()
+  
+  grad = net$layers[[1]]$llik.grad
+  
+  
+  net$layers[[1]]$coefficients[1,1] = net$layers[[1]]$coefficients[1,1] + eps
+  net$feedForward()
+  net$backprop()
+  plus.loss = net$reportLoss()
+  
+  
+  net$layers[[1]]$coefficients[1,1] = net$layers[[1]]$coefficients[1,1] - 2 * eps
+  net$feedForward()
+  net$backprop()
+  minus.loss = net$reportLoss()
+  
+  expect_equal(
+    sum((plus.loss - minus.loss) / 2 / eps),
+    grad[1,1]
+  )
+})
