@@ -61,8 +61,8 @@ plus.error = net$loss(
   yhat = net$layers[[2]]$output
 )
 
-# subtract 2 * eps: once to undo the addition above and once to decrement another
-# eps
+# subtract 2 * eps: once to undo the addition above and once to actually
+# decrement by eps
 net$layers[[2]]$coefficients[1,1] = -2 * eps + net$layers[[2]]$coefficients[1,1]
 net$feedForward()
 net$backprop()
