@@ -12,7 +12,7 @@ rectifyGrad = function(x){
 }
 
 matrixMultiplyGrad = function(n.in, n.out, error.grad, input){
-  -vapply(
+  vapply(
     1:n.out,
     function(i){error.grad[, i] %*% input},
     FUN.VALUE = numeric(n.in)

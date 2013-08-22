@@ -23,6 +23,21 @@ test_that("rectifyGrad is accurate", {
 })
 
 
+test_that("crossEntropyGrad is accurate", {
+  eps = 1E-5
+  x = seq(.1, .9, by = .1)
+  y = crossEntropy(y = 1, yhat = x)
+  y.plus  = crossEntropy(y = 1, yhat = x + eps)
+  y.minus = crossEntropy(y = 1, yhat = x - eps)
+  grad = crossEntropyGrad(y = 1, yhat = x)
+  
+  expect_equal(
+    (y.plus - y.minus)/2 / eps,
+    grad
+  )
+})
+
+
 
 eps = 1E-7
 n = 37
@@ -47,7 +62,7 @@ test_that("output layer gradient is accurate", {
   error.grad = .5 / eps * (error.plus - error.minus)
   
   expect_equal(
-    - crossEntropyGrad(y = y, yhat = o) * sigmoidGrad(x = a),
+    crossEntropyGrad(y = y, yhat = o) * sigmoidGrad(x = a),
     error.grad
   )
 })
@@ -83,7 +98,7 @@ test_that("backprop works",{
   )
   predicted.grad = -sapply(
     1:n, function(i){
-      crossEntropyGrad(y = y, yhat = o)[i, ] * 
+      -crossEntropyGrad(y = y, yhat = o)[i, ] * 
         sigmoidGrad(x = a)[i, ] * 
         h[i, target.hidden] 
     }

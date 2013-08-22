@@ -129,6 +129,7 @@ test_that("Single-layer networks work",{
   
   expect_equal(
     sum((plus.loss - minus.loss) / 2 / eps),
-    grad[1,1]
+    grad[1,1],
+    tolerance = eps
   )
 })

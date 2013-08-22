@@ -3,7 +3,7 @@
 }
 
 crossEntropy = function(y, yhat){
-  y * log(yhat) + (1 - y) * log(1 - yhat)
+  -(y * log(yhat) + (1 - y) * log(1 - yhat))
 }
 
 sigmoid = function(x){
