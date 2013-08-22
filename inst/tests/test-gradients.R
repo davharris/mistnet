@@ -52,6 +52,9 @@ test_that("output layer gradient is accurate", {
   )
 })
 
+
+# This test has largely been duplicated in test-backprop.R and should probably
+# be removed.  It's not hurting anything right now, though...
 test_that("backprop works",{
   h = matrix(rnorm(n * n.hid), nrow = n) / 10
   b2 = rnorm(n.out)
