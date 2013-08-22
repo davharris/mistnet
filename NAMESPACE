@@ -1,2 +1,2 @@
-useDynLib(marsrover)
+useDynLib(mistnet)
 exportPattern("^[[:alpha:]]+")

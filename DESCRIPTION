@@ -1,13 +1,13 @@
-Package: marsrover
+Package: mistnet
 Type: Package
-Title: What the package does (short line)
+Title: Stochastic neural networks
 Version: 0.0.1
-Date: 2013-07-06
+Date: 2013-08-22
 Author: David J. Harris
 Maintainer: David J. Harris <DavHarris@UCDavis.edu>
 Description: More about what it does (maybe more than one
     line)
-License: GPL 2.0
+License: MIT
 Depends:
     Rcpp (>= 0.10.3),
     testthat,

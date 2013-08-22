@@ -2,10 +2,10 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 rcpp_add_biases <- function(m, v) {
-    .Call('marsrover_rcpp_add_biases', PACKAGE = 'marsrover', m, v)
+    .Call('mistnet_rcpp_add_biases', PACKAGE = 'mistnet', m, v)
 }
 
 rectify <- function(m) {
-    .Call('marsrover_rectify', PACKAGE = 'marsrover', m)
+    .Call('mistnet_rectify', PACKAGE = 'mistnet', m)
 }
 

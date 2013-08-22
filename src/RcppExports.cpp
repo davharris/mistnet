@@ -7,7 +7,7 @@ using namespace Rcpp;
 
 // rcpp_add_biases
 NumericMatrix rcpp_add_biases(NumericMatrix m, NumericVector v);
-RcppExport SEXP marsrover_rcpp_add_biases(SEXP mSEXP, SEXP vSEXP) {
+RcppExport SEXP mistnet_rcpp_add_biases(SEXP mSEXP, SEXP vSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -23,7 +23,7 @@ END_RCPP
 }
 // rectify
 NumericMatrix rectify(NumericMatrix m);
-RcppExport SEXP marsrover_rectify(SEXP mSEXP) {
+RcppExport SEXP mistnet_rectify(SEXP mSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
