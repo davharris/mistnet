@@ -43,11 +43,17 @@ net$backprop()
 expect_true(all(net$layers[[1]]$llik.grad == 0))
 
 
+# Set coefficients to random values
+net$layers[[1]]$coefficients[ , ] = rnorm(net$layers[[1]]$coefficients)
+net$layers[[2]]$coefficients[ , ] = rnorm(net$layers[[2]]$coefficients)
+
 # Compare the computed gradient for layer 2 with a finite difference 
 # approximation
+net$feedForward()
+net$backprop()
 grad = net$layers[[2]]$llik.grad
 
-net$layers[[2]]$coefficients[1,1] = eps
+net$layers[[2]]$coefficients[1,1] = eps + net$layers[[2]]$coefficients[1,1]
 net$feedForward()
 net$backprop()
 plus.error = net$loss(
@@ -55,7 +61,9 @@ plus.error = net$loss(
   yhat = net$layers[[2]]$output
 )
 
-net$layers[[2]]$coefficients[1,1] = -eps
+# subtract 2 * eps: once to undo the addition above and once to decrement another
+# eps
+net$layers[[2]]$coefficients[1,1] = -2 * eps + net$layers[[2]]$coefficients[1,1]
 net$feedForward()
 net$backprop()
 minus.error = net$loss(
@@ -64,7 +72,7 @@ minus.error = net$loss(
 )
 
 expect_equal(
-  sum((plus.error - minus.error) / 2 / eps),
+  sum((plus.error - minus.error)) / 2 / eps,
   grad[1,1]
 )
 })
