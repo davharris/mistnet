@@ -16,7 +16,8 @@ layer = setRefClass(
     nonlinearity = "function",
     nonlinearityGrad = "function",
     prior = "prior",
-    dataset.size = "numeric"
+    dataset.size = "numeric",
+    dropout = "logical"
   ),
   
   methods = list(
@@ -25,6 +26,9 @@ layer = setRefClass(
       input <<- input
       activation <<- (input %*% coefficients) %plus% biases
       output <<- .self$nonlinearity(activation)
+      if(dropout){
+        output <<- output * dropoutMask(nrow(output), dim[[2]])
+      }
     },
     
     backwardPass = function(incoming.error.grad){
@@ -53,7 +57,8 @@ createLayer = function(
   momentum,
   prior,
   dataset.size,
-  nonlinearity.name
+  nonlinearity.name,
+  dropout = FALSE
 ){
   if(learning.rate > 1 | learning.rate <= 0){
     stop("learning.rate must be greater than 0 and less than or equal to one")
@@ -72,6 +77,7 @@ createLayer = function(
     nonlinearity = get(nonlinearity.name, mode = "function"),
     nonlinearityGrad = get(paste0(nonlinearity.name, "Grad"), mode = "function"),
     prior = prior,
-    dataset.size = dataset.size
+    dataset.size = dataset.size,
+    dropout = dropout
   )
 }

@@ -4,7 +4,8 @@ test_that("Single-layer feedforward works", {
   l = layer$new(
     biases = 1:7,
     coefficients = matrix(rnorm(28), nrow = 4),
-    nonlinearity = rectify
+    nonlinearity = rectify,
+    dropout = FALSE
   )
   l.copy = l$copy()
   
@@ -44,12 +45,14 @@ test_that("Multi-layer feedforward works", {
         biases = rnorm(6),
         coefficients = matrix(rnorm(30), nrow = 5),
         nonlinearity = rectify,
-        dim = c(5L, 6L)
+        dim = c(5L, 6L),
+        dropout = FALSE
       ),
       l2 = layer$new(
         biases = rnorm(7),
         coefficients = matrix(rnorm(42), nrow = 6),
-        nonlinearity = sigmoid
+        nonlinearity = sigmoid,
+        dropout = FALSE
       )
     ),
     n.layers = 2L,
