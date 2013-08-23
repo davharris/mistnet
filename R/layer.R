@@ -46,7 +46,13 @@ layer = setRefClass(
       grad.step <<- grad * learning.rate + momentum * grad.step
       coefficients <<- coefficients + grad.step
       
-      # TODO: Update biases
+      
+      # Hinton suggested the factor of 10 in his "practical guide" for RBMs,
+      # if I recall correctly.  The idea is that biases' gradients are easier
+      # to estimate reliably, so we can move farther along them.
+      # Also, I don't have any momentum for biases at the moment, so this should
+      # allow them to keep up better.
+      biases <<- biases - colMeans(error.grad) * learning.rate * 10
     }
   )
 )
