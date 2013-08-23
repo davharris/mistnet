@@ -42,7 +42,7 @@ layer = setRefClass(
     },
     
     updateCoefficients = function(){
-      grad = llik.grad + prior$getLogGrad(coefficients) / dataset.size
+      grad = -llik.grad + prior$getLogGrad(coefficients) / dataset.size
       grad.step <<- grad * learning.rate + momentum * grad.step
       coefficients <<- coefficients + grad.step
       
