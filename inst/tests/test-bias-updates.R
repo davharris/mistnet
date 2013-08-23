@@ -20,7 +20,7 @@ test_that("biases update correctly",{
       )
     ),
     n.layers = 1L,
-    minibatch.size = 10L,
+    minibatch.size = 11L,
     loss = crossEntropy,
     lossGradient = crossEntropyGrad
   )
@@ -32,7 +32,7 @@ test_that("biases update correctly",{
   net$fit(1)
   
   # factor of 10 is baked into bias update.  See comment there.
-  grad = (initial.biases - net$layers[[1]]$biases)
+  grad = (initial.biases - net$layers[[1]]$biases) / 10
   
   
   net$layers[[1]]$coefficients[ , ] = 0

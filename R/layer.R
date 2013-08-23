@@ -52,7 +52,7 @@ layer = setRefClass(
       # to estimate reliably, so we can move farther along them.
       # Also, I don't have any momentum for biases at the moment, so this should
       # allow them to keep up better.
-      biases <<- biases - colMeans(error.grad) * learning.rate * 10
+      biases <<- biases - colSums(error.grad) * learning.rate * 10
     }
   )
 )
