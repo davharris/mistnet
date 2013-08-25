@@ -11,6 +11,10 @@ rectifyGrad = function(x){
   x > 0
 }
 
+linearGrad = function(x){
+  1
+}
+
 matrixMultiplyGrad = function(n.in, n.out, error.grad, input){
   vapply(
     1:n.out,

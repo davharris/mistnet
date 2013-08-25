@@ -12,6 +12,10 @@ sigmoid = function(x){
   binomial()$linkinv(x)
 }
 
+linear = function(x){
+  x
+}
+
 # Note: rectify is defined in src/rectify.cpp
 
 # based on the "josh" function from 
