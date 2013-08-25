@@ -96,7 +96,7 @@ test_that("Single-layer networks work",{
       )
     ),
     n.layers = 1L,
-    minibatch.size = 20L,
+    minibatch.size = 23L,
     loss = crossEntropy,
     lossGradient = crossEntropyGrad
   )
