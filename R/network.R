@@ -13,7 +13,7 @@ network = setRefClass(
   methods = list(
     newMinibatch = function(row.nums){
       if(missing(row.nums)){
-        minibatch.ids <<- sample.int(minibatch.size, replace = FALSE)
+        minibatch.ids <<- sample.int(nrow(x), minibatch.size, replace = FALSE)
       }else{
         # Should this check that length(row.nums) == minibatch.size?
         minibatch.ids <<- row.nums
