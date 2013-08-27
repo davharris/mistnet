@@ -6,7 +6,7 @@ test_that("Backpropagation works",{
   
   net = network$new(
     x = matrix(rnorm(99), nrow = 33, ncol = 3),
-    y = dropoutMask(20, 7),
+    y = dropoutMask(99, 7),
     layers = list(
       l1 = createLayer(
         dim = c(3L, 6L),
