@@ -17,7 +17,10 @@ layer = setRefClass(
     nonlinearityGrad = "function",
     prior = "prior",
     dataset.size = "numeric",
-    dropout = "logical"
+    dropout = "logical",
+    importance.errors = "numeric",
+    importance.llik.grads = "array",
+    importance.bias.grads = "matrix"
   ),
   
   methods = list(

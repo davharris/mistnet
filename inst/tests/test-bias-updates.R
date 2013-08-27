@@ -22,7 +22,8 @@ test_that("biases update correctly",{
     n.layers = 1L,
     minibatch.size = 11L,
     loss = crossEntropy,
-    lossGradient = crossEntropyGrad
+    lossGradient = crossEntropyGrad,
+    n.importance.samples = 1L
   )
   
   initial.biases = rnorm(ncol(y))

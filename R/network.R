@@ -7,6 +7,7 @@ network = setRefClass(
     n.layers = "integer",
     minibatch.size = "integer",
     minibatch.ids = "integer",
+    n.importance.samples = "integer",
     loss = "function",
     lossGradient = "function"
   ),
@@ -64,10 +65,22 @@ network = setRefClass(
     fit = function(iterations){
       for(i in 1:iterations){
         newMinibatch()
-        feedForward()
-        backprop()
+        for(i in 1:n.importance.samples){
+          sampleXFromPrior()
+          feedForward()
+          backprop()
+        }
+        if(n.importance.samples > 1){
+          averageSampleGradients()
+        }
         updateCoefficients()
       }
+    },
+    sampleXFromPrior = function(){
+      # Do nothing
+    },
+    averageSampleGradients = function(){
+      # Do nothing
     },
     reportLoss = function(){
       loss(y = y[minibatch.ids, ], yhat = layers[[n.layers]]$output)
