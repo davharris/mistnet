@@ -65,13 +65,15 @@ network = setRefClass(
     fit = function(iterations){
       for(i in 1:iterations){
         newMinibatch()
-        for(i in 1:n.importance.samples){
-          sampleXFromPrior()
+        for(j in 1:n.importance.samples){
+          if(n.importance.samples > 1){sampleXFromPrior()}
           feedForward()
           backprop()
+          if(n.importance.samples > 1){saveGradients(j)}
         }
         if(n.importance.samples > 1){
           averageSampleGradients()
+          resetSavedGradients()
         }
         updateCoefficients()
       }
@@ -80,6 +82,9 @@ network = setRefClass(
       # Do nothing
     },
     averageSampleGradients = function(){
+      # Do nothing
+    },
+    resetSavedGradients = function(){
       # Do nothing
     },
     reportLoss = function(){
