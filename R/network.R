@@ -113,9 +113,9 @@ network = setRefClass(
       layer$llik.grad = 0
       
       for(layer in layers){
-        for(j in 1:n.importance.samples){
-          layer$bias.grad = layer$bias.grad + weights[j] * bias.grads[ , iter]
-          layer$llik.grad = layer$llik.grad + weights[j] * llik.grads[ , , iter]
+        for(i in 1:n.importance.samples){
+          layer$bias.grad = layer$bias.grad + weights[i] * bias.grads[ , iter]
+          layer$llik.grad = layer$llik.grad + weights[i] * llik.grads[ , , iter]
         }
       }
     },
