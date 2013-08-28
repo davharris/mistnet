@@ -21,6 +21,10 @@ test_that("minibatch generation works",{
   
   
   net$minibatch.size = as.integer(n/2)
+  net$newMinibatch()
+  expect_equal(length(net$minibatch.ids), net$minibatch.size)
+  
+  
   counts = integer(n)
   for(i in 1:niter){
     net$newMinibatch()
