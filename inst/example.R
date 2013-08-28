@@ -38,7 +38,8 @@ net = network$new(
   loss = crossEntropy,
   lossGradient = crossEntropyGrad,
   minibatch.size = 50L,
-  n.layers = 3L
+  n.layers = 3L,
+  n.importance.samples = 1L
 )
 
 net$layers[[3]]$biases = qlogis(colMeans(route.presence.absence))
