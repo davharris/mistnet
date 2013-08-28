@@ -9,7 +9,9 @@ network = setRefClass(
     minibatch.ids = "integer",
     n.importance.samples = "integer",
     loss = "function",
-    lossGradient = "function"
+    lossGradient = "function",
+    randomizeX = "function",
+    importance.errors = "numeric"
   ),
   methods = list(
     newMinibatch = function(row.nums){
@@ -66,26 +68,50 @@ network = setRefClass(
       for(i in 1:iterations){
         newMinibatch()
         for(j in 1:n.importance.samples){
-          if(n.importance.samples > 1){sampleXFromPrior()}
+          x <<- randomizeX() # Default for randomizeX should be identity()
           feedForward()
           backprop()
-          if(n.importance.samples > 1){saveGradients(j)}
+          if(n.importance.samples > 1){
+            saveGradients(j)
+            saveImportanceError(j)
+          }
         }
         if(n.importance.samples > 1){
           averageSampleGradients()
-          resetSavedGradients()
+          resetImportanceSampler()
         }
         updateCoefficients()
       }
     },
-    sampleXFromPrior = function(){
-      # Do nothing
+    saveGradients = function(sample.number){
+      for(layer in layers){
+        layer$importance.bias.grads[ , sample.number] = layer$bias.grad
+        layer$importance.llik.grads[ , , sample.number] = layer$llik.grad
+      }
     },
     averageSampleGradients = function(){
-      # Do nothing
+      unscaled.weights = exp(min(importance.errors) - importance.errors)
+      weights = unscaled.weights / sum(unscaled.weights)
+      
+      layer$bias.grad = 0
+      layer$llik.grad = 0
+      
+      for(layer in layers){
+        for(j in 1:n.importance.samples){
+          layer$bias.grad = layer$bias.grad + weights[j] * bias.grads[ , iter]
+          layer$llik.grad = layer$llik.grad + weights[j] * llik.grads[ , , iter]
+        }
+      }
     },
-    resetSavedGradients = function(){
-      # Do nothing
+    resetImportanceSampler = function(){
+      "If everything is working properly, this shouldn't be necessary. But this
+      step is still useful because it might prevent the code from failing
+      silently."
+      
+      # TODO
+    },
+    saveImportanceError = function(sample.number){
+      importance.errors[sample.number] <<- sum(reportLoss())
     },
     reportLoss = function(){
       loss(y = y[minibatch.ids, ], yhat = layers[[n.layers]]$output)
