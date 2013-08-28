@@ -11,7 +11,7 @@ network = setRefClass(
     loss = "function",
     lossGradient = "function",
     ranefSample = "function",
-    n.ranef = "integer"
+    n.ranef = "integer",
     importance.errors = "numeric"  
   ),
   methods = list(
@@ -68,13 +68,15 @@ network = setRefClass(
     fit = function(iterations){
       for(i in 1:iterations){
         
+        # Step 1: pick a minibatch.
         newMinibatch()
         
+        # Step 2: Find gradients on that minibatch.
         if(n.importance.samples == 1L){
           feedForward()
           backprop()
-          updateCoefficients()
         }else{
+          # TODO: This should be broken into its own function.
           for(j in 1:n.importance.samples){
             feedForward(
               cbind(
@@ -86,10 +88,13 @@ network = setRefClass(
             saveGradients(j)
             saveImportanceError(j)
           }
+          
           averageSampleGradients()
           resetImportanceSampler()
-          updateCoefficients()
         }
+        
+        # Step 3: Update coefficients.
+        updateCoefficients()
       }
     },
     saveGradients = function(sample.number){
