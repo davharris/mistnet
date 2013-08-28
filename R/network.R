@@ -10,8 +10,8 @@ network = setRefClass(
     n.importance.samples = "integer",
     loss = "function",
     lossGradient = "function",
-    randomizeX = "function",
-    importance.errors = "numeric"
+    ranefSampler = "function",
+    importance.errors = "numeric"  
   ),
   methods = list(
     newMinibatch = function(row.nums){
@@ -66,21 +66,24 @@ network = setRefClass(
     },
     fit = function(iterations){
       for(i in 1:iterations){
+        
         newMinibatch()
-        for(j in 1:n.importance.samples){
-          x <<- randomizeX() # Default for randomizeX should be identity()
+        
+        if(n.importance.samples == 1L){
           feedForward()
           backprop()
-          if(n.importance.samples > 1){
+          updateCoefficients()
+        }else{
+          for(j in 1:n.importance.samples){
+            feedForward(cbind(x[minibatch.ids, ], ranefSample()))
+            backprop()
             saveGradients(j)
             saveImportanceError(j)
           }
-        }
-        if(n.importance.samples > 1){
           averageSampleGradients()
           resetImportanceSampler()
+          updateCoefficients()
         }
-        updateCoefficients()
       }
     },
     saveGradients = function(sample.number){
