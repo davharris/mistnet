@@ -10,7 +10,8 @@ network = setRefClass(
     n.importance.samples = "integer",
     loss = "function",
     lossGradient = "function",
-    ranefSampler = "function",
+    ranefSample = "function",
+    n.ranef = "integer"
     importance.errors = "numeric"  
   ),
   methods = list(
@@ -75,7 +76,12 @@ network = setRefClass(
           updateCoefficients()
         }else{
           for(j in 1:n.importance.samples){
-            feedForward(cbind(x[minibatch.ids, ], ranefSample()))
+            feedForward(
+              cbind(
+                x[minibatch.ids, ], 
+                ranefSample(nrow = minibatch.size, ncol = n.ranef)
+              )
+            )
             backprop()
             saveGradients(j)
             saveImportanceError(j)
