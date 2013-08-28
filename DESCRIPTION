@@ -1,8 +1,8 @@
 Package: mistnet
 Type: Package
 Title: Stochastic neural networks
-Version: 0.0.1
-Date: 2013-08-22
+Version: 0.1.0
+Date: 2013-08-28
 Author: David J. Harris
 Maintainer: David J. Harris <DavHarris@UCDavis.edu>
 Description: More about what it does (maybe more than one
