@@ -21,3 +21,4 @@ Collate:
     'prior.R'
     'layer.R'
     'network.R'
+    'ranefSample.R'
