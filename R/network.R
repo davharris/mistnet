@@ -76,26 +76,28 @@ network = setRefClass(
           feedForward()
           backprop()
         }else{
-          # TODO: This should be broken into its own function.
-          for(j in 1:n.importance.samples){
-            feedForward(
-              cbind(
-                x[minibatch.ids, ], 
-                ranefSample(nrow = minibatch.size, ncol = n.ranef)
-              )
-            )
-            backprop()
-            saveGradients(j)
-            saveImportanceError(j)
-          }
-          
-          averageSampleGradients()
-          resetImportanceSampler()
+          findImportanceSampleGradients()
         }
         
         # Step 3: Update coefficients.
         updateCoefficients()
       }
+    },
+    findImportanceSampleGradients = function(){
+      for(j in 1:n.importance.samples){
+        feedForward(
+          cbind(
+            x[minibatch.ids, ], 
+            ranefSample(nrow = minibatch.size, ncol = n.ranef)
+          )
+        )
+        backprop()
+        saveGradients(j)
+        saveImportanceError(j)
+      }
+      
+      averageSampleGradients()
+      resetImportanceSampler()
     },
     saveGradients = function(sample.number){
       for(layer in layers){
