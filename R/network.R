@@ -1,3 +1,5 @@
+# documentation should note that ranefSample should have mean zero.
+
 network = setRefClass(
   Class = "network",
   fields = list(
