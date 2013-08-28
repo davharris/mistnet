@@ -122,11 +122,16 @@ network = setRefClass(
       }
     },
     resetImportanceSampler = function(){
-      "If everything is working properly, this shouldn't be necessary. But this
-      step is still useful because it might prevent the code from failing
-      silently."
+      "Fill importance grads with NAs.
       
-      # TODO
+      If everything is working properly, this shouldn't be necessary. But this
+      step is still useful because it might prevent the code from failing
+      silently.  I may remove this step later if it's a performance problem"
+      
+      for(layer in layers){
+        layer$importance.bias.grads[ , ] = NA
+        layer$importance.llik.grads[ , , ] = NA
+      }
     },
     saveImportanceError = function(sample.number){
       importance.errors[sample.number] <<- sum(reportLoss())
