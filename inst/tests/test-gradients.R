@@ -22,6 +22,11 @@ test_that("rectifyGrad is accurate", {
   )
 })
 
+test_that("linearGrad is accurate", {
+  x = matrix(1:1000, nrow = 10)
+  expect_equal(linearGrad(x), 1)
+})
+
 
 test_that("crossEntropyGrad is accurate", {
   eps = 1E-5

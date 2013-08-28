@@ -23,3 +23,12 @@ test_that("rectify produces accurate values", {
   # overwrite x.  This makes sure x hasn't been rectified
   expect_equal(x, matrix(seq(-10, 10, length = 1E4), ncol = 2))
 })
+
+
+test_that("'linear nonlinearity' produces accurate values", {
+  x = matrix(rnorm(100000), nrow = 10)
+  expect_equal(
+    linear(x),
+    x
+  )
+})
