@@ -80,6 +80,17 @@ net$minibatch.size = nrow(xx)
 net$minibatch.ids = 1:nrow(xx)
 net$feedForward()
 
-
 mean(rowSums(net$reportLoss()))
-plot(prcomp(qlogis(net$layers[[3]]$output)))
+plot(prcomp(net$layers[[2]]$output))
+
+
+
+net$feedForward(f$S)
+library(ggplot2)
+color = predict(prcomp(net$layers[[2]]$output))[,1]
+qplot(
+  latlon[,1],
+  latlon[,2],
+  color = color,
+  cex = 2
+) + coord_equal() + scale_color_gradient2()
