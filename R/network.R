@@ -1,3 +1,5 @@
+# documentation should note that ranefSample should have mean zero.
+
 network = setRefClass(
   Class = "network",
   fields = list(
@@ -9,7 +11,10 @@ network = setRefClass(
     minibatch.ids = "integer",
     n.importance.samples = "integer",
     loss = "function",
-    lossGradient = "function"
+    lossGradient = "function",
+    ranefSample = "function",
+    n.ranef = "integer",
+    importance.errors = "numeric"  
   ),
   methods = list(
     newMinibatch = function(row.nums){
@@ -64,28 +69,72 @@ network = setRefClass(
     },
     fit = function(iterations){
       for(i in 1:iterations){
+        
+        # Step 1: pick a minibatch.
         newMinibatch()
-        for(j in 1:n.importance.samples){
-          if(n.importance.samples > 1){sampleXFromPrior()}
+        
+        # Step 2: Find gradients on that minibatch.
+        if(n.importance.samples == 1L){
           feedForward()
           backprop()
-          if(n.importance.samples > 1){saveGradients(j)}
+        }else{
+          findImportanceSampleGradients()
         }
-        if(n.importance.samples > 1){
-          averageSampleGradients()
-          resetSavedGradients()
-        }
+        
+        # Step 3: Update coefficients.
         updateCoefficients()
       }
     },
-    sampleXFromPrior = function(){
-      # Do nothing
+    findImportanceSampleGradients = function(){
+      for(j in 1:n.importance.samples){
+        feedForward(
+          cbind(
+            x[minibatch.ids, ], 
+            ranefSample(nrow = minibatch.size, ncol = n.ranef)
+          )
+        )
+        backprop()
+        saveGradients(j)
+        saveImportanceError(j)
+      }
+      
+      averageSampleGradients()
+      resetImportanceSampler()
+    },
+    saveGradients = function(sample.number){
+      for(layer in layers){
+        layer$importance.bias.grads[ , sample.number] = layer$bias.grad
+        layer$importance.llik.grads[ , , sample.number] = layer$llik.grad
+      }
     },
     averageSampleGradients = function(){
-      # Do nothing
+      unscaled.weights = exp(min(importance.errors) - importance.errors)
+      weights = unscaled.weights / sum(unscaled.weights)
+      
+      layer$bias.grad = 0
+      layer$llik.grad = 0
+      
+      for(layer in layers){
+        for(i in 1:n.importance.samples){
+          layer$bias.grad = layer$bias.grad + weights[i] * bias.grads[ , iter]
+          layer$llik.grad = layer$llik.grad + weights[i] * llik.grads[ , , iter]
+        }
+      }
     },
-    resetSavedGradients = function(){
-      # Do nothing
+    resetImportanceSampler = function(){
+      "Fill importance grads with NAs.
+      
+      If everything is working properly, this shouldn't be necessary. But this
+      step is still useful because it might prevent the code from failing
+      silently.  I may remove this step later if it's a performance problem"
+      
+      for(layer in layers){
+        layer$importance.bias.grads[ , ] = NA
+        layer$importance.llik.grads[ , , ] = NA
+      }
+    },
+    saveImportanceError = function(sample.number){
+      importance.errors[sample.number] <<- sum(reportLoss())
     },
     reportLoss = function(){
       loss(y = y[minibatch.ids, ], yhat = layers[[n.layers]]$output)
