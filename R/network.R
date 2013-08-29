@@ -42,7 +42,7 @@ network = setRefClass(
       
       # Final layer just sees error from the loss gradient
       layers[[n.layers]]$backwardPass(
-        lossGradient(y = y[minibatch.ids, ], yhat = layers[[n.layers]]$output)
+        lossGradient(y = y[minibatch.ids, ], yhat = returnOutput())
       )
       
       # Earlier layers' error gradients are filtered through the coefficients of
