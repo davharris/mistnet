@@ -1,7 +1,7 @@
 context("Minibatch generation")
 test_that("minibatch generation works",{
   n = 1001L
-  niter = net$minibatch.size = n
+  niter = n
   set.seed(1)
   
   net = network$new(
