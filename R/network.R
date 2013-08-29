@@ -138,6 +138,9 @@ network = setRefClass(
     },
     reportLoss = function(){
       loss(y = y[minibatch.ids, ], yhat = layers[[n.layers]]$output)
+    },
+    returnOutput = function(){
+      layers[[n.layers]]$output
     }
   )
 )
