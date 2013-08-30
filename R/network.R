@@ -106,15 +106,20 @@ network = setRefClass(
       }
     },
     averageSampleGradients = function(){
-      unscaled.weights = exp(min(importance.errors) - importance.errors)
-      weights = unscaled.weights / sum(unscaled.weights)
+      unscaled.weights = t(apply(
+        importance.errors, 
+        1,
+        function(x) exp(min(x) - x)
+      ))
+      weights = colMeans(unscaled.weights / rowSums(unscaled.weights))
       
       for(lay in layers){
         lay$bias.grad = 0 * lay$bias.grad
         lay$llik.grad = 0 * lay$llik.grad
         for(i in 1:n.importance.samples){
-          lay$bias.grad = lay$bias.grad + weights[i] * lay$importance.bias.grads[ , i]
-          lay$llik.grad = lay$llik.grad + weights[i] * lay$importance.llik.grads[ , , i]
+          w = weights[i]
+          lay$bias.grad = lay$bias.grad + w * lay$importance.bias.grads[ , i]
+          lay$llik.grad = lay$llik.grad + w * lay$importance.llik.grads[ , , i]
         }
       }
     },
