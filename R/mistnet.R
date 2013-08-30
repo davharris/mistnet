@@ -14,9 +14,16 @@ mistnet = function(
 ){
   n.layers = length(nonlinearity.names)
   stopifnot(length(priors) == n.layers)
-  stopifnot((length(hidden.dims) + 2) == n.layers)
+  stopifnot((length(hidden.dims) + 1L) == n.layers)
   
-  network.dims = c(ncol(x) + n.ranef, hidden.dims, ncol(y))
+  stopifnot(hidden.dims == as.integer(hidden.dims))
+  stopifnot(n.ranef == as.integer(n.ranef))
+  stopifnot(n.ranef == as.integer(n.ranef))
+  
+  
+  network.dims = as.integer(
+    c(ncol(x) + n.ranef, hidden.dims, ncol(y))
+  )
   
   stopifnot(nrow(x) == nrow(y))
   dataset.size = nrow(x)
@@ -48,6 +55,7 @@ mistnet = function(
   ) 
   
   # Coefficients can't all start at zero!
+  # Final layer's biases shouldn't be zero either!
   
   net$fit(training.iterations)
   
