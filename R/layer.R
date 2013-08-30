@@ -19,7 +19,6 @@ layer = setRefClass(
     prior = "prior",
     dataset.size = "numeric",
     dropout = "logical",
-    importance.errors = "matrix",
     importance.llik.grads = "array",
     importance.bias.grads = "matrix",
     n.importance.samples = "integer"
@@ -92,7 +91,6 @@ createLayer = function(
     dataset.size = dataset.size,
     n.importance.samples = n.importance.samples,
     dropout = dropout,
-    importance.errors = matrix(NA, nrow = , ncol = n.importance.samples),
     importance.llik.grads = array(
       NA, 
       dim = c(dim[[1]], dim[[2]], n.importance.samples)
