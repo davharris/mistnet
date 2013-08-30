@@ -98,7 +98,6 @@ network = setRefClass(
       }
       
       averageSampleGradients()
-      resetImportanceSampler()
     },
     saveGradients = function(sample.number){
       for(lay in layers){
@@ -117,18 +116,6 @@ network = setRefClass(
           lay$bias.grad = lay$bias.grad + weights[i] * lay$importance.bias.grads[ , i]
           lay$llik.grad = lay$llik.grad + weights[i] * lay$importance.llik.grads[ , , i]
         }
-      }
-    },
-    resetImportanceSampler = function(){
-      "Fill importance grads with NAs.
-      
-      If everything is working properly, this shouldn't be necessary. But this
-      step is still useful because it might prevent the code from failing
-      silently.  I may remove this step later if it's a performance problem"
-      
-      for(lay in layers){
-        lay$importance.bias.grads[ , ] = NA
-        lay$importance.llik.grads[ , , ] = NA
       }
     },
     saveImportanceError = function(sample.number){

@@ -64,7 +64,7 @@ net$layers[[3]]$coefficients[,] = rt(length(net$layers[[3]]$coefficients), df = 
 
 net$fit(1)
 
-losses = numeric(1E4)
+losses = numeric(2E2)
 for(i in 1:(length(losses))){
   net$fit(1)
   losses[i] = mean(rowSums(net$reportLoss()))
@@ -92,14 +92,24 @@ head(sort(z[,"Veery"], decreasing=TRUE), 11)[-1]
 
 net$minibatch.size = nrow(xx)
 net$minibatch.ids = 1:nrow(xx)
-net$feedForward()
+net$feedForward(
+  cbind(
+    xx, 
+    net$ranefSample(nrow = net$minibatch.size, ncol = n.ranef)
+  )
+)
 
 mean(rowSums(net$reportLoss()))
 plot(prcomp(net$layers[[2]]$output))
 
 
 
-net$feedForward(f$S)
+net$feedForward(
+  cbind(
+    f$S, 
+    net$ranefSample(nrow = nrow(f$S), ncol = n.ranef)
+  )
+)
 library(ggplot2)
 color = predict(prcomp(net$layers[[2]]$output))[,1]
 qplot(
