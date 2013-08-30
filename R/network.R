@@ -58,8 +58,8 @@ network = setRefClass(
       }
     },
     updateCoefficients = function(){
-      for(layer in layers){
-        layer$updateCoefficients()
+      for(lay in layers){
+        lay$updateCoefficients()
       }
     },
     predict = function(newdata){
@@ -101,22 +101,21 @@ network = setRefClass(
       resetImportanceSampler()
     },
     saveGradients = function(sample.number){
-      for(layer in layers){
-        layer$importance.bias.grads[ , sample.number] = layer$bias.grad
-        layer$importance.llik.grads[ , , sample.number] = layer$llik.grad
+      for(lay in layers){
+        lay$importance.bias.grads[ , sample.number] = lay$bias.grad
+        lay$importance.llik.grads[ , , sample.number] = lay$llik.grad
       }
     },
     averageSampleGradients = function(){
       unscaled.weights = exp(min(importance.errors) - importance.errors)
       weights = unscaled.weights / sum(unscaled.weights)
       
-      layer$bias.grad = 0
-      layer$llik.grad = 0
-      
-      for(layer in layers){
+      for(lay in layers){
+        lay$bias.grad = 0 * lay$bias.grad
+        lay$llik.grad = 0 * lay$llik.grad
         for(i in 1:n.importance.samples){
-          layer$bias.grad = layer$bias.grad + weights[i] * bias.grads[ , iter]
-          layer$llik.grad = layer$llik.grad + weights[i] * llik.grads[ , , iter]
+          lay$bias.grad = lay$bias.grad + weights[i] * lay$importance.bias.grads[ , i]
+          lay$llik.grad = lay$llik.grad + weights[i] * lay$importance.llik.grads[ , , i]
         }
       }
     },
@@ -127,9 +126,9 @@ network = setRefClass(
       step is still useful because it might prevent the code from failing
       silently.  I may remove this step later if it's a performance problem"
       
-      for(layer in layers){
-        layer$importance.bias.grads[ , ] = NA
-        layer$importance.llik.grads[ , , ] = NA
+      for(lay in layers){
+        lay$importance.bias.grads[ , ] = NA
+        lay$importance.llik.grads[ , , ] = NA
       }
     },
     saveImportanceError = function(sample.number){

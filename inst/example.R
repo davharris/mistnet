@@ -2,8 +2,13 @@ devtools::load_all()
 load("birds.Rdata")
 library(fastICA)
 
+n.ranef = 3L
+n.importance.samples = 2L
+
 n.layer1 = 20L
 n.layer2 = 4L
+
+minibatch.size = 50L
 
 f = fastICA(scale(env), 10)
 xx = f$S[in.train, ]
@@ -13,12 +18,13 @@ net = network$new(
   y = route.presence.absence[in.train, ],
   layers = list(
     createLayer(
-      dim = c(ncol(env), n.layer1),
+      dim = c(ncol(env) + n.ranef, n.layer1),
       learning.rate = 1E-4,
       momentum = 0,
       prior = gaussian.prior(mean = 0, var = .0001),
       dataset.size = nrow(env),
       nonlinearity.name = "rectify",
+      n.importance.samples = n.importance.samples,
       dropout = FALSE
     ),
     createLayer(
@@ -27,7 +33,8 @@ net = network$new(
       momentum = 0,
       prior = gaussian.prior(mean = 0, var = .0001),
       dataset.size = nrow(env),
-      nonlinearity.name = "linear"
+      nonlinearity.name = "linear",
+      n.importance.samples = n.importance.samples
     ),
     createLayer(
       dim = c(n.layer2, ncol(route.presence.absence)),
@@ -35,14 +42,18 @@ net = network$new(
       momentum = 0,
       prior = gaussian.prior(mean = 0, var = .0001),
       dataset.size = nrow(env),
-      nonlinearity.name = "sigmoid"
+      nonlinearity.name = "sigmoid",
+      n.importance.samples = n.importance.samples
     )
   ),
   loss = crossEntropy,
   lossGradient = crossEntropyGrad,
-  minibatch.size = 50L,
+  minibatch.size = minibatch.size,
   n.layers = 3L,
-  n.importance.samples = 1L
+  n.importance.samples = n.importance.samples,
+  n.ranef = n.ranef,
+  ranefSample = gaussianRanefSample,
+  importance.errors = matrix(NA, nrow = minibatch.size, ncol = n.importance.samples)
 )
 
 net$layers[[3]]$biases = qlogis(colMeans(route.presence.absence))
