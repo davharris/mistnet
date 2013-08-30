@@ -1,4 +1,5 @@
 context("3-layer backprop")
+set.seed(1)
 
 test_that("3-layer backprop works", {
   eps = 1E-5
