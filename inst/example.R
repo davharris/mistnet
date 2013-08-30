@@ -2,6 +2,9 @@ devtools::load_all()
 load("birds.Rdata")
 library(fastICA)
 
+n.layer1 = 20L
+n.layer2 = 4L
+
 f = fastICA(scale(env), 10)
 xx = f$S[in.train, ]
 
@@ -10,16 +13,16 @@ net = network$new(
   y = route.presence.absence[in.train, ],
   layers = list(
     createLayer(
-      dim = c(ncol(env), 50L),
+      dim = c(ncol(env), n.layer1),
       learning.rate = 1E-4,
       momentum = 0,
-      prior = gaussian.prior(mean = 0, var = .001),
+      prior = gaussian.prior(mean = 0, var = .0001),
       dataset.size = nrow(env),
       nonlinearity.name = "rectify",
       dropout = FALSE
     ),
     createLayer(
-      dim = c(50L, 10L),
+      dim = c(n.layer1, n.layer2),
       learning.rate = 1E-4,
       momentum = 0,
       prior = gaussian.prior(mean = 0, var = .0001),
@@ -27,10 +30,10 @@ net = network$new(
       nonlinearity.name = "linear"
     ),
     createLayer(
-      dim = c(10L, ncol(route.presence.absence)),
+      dim = c(n.layer2, ncol(route.presence.absence)),
       learning.rate = 1E-4,
       momentum = 0,
-      prior = gaussian.prior(mean = 0, var = .0005),
+      prior = gaussian.prior(mean = 0, var = .0001),
       dataset.size = nrow(env),
       nonlinearity.name = "sigmoid"
     )
