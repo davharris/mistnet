@@ -14,7 +14,7 @@ network = setRefClass(
     lossGradient = "function",
     ranefSample = "function",
     n.ranef = "integer",
-    importance.errors = "numeric"  
+    importance.errors = "matrix"  
   ),
   methods = list(
     newMinibatch = function(row.nums){
@@ -134,7 +134,7 @@ network = setRefClass(
       }
     },
     saveImportanceError = function(sample.number){
-      importance.errors[sample.number] <<- sum(reportLoss())
+      importance.errors[ , sample.number] <<- rowSums(reportLoss())
     },
     reportLoss = function(){
       loss(y = y[minibatch.ids, ], yhat = layers[[n.layers]]$output)

@@ -19,9 +19,10 @@ layer = setRefClass(
     prior = "prior",
     dataset.size = "numeric",
     dropout = "logical",
-    importance.errors = "numeric",
+    importance.errors = "matrix",
     importance.llik.grads = "array",
-    importance.bias.grads = "matrix"
+    importance.bias.grads = "matrix",
+    n.importance.samples = "integer"
   ),
   
   methods = list(
@@ -68,6 +69,7 @@ createLayer = function(
   prior,
   dataset.size,
   nonlinearity.name,
+  n.importance.samples = 1L,
   dropout = FALSE
 ){
   if(learning.rate > 1 | learning.rate <= 0){
@@ -88,6 +90,17 @@ createLayer = function(
     nonlinearityGrad = get(paste0(nonlinearity.name, "Grad"), mode = "function"),
     prior = prior,
     dataset.size = dataset.size,
-    dropout = dropout
+    n.importance.samples = n.importance.samples,
+    dropout = dropout,
+    importance.errors = matrix(NA, nrow = , ncol = n.importance.samples),
+    importance.llik.grads = array(
+      NA, 
+      dim = c(dim[[1]], dim[[2]], n.importance.samples)
+    ),
+    importance.bias.grads = matrix(
+      NA, 
+      nrow = dim[[2]], 
+      ncol = n.importance.samples
+    )
   )
 }
