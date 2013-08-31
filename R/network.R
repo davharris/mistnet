@@ -18,12 +18,41 @@ network = setRefClass(
     momentum = "numeric"
   ),
   methods = list(
+    fit = function(iterations){
+      for(i in 1:iterations){
+        selectMinibatch()
+        estimateGradient()
+        updateCoefficients()
+      }
+    },
     selectMinibatch = function(row.nums){
       if(missing(row.nums)){
         minibatch.ids <<- sample.int(nrow(x), minibatch.size, replace = FALSE)
       }else{
         # Should this check that length(row.nums) == minibatch.size?
         minibatch.ids <<- row.nums
+      }
+    },
+    estimateGradient = function(){
+      for(i in 1:n.importance.samples){
+        feedForward(
+          cbind(
+            x[minibatch.ids, ], 
+            ranefSample(nrow = minibatch.size, ncol = n.ranef)
+          ),
+          i
+        )
+        backprop(i)
+      }
+      averageSampleGradients()
+    },
+    updateCoefficients = function(){
+      for(i in 1:n.layers){
+        layers[[i]]$updateCoefficients(
+          learning.rate = learning.rate, 
+          momentum = momentum,
+          dataset.size = dataset.size
+        )
       }
     },
     feedForward = function(input, sample.num){
@@ -56,35 +85,6 @@ network = setRefClass(
           )
         }
       }
-    },
-    updateCoefficients = function(){
-      for(i in 1:n.layers){
-        layers[[i]]$updateCoefficients(
-          learning.rate = learning.rate, 
-          momentum = momentum,
-          dataset.size = dataset.size
-        )
-      }
-    },
-    fit = function(iterations){
-      for(i in 1:iterations){
-        selectMinibatch()
-        estimateGradient()
-        updateCoefficients()
-      }
-    },
-    estimateGradient = function(){
-      for(i in 1:n.importance.samples){
-        feedForward(
-          cbind(
-            x[minibatch.ids, ], 
-            ranefSample(nrow = minibatch.size, ncol = n.ranef)
-          ),
-          i
-        )
-        backprop(i)
-      }
-      averageSampleGradients()
     },
     findImportanceWeights = function(){
       for(i in 1:n.importance.samples){
