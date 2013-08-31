@@ -93,12 +93,7 @@ network = setRefClass(
           loss(y = y[minibatch.ids, ], yhat = yhat)
         )
       }
-      unscaled.weights = t(apply(
-        importance.errors, 
-        1,
-        function(x) exp(min(x) - x)
-      ))
-      importance.weights <<- unscaled.weights / rowSums(unscaled.weights)
+      importance.weights <<- weighImportance(importance.errors)
     },
     averageSampleGradients = function(){
       findImportanceWeights()

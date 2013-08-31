@@ -29,3 +29,12 @@ dropoutMask = function(nrow, ncol) {
 zeros = function(nrow, ncol){
   matrix(0, nrow = nrow, ncol = ncol)
 }
+
+weighImportance = function(importance.errors){
+  unscaled.weights = t(apply(
+    importance.errors, 
+    1,
+    function(x) exp(min(x) - x)
+  ))
+  unscaled.weights / rowSums(unscaled.weights)
+}
