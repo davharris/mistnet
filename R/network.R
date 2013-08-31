@@ -19,6 +19,7 @@ network = setRefClass(
   ),
   methods = list(
     fit = function(iterations){
+      # Maybe put some (optional) assertions here?
       for(i in 1:iterations){
         selectMinibatch()
         estimateGradient()

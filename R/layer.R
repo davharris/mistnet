@@ -20,8 +20,9 @@ layer = setRefClass(
   methods = list(
     
     forwardPass = function(input, sample.num){
-      inputs[ , , sample.num] <<- input
       activation = (input %*% coefficients) %plus% biases
+      
+      inputs[ , , sample.num] <<- input
       activations[ , , sample.num] <<- activation
       outputs[ , , sample.num] <<- nonlinearity(activation)
     },
