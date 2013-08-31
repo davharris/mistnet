@@ -61,3 +61,48 @@ mistnet = function(
   
   return(net)
 }
+
+
+createLayer = function(
+  coef.dim,
+  learning.rate,
+  momentum,
+  prior,
+  dataset.size,
+  nonlinearity.name,
+  n.importance.samples
+){
+  
+  if(learning.rate > 1 | learning.rate < 0){
+    stop("learning.rate must be between 0 and 1 (inclusive)")
+  }
+  if(learning.rate == 0){
+    warning("learning.rate is zero: training will not adjust the coefficients")
+  }
+  if(momentum >= 1 | momentum < 0){
+    stop("momentum cannot be negative and must be less than one")
+  }
+  
+  layer$new(
+    coefficients = matrix(0, nrow = coef.dim[[1]], ncol = coef.dim[[2]]),
+    biases = rep(0, dim[[2]]),
+    grad.step = matrix(0, nrow = coef.dim[[1]], ncol = coef.dim[[2]]),
+    coef.dim = coef.dim,
+    learning.rate = learning.rate,
+    momentum = momentum,
+    nonlinearity = get(nonlinearity.name, mode = "function"),
+    nonlinearityGrad = get(paste0(nonlinearity.name, "Grad"), mode = "function"),
+    prior = prior,
+    dataset.size = dataset.size,
+    n.importance.samples = n.importance.samples,
+    llik.grads = array(
+      NA, 
+      dim = c(coef.dim[[1]], coef.dim[[2]], n.importance.samples)
+    ),
+    bias.grads = matrix(
+      NA, 
+      nrow = coef.dim[[2]], 
+      ncol = n.importance.samples
+    )
+  )
+}
