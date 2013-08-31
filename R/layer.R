@@ -16,9 +16,6 @@ layer = setRefClass(
     activations = "array",
     outputs = "array",
     error.grads = "array",
-    bias.grads = "matrix",
-    llik.grads = "array",
-    weighted.error.grads = "matrix",
     weighted.bias.grads = "numeric",
     weighted.llik.grads = "matrix",
     grad.step = "matrix"
@@ -34,22 +31,15 @@ layer = setRefClass(
     },
     
     backwardPass = function(incoming.error.grad, sample.num){
+      # Chain rule: multiply incoming error gradient by the nonlinearity's own 
+      # gradient.
       nonlinear.grad = nonlinearityGrad(activations[ , , sample.num])
-      error.grads[ , , sample.num] <<- nonlinear.grad * incoming.error.grad
-      
-      # Since this step is linear, it might be possible to refactor so I only
-      # do it once per update instead of once per importance sample.
-      llik.grads[ , , sample.num] <<- matrixMultiplyGrad(
-        n.in = coef.dim[[1]],
-        n.out = coef.dim[[2]],
-        error.grad = error.grads[ , , sample.num],
-        input = inputs[ , , sample.num]
-      )
-      bias.grads[ , sample.num] <<- colSums(error.grads[ , , sample.num])
+      error.grads[ , , sample.num] <<- incoming.error.grad * nonlinear.grad
     },
     
     updateCoefficients = function(){
-      grad = -weighted.llik.grads + prior$getLogGrad(coefficients) / dataset.size
+      log.prior.grad = prior$getLogGrad(coefficients) / dataset.size
+      grad = -weighted.llik.grads + log.prior.grad
       grad.step <<- grad * learning.rate + momentum * grad.step
       coefficients <<- coefficients + grad.step
       
@@ -60,14 +50,23 @@ layer = setRefClass(
       # allow them to keep up better.
       biases <<- biases - weighted.bias.grad * learning.rate * 10
     },
-    averageSampleGradients = function(){
-      weighted.bias.grads <<- 0 * weighted.bias.grads
+    
+    combineSampleGradients = function(){
       weighted.llik.grads <<- 0 * weighted.llik.grads
+      weighted.bias.grads <<- 0 * weighted.bias.grads
       for(j in 1:n.importance.samples){
-        w = weights[ , i]
-        weighted.bias.grads <<- weighted.bias.grads + w * bias.grads[ , j]
-        # Won't the recycling rule mess this up?
-        weighted.llik.grads <<- weighted.llik.grads + w * llik.grads[ , , j]
+        partial.error.grad = error.grads[ , , sample.num] * weights[ , i]
+        
+        partial.llik.grad = matrixMultiplyGrad(
+          n.in = coef.dim[[1]],
+          n.out = coef.dim[[2]],
+          error.grad = partial.error.grad,
+          input = inputs[ , , sample.num]
+        )
+        partial.bias.grad = colSums(partial.error.grad)
+        
+        weighted.llik.grads <<- weighted.llik.grads + partial.llik.grad
+        weighted.bias.grads <<- weighted.bias.grads + partial.bias.grad
       }
     }
   )

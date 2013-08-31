@@ -95,9 +95,8 @@ network = setRefClass(
     },
     averageSampleGradients = function(){
       findImportanceWeights()
-      
       for(i in 1:n.layers){
-        layers[[i]]$averageSampleGradients()
+        layers[[i]]$combineSampleGradients()
       }
     }
   )
