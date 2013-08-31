@@ -48,8 +48,8 @@ layer = setRefClass(
     },
     
     combineSampleGradients = function(weights, n.importance.samples){
-      weighted.llik.grads <<- 0 * weighted.llik.grads
-      weighted.bias.grads <<- 0 * weighted.bias.grads
+      weighted.llik.grads <<- zeros(coef.dim[[1]], coef.dim[[2]])
+      weighted.bias.grads <<- rep(0, coef.dim[[2]])
       for(j in 1:n.importance.samples){
         partial.error.grad = error.grads[ , , sample.num] * weights[ , i]
         

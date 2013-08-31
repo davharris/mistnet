@@ -25,3 +25,7 @@ dropoutMask = function(nrow, ncol) {
   dim(out) = c(nrow, ncol)
   out
 }
+
+zeros = function(nrow, ncol){
+  matrix(0, nrow = nrow, ncol = ncol)
+}
