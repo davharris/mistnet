@@ -60,7 +60,17 @@ layer = setRefClass(
       # allow them to keep up better.
       biases <<- biases - weighted.bias.grad * learning.rate * 10
     }
-  )
+  ),
+  averageSampleGradients(){
+    weighted.bias.grads = 0 * weighted.bias.grads
+    weighted.llik.grads = 0 * weighted.llik.grads
+    for(j in 1:n.importance.samples){
+      w = weights[ , i]
+      weighted.bias.grads = weighted.bias.grads + w * bias.grads[ , j]
+      # Won't the recycling rule mess this up?
+      weighted.llik.grads = weighted.llik.grads + w * llik.grads[ , , j]
+    }
+  }
 )
 
 createLayer = function(

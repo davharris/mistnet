@@ -97,18 +97,7 @@ network = setRefClass(
       findImportanceWeights()
       
       for(i in 1:n.layers){
-        with(
-          layers[[i]],{
-            weighted.bias.grads = 0 * weighted.bias.grads
-            weighted.llik.grads = 0 * weighted.llik.grads
-            for(j in 1:n.importance.samples){
-              w = weights[ , i]
-              weighted.bias.grads = bias.grad + w * bias.grads[ , j]
-              # Won't the recycling rule mess this up?
-              weighted.llik.grads = llik.grad + w * llik.grads[ , , j]
-            }
-          }
-        )
+        layers[[i]]$averageSampleGradients()
       }
     }
   )
