@@ -27,12 +27,7 @@ network = setRefClass(
       }
     },
     selectMinibatch = function(row.nums){
-      if(missing(row.nums)){
-        minibatch.ids <<- sample.int(nrow(x), minibatch.size, replace = FALSE)
-      }else{
-        # Should this check that length(row.nums) == minibatch.size?
-        minibatch.ids <<- row.nums
-      }
+      minibatch.ids <<- sample.int(nrow(x), minibatch.size, replace = FALSE)
     },
     estimateGradient = function(){
       for(i in 1:n.importance.samples){
