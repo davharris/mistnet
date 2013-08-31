@@ -1,5 +1,3 @@
-# documentation should note that ranefSample should have mean zero.
-
 network = setRefClass(
   Class = "network",
   fields = list(
@@ -17,7 +15,7 @@ network = setRefClass(
     n.ranef = "integer"
   ),
   methods = list(
-    newMinibatch = function(row.nums){
+    selectMinibatch = function(row.nums){
       if(missing(row.nums)){
         minibatch.ids <<- sample.int(nrow(x), minibatch.size, replace = FALSE)
       }else{
@@ -63,7 +61,7 @@ network = setRefClass(
     },
     fit = function(iterations){
       for(i in 1:iterations){
-        newMinibatch()
+        selectMinibatch()
         estimateGradient()
         updateCoefficients()
       }
@@ -103,10 +101,11 @@ network = setRefClass(
           layers[[i]],{
             weighted.bias.grads = 0 * weighted.bias.grads
             weighted.llik.grads = 0 * weighted.llik.grads
-            for(i in 1:n.importance.samples){
+            for(j in 1:n.importance.samples){
               w = weights[ , i]
-              weighted.bias.grads = bias.grad + w * bias.grads[ , i]
-              weighted.llik.grads = llik.grad + w * llik.grads[ , , i]
+              weighted.bias.grads = bias.grad + w * bias.grads[ , j]
+              # Won't the recycling rule mess this up?
+              weighted.llik.grads = llik.grad + w * llik.grads[ , , j]
             }
           }
         )
