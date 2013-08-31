@@ -5,13 +5,9 @@ layer = setRefClass(
     coef.dim = "integer",
     coefficients = "matrix",
     biases = "numeric",
-    learning.rate = "numeric",
-    momentum = "numeric",
     nonlinearity = "function",
     nonlinearityGrad = "function",
     prior = "prior",
-    dataset.size = "numeric",
-    n.importance.samples = "integer",
     inputs = "array",
     activations = "array",
     outputs = "array",
@@ -37,7 +33,7 @@ layer = setRefClass(
       error.grads[ , , sample.num] <<- incoming.error.grad * nonlinear.grad
     },
     
-    updateCoefficients = function(){
+    updateCoefficients = function(learning.rate, momentum, dataset.size){
       log.prior.grad = prior$getLogGrad(coefficients) / dataset.size
       grad = -weighted.llik.grads + log.prior.grad
       grad.step <<- grad * learning.rate + momentum * grad.step
@@ -51,7 +47,7 @@ layer = setRefClass(
       biases <<- biases - weighted.bias.grad * learning.rate * 10
     },
     
-    combineSampleGradients = function(){
+    combineSampleGradients = function(weights, n.importance.samples){
       weighted.llik.grads <<- 0 * weighted.llik.grads
       weighted.bias.grads <<- 0 * weighted.bias.grads
       for(j in 1:n.importance.samples){

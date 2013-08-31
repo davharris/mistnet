@@ -5,6 +5,7 @@ network = setRefClass(
     y = "matrix",
     layers = "list",
     n.layers = "integer",
+    dataset.size = "integer",
     minibatch.size = "integer",
     minibatch.ids = "integer",
     n.importance.samples = "integer",
@@ -12,7 +13,9 @@ network = setRefClass(
     loss = "function",
     lossGradient = "function",
     ranefSample = "function",
-    n.ranef = "integer"
+    n.ranef = "integer",
+    learning.rate = "numeric",
+    momentum = "numeric"
   ),
   methods = list(
     selectMinibatch = function(row.nums){
@@ -56,7 +59,11 @@ network = setRefClass(
     },
     updateCoefficients = function(){
       for(i in 1:n.layers){
-        layers[[i]]$updateCoefficients()
+        layers[[i]]$updateCoefficients(
+          learning.rate = learning.rate, 
+          momentum = momentum,
+          dataset.size = dataset.size
+        )
       }
     },
     fit = function(iterations){
@@ -96,7 +103,10 @@ network = setRefClass(
     averageSampleGradients = function(){
       findImportanceWeights()
       for(i in 1:n.layers){
-        layers[[i]]$combineSampleGradients()
+        layers[[i]]$combineSampleGradients(
+          weights = importance.weights,     
+          n.importance.samples = n.importance.samples
+        )
       }
     }
   )
