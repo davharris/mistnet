@@ -9,6 +9,7 @@ test_that("Importance weighting works", {
   outcomes = abs(matrix(rt(nrow * ncol, df = 1), nrow = nrow, ncol = ncol))
   true.probs = outcomes / rowSums(outcomes)
   
+  # each row can have a different baseline log-probability
   raw.errors = -log(true.probs) + rnorm(nrow)
   
   expect_equal(weighImportance(raw.errors), true.probs)
