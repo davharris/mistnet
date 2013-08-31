@@ -20,6 +20,7 @@ layer = setRefClass(
   methods = list(
     
     forwardPass = function(input, sample.num){
+      if(missing(sample.num)){stop("sample.num is missing in forwardPass")}
       activation = (input %*% coefficients) %plus% biases
       
       inputs[ , , sample.num] <<- input

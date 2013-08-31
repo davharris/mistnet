@@ -1,39 +1,47 @@
 context("Feedforward")
 
 test_that("Single-layer feedforward works", {
-  l = layer$new(
-    biases = 1:7,
-    coefficients = matrix(rnorm(28), nrow = 4),
-    nonlinearity = rectify,
-    dropout = FALSE
+  l = createLayer(
+    n.inputs = 4L,
+    n.outputs = 7L,
+    prior = gaussian.prior$new(mean = 0, var = 1),
+    nonlinearity.name = "sigmoid",
+    minibatch.size = 5L,
+    n.importance.samples = 3L
   )
   l.copy = l$copy()
   
   input.matrix = matrix(rnorm(20), ncol = 4)
-  l$forwardPass(input.matrix)
+  expect_error(l$forwardPass(input.matrix), "sample.num is missing")
   
+  l$forwardPass(input.matrix, 2L)
   
   expect_equal(
-    l$input,
+    l$inputs[ , , 2],
     input.matrix
   )
-  expect_equal(
-    l$activation,
-    (l$input %*% l$coefficients) %plus% l$biases
-  )
-  expect_equal(
-    l$output,
-    l$nonlinearity((l$input %*% l$coefficients) %plus% l$biases)
+  expect_true(
+    all(is.na(l$inputs[ , , -2]))
   )
   
-  # copy shouldn't be overwritten by the forward pass on l
-  # (making sure that I didn't accidentally cheat when I made the copy)
-  expect_equal(length(l.copy$input), 0)
   
-  # copy's only difference from original should be the input and output fields
-  l.copy$input = l$input
-  l.copy$output = l$output
-  expect_equal(l, l.copy)
+  expect_equal(
+    l$activations[ , , 2],
+    (l$inputs[ , , 2] %*% l$coefficients) %plus% l$biases
+  )
+  expect_equal(
+    l$outputs[ , , 2],
+    l$nonlinearity((l$inputs[ , , 2] %*% l$coefficients) %plus% l$biases)
+  )
+
+  # Nothing should change during feedforward except the three listed fields
+  for(name in layer$fields()){
+    name.shouldnt.change = name %in% c("inputs", "activations", "outputs")
+    if(name.shouldnt.change){
+    }else{
+      expect_equal(l[[name]], l.copy[[name]])
+    }
+  }
 })
 
 
