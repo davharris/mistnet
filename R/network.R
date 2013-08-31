@@ -18,6 +18,7 @@ network = setRefClass(
     momentum = "numeric"
   ),
   methods = list(
+    
     fit = function(iterations){
       # Maybe put some (optional) assertions here?
       for(i in 1:iterations){
@@ -26,9 +27,11 @@ network = setRefClass(
         updateCoefficients()
       }
     },
+    
     selectMinibatch = function(row.nums){
       minibatch.ids <<- sample.int(nrow(x), minibatch.size, replace = FALSE)
     },
+    
     estimateGradient = function(){
       for(i in 1:n.importance.samples){
         feedForward(
@@ -42,6 +45,7 @@ network = setRefClass(
       }
       averageSampleGradients()
     },
+    
     updateCoefficients = function(){
       for(i in 1:n.layers){
         layers[[i]]$updateCoefficients(
@@ -51,6 +55,7 @@ network = setRefClass(
         )
       }
     },
+    
     feedForward = function(input, sample.num){
       # First layer gets the specified inputs
       layers[[1]]$forwardPass(input, sample.num)
@@ -61,6 +66,7 @@ network = setRefClass(
         }
       }
     },
+    
     backprop = function(sample.num){
       # Final layer gets its error from the loss gradient
       net.output = layers[[n.layers]]$outputs[ , , sample.num]
@@ -82,15 +88,7 @@ network = setRefClass(
         }
       }
     },
-    findImportanceWeights = function(){
-      for(i in 1:n.importance.samples){
-        importance.errors[ , i] = rowSums(
-          yhat = layers[[n.layers]]$outputs[ , , i],
-          loss(y = y[minibatch.ids, ], yhat = yhat)
-        )
-      }
-      importance.weights <<- weighImportance(importance.errors)
-    },
+    
     averageSampleGradients = function(){
       findImportanceWeights()
       for(i in 1:n.layers){
@@ -99,6 +97,16 @@ network = setRefClass(
           n.importance.samples = n.importance.samples
         )
       }
+    },
+    
+    findImportanceWeights = function(){
+      for(i in 1:n.importance.samples){
+        importance.errors[ , i] = rowSums(
+          yhat = layers[[n.layers]]$outputs[ , , i],
+          loss(y = y[minibatch.ids, ], yhat = yhat)
+        )
+      }
+      importance.weights <<- weighImportance(importance.errors)
     }
   )
 )
