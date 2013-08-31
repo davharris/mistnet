@@ -64,45 +64,24 @@ mistnet = function(
 
 
 createLayer = function(
-  coef.dim,
-  learning.rate,
-  momentum,
+  n.inputs,
+  n.outputs,
   prior,
-  dataset.size,
   nonlinearity.name,
+  minibatch.size,
   n.importance.samples
 ){
-  
-  if(learning.rate > 1 | learning.rate < 0){
-    stop("learning.rate must be between 0 and 1 (inclusive)")
-  }
-  if(learning.rate == 0){
-    warning("learning.rate is zero: training will not adjust the coefficients")
-  }
-  if(momentum >= 1 | momentum < 0){
-    stop("momentum cannot be negative and must be less than one")
-  }
-  
   layer$new(
-    coefficients = matrix(0, nrow = coef.dim[[1]], ncol = coef.dim[[2]]),
-    biases = rep(0, dim[[2]]),
-    grad.step = matrix(0, nrow = coef.dim[[1]], ncol = coef.dim[[2]]),
-    coef.dim = coef.dim,
-    learning.rate = learning.rate,
-    momentum = momentum,
+    coef.dim = c(n.inputs, n.outputs),
+    coefficients = matrix(0, nrow = n.inputs, ncol = n.outputs),
+    biases = rep(0, n.outputs),
+    grad.step = matrix(0, nrow = n.inputs, ncol = n.outputs),
     nonlinearity = get(nonlinearity.name, mode = "function"),
     nonlinearityGrad = get(paste0(nonlinearity.name, "Grad"), mode = "function"),
     prior = prior,
-    dataset.size = dataset.size,
-    n.importance.samples = n.importance.samples,
-    llik.grads = array(
-      NA, 
-      dim = c(coef.dim[[1]], coef.dim[[2]], n.importance.samples)
-    ),
-    bias.grads = matrix(
-      NA, 
-      nrow = coef.dim[[2]], 
-      ncol = n.importance.samples
-    )
+    inputs = array(NA, c(minibatch.size, n.inputs, n.importance.samples)),
+    activations = array(NA, c(minibatch.size, n.outputs, n.importance.samples)),
+    outputs = array(NA, c(minibatch.size, n.outputs, n.importance.samples)),
+    error.grads = array(NA, c(minibatch.size, n.outputs, n.importance.samples))
   )
 }
