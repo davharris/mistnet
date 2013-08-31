@@ -10,11 +10,11 @@ network = setRefClass(
     minibatch.size = "integer",
     minibatch.ids = "integer",
     n.importance.samples = "integer",
+    importance.weights = "matrix",
     loss = "function",
     lossGradient = "function",
     ranefSample = "function",
-    n.ranef = "integer",
-    importance.errors = "matrix"  
+    n.ranef = "integer"
   ),
   methods = list(
     newMinibatch = function(row.nums){
@@ -27,7 +27,7 @@ network = setRefClass(
     },
     feedForward = function(input, sample.num){
       # First layer gets the specified inputs
-      layers[[1]]$forwardPass(inputs, sample.num)
+      layers[[1]]$forwardPass(input, sample.num)
       # Subsequent layers get their inputs from the layer preceding them
       if(n.layers > 1){
         for(j in 2:n.layers){
@@ -57,79 +57,60 @@ network = setRefClass(
       }
     },
     updateCoefficients = function(){
-      for(lay in layers){
-        lay$updateCoefficients()
+      for(i in 1:n.layers){
+        layers[[i]]$updateCoefficients()
       }
-    },
-    predict = function(newdata){
-      feedForward(newdata)
-      return(output)
     },
     fit = function(iterations){
       for(i in 1:iterations){
-        
-        # Step 1: pick a minibatch.
         newMinibatch()
-        
-        # Step 2: Find gradients on that minibatch.
-        if(n.importance.samples == 1L){
-          feedForward()
-          backprop()
-        }else{
-          findImportanceSampleGradients()
-        }
-        
-        # Step 3: Update coefficients.
+        estimateGradient()
         updateCoefficients()
       }
     },
-    findImportanceSampleGradients = function(){
-      for(j in 1:n.importance.samples){
+    estimateGradient = function(){
+      for(i in 1:n.importance.samples){
         feedForward(
           cbind(
             x[minibatch.ids, ], 
             ranefSample(nrow = minibatch.size, ncol = n.ranef)
-          )
+          ),
+          i
         )
-        backprop()
-        saveGradients(j)
-        saveImportanceError(j)
+        backprop(i)
       }
-      
       averageSampleGradients()
     },
-    saveGradients = function(sample.number){
-      for(lay in layers){
-        lay$importance.bias.grads[ , sample.number] = lay$bias.grad
-        lay$importance.llik.grads[ , , sample.number] = lay$llik.grad
+    findImportanceWeights = function(){
+      for(i in 1:n.importance.samples){
+        importance.errors[ , i] = rowSums(
+          yhat = layers[[n.layers]]$outputs[ , , i],
+          loss(y = y[minibatch.ids, ], yhat = yhat)
+        )
       }
-    },
-    averageSampleGradients = function(){
       unscaled.weights = t(apply(
         importance.errors, 
         1,
         function(x) exp(min(x) - x)
       ))
-      weights = colMeans(unscaled.weights / rowSums(unscaled.weights))
+      importance.weights <<- unscaled.weights / rowSums(unscaled.weights)
+    },
+    averageSampleGradients = function(){
+      findImportanceWeights()
       
-      for(lay in layers){
-        lay$bias.grad = 0 * lay$bias.grad
-        lay$llik.grad = 0 * lay$llik.grad
-        for(i in 1:n.importance.samples){
-          w = weights[i]
-          lay$bias.grad = lay$bias.grad + w * lay$importance.bias.grads[ , i]
-          lay$llik.grad = lay$llik.grad + w * lay$importance.llik.grads[ , , i]
-        }
+      for(i in 1:n.layers){
+        with(
+          layers[[i]],{
+            weighted.bias.grads = 0 * weighted.bias.grads
+            weighted.llik.grads = 0 * weighted.llik.grads
+            for(i in 1:n.importance.samples){
+              w = weights[ , i]
+              weighted.bias.grads = bias.grad + w * bias.grads[ , i]
+              weighted.llik.grads = llik.grad + w * llik.grads[ , , i]
+            }
+          }
+        )
       }
-    },
-    saveImportanceError = function(sample.number){
-      importance.errors[ , sample.number] <<- rowSums(reportLoss())
-    },
-    reportLoss = function(){
-      loss(y = y[minibatch.ids, ], yhat = layers[[n.layers]]$output)
-    },
-    returnOutput = function(){
-      layers[[n.layers]]$output
     }
   )
 )
