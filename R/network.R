@@ -25,23 +25,22 @@ network = setRefClass(
         minibatch.ids <<- row.nums
       }
     },
-    feedForward = function(inputs){
-      # First layer gets its inputs from x
-      if(missing(inputs)){inputs = x[minibatch.ids, ]}
-      layers[[1]]$forwardPass(inputs)
-      
-      # Subsequent layers get their inputs from previous layers
+    feedForward = function(input, sample.num){
+      # First layer gets the specified inputs
+      layers[[1]]$forwardPass(inputs, sample.num)
+      # Subsequent layers get their inputs from the layer preceding them
       if(n.layers > 1){
-        for(i in 2:n.layers){
-          layers[[i]]$forwardPass(layers[[i - 1]]$output)
+        for(j in 2:n.layers){
+          layers[[j]]$forwardPass(layers[[j - 1]]$output, sample.num)
         }
       }
     },
-    backprop = function(){
-      
-      # Final layer just sees error from the loss gradient
+    backprop = function(sample.num){
+      # Final layer gets its error from the loss gradient
+      net.output = layers[[n.layers]]$outputs[ , , sample.num]
       layers[[n.layers]]$backwardPass(
-        lossGradient(y = y[minibatch.ids, ], yhat = returnOutput())
+        lossGradient(y = y[minibatch.ids, ], yhat = net.output),
+        sample.num
       )
       
       # Earlier layers' error gradients are filtered through the coefficients of
@@ -50,7 +49,7 @@ network = setRefClass(
         for(i in (n.layers - 1):1){
           layers[[i]]$backwardPass(
             tcrossprod(
-              layers[[i + 1]]$error.grad, 
+              layers[[i + 1]]$error.grads[ , , sample.num], 
               layers[[i + 1]]$coefficients
             )
           )
