@@ -1,16 +1,18 @@
 mistnet = function(
   x,
   y,
-  output.distribution,
   nonlinearity.names,
   hidden.dims,
   priors,
-  learning.schedule,
-  momentum.schedule,
+  learning.rate,
+  momentum,
   n.ranef,
+  ranefSample,
   n.importance.samples,
-  minibatch.size = 50,
-  training.iterations
+  minibatch.size,
+  training.iterations,
+  loss,
+  lossGrad
 ){
   n.layers = length(nonlinearity.names)
   stopifnot(length(priors) == n.layers)
@@ -18,7 +20,8 @@ mistnet = function(
   
   stopifnot(hidden.dims == as.integer(hidden.dims))
   stopifnot(n.ranef == as.integer(n.ranef))
-  stopifnot(n.ranef == as.integer(n.ranef))
+  stopifnot(minibatch.size == as.integer(minibatch.size))
+  # etc.  Probably worth writing a function for this...
   
   
   network.dims = as.integer(
@@ -28,33 +31,36 @@ mistnet = function(
   stopifnot(nrow(x) == nrow(y))
   dataset.size = nrow(x)
   
-  net = network$new(
+  net = network$new( 
     x = x,
     y = y,
     layers = lapply(
       1:n.layers,
       function(i){
         createLayer(
-          dim = network.dims[c(i, i + 1)],
-          learning.rate,
-          momentum,
+          n.in = network.dims[[i]],
+          n.out = network.dims[[i + 1]],
           prior = priors[[i]],
-          dataset.size = dataset.size,
           nonlinearity.name = nonlinearity.names[[i]],
-          dropout = FALSE
+          minibatch.size = minibatch.size,
+          n.importance.samples = n.importance.samples
         )
       }
     ),
     n.layers = n.layers,
+    dataset.size = dataset.size,
     minibatch.size = minibatch.size,
     n.importance.samples = n.importance.samples,
-    loss = output.distribution$loss,
-    lossGradient = output.distribution$lossGrad,
-    ranefSample = gaussianRanefSample(),
-    n.ranef = n.ranef 
+    loss = loss,
+    lossGradient = lossGrad,
+    ranefSample = ranefSample,
+    n.ranef = n.ranef,
+    learning.rate = learning.rate,
+    momentum = momentum
   ) 
   
-  # Coefficients can't all start at zero!
+  # Coefficients can't all start at zero! Perhaps sample coefficients from their
+  # prior?
   # Final layer's biases shouldn't be zero either!
   
   net$fit(training.iterations)
