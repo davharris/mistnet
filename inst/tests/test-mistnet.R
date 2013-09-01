@@ -3,7 +3,7 @@ context("Mistnet function")
 x = dropoutMask(17L, 37L)
 y = dropoutMask(17L, 19L)
 
-test_that("mistnet(training.iterations = 0) works",{
+test_that("Correct behavior for fewer than one iteration",{
   net = mistnet(
     x,
     y,
@@ -26,4 +26,5 @@ test_that("mistnet(training.iterations = 0) works",{
   )
   
   expect_equal(net$completed.iterations, 0)
+  expect_error(net$fit(-1), "valid number of iterations")
 })

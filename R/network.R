@@ -21,8 +21,15 @@ network = setRefClass(
   methods = list(
     
     fit = function(iterations){
-      if(iterations == 0){return(NULL)}
+      if(iterations < 1L){
+        if(iterations == 0L){
+          return(NULL)
+        }else{
+          stop(paste0(iterations, " is not a valid number of iterations"))
+        }
+      }
       # Maybe put some (optional) assertions here?
+      # Do I have an opinion about non-integer iteration counts?
       for(i in 1:iterations){
         selectMinibatch()
         estimateGradient()
