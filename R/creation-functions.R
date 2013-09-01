@@ -56,7 +56,8 @@ mistnet = function(
     ranefSample = ranefSample,
     n.ranef = n.ranef,
     learning.rate = learning.rate,
-    momentum = momentum
+    momentum = momentum,
+    completed.iterations = 0L
   ) 
   
   # Coefficients can't all start at zero! Perhaps sample coefficients from their

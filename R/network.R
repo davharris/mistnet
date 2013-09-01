@@ -15,16 +15,19 @@ network = setRefClass(
     ranefSample = "function",
     n.ranef = "integer",
     learning.rate = "numeric",
-    momentum = "numeric"
+    momentum = "numeric",
+    completed.iterations = "integer"
   ),
   methods = list(
     
     fit = function(iterations){
+      if(iterations == 0){return(NULL)}
       # Maybe put some (optional) assertions here?
       for(i in 1:iterations){
         selectMinibatch()
         estimateGradient()
         updateCoefficients()
+        completed.iterations <<- completed.iterations + 1L
       }
     },
     
