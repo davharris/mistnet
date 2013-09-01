@@ -52,14 +52,14 @@ layer = setRefClass(
     combineSampleGradients = function(weights, n.importance.samples){
       weighted.llik.grads <<- zeros(coef.dim[[1]], coef.dim[[2]])
       weighted.bias.grads <<- rep(0, coef.dim[[2]])
-      for(j in 1:n.importance.samples){
-        partial.error.grad = error.grads[ , , sample.num] * weights[ , i]
+      for(i in 1:n.importance.samples){
+        partial.error.grad = error.grads[ , , i] * weights[ , i]
         
         partial.llik.grad = matrixMultiplyGrad(
           n.in = coef.dim[[1]],
           n.out = coef.dim[[2]],
           error.grad = partial.error.grad,
-          input = inputs[ , , sample.num]
+          input = inputs[ , , i]
         )
         partial.bias.grad = colSums(partial.error.grad)
         

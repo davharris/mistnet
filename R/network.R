@@ -92,11 +92,12 @@ network = setRefClass(
       # the layer above.
       if(n.layers > 1){
         for(i in (n.layers - 1):1){
-          layers[[i]]$backwardPass(
+          incoming.error.grad = layers[[i]]$backwardPass(
             tcrossprod(
               layers[[i + 1]]$error.grads[ , , sample.num], 
               layers[[i + 1]]$coefficients
-            )
+            ),
+            sample.num = sample.num
           )
         }
       }
@@ -113,10 +114,13 @@ network = setRefClass(
     },
     
     findImportanceWeights = function(){
+      importance.errors = zeros(minibatch.size, n.importance.samples)
       for(i in 1:n.importance.samples){
         importance.errors[ , i] = rowSums(
-          yhat = layers[[n.layers]]$outputs[ , , i],
-          loss(y = y[minibatch.ids, ], yhat = yhat)
+          loss(
+            y = y[minibatch.ids, ], 
+            yhat = layers[[n.layers]]$outputs[ , , i]
+          )
         )
       }
       importance.weights <<- weighImportance(importance.errors)
