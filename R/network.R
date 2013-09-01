@@ -62,7 +62,10 @@ network = setRefClass(
       # Subsequent layers get their inputs from the layer preceding them
       if(n.layers > 1){
         for(j in 2:n.layers){
-          layers[[j]]$forwardPass(layers[[j - 1]]$output, sample.num)
+          layers[[j]]$forwardPass(
+            layers[[j - 1]]$outputs[ , , sample.num], 
+            sample.num
+          )
         }
       }
     },
