@@ -78,17 +78,16 @@ createLayer = function(
   minibatch.size,
   n.importance.samples
 ){
-  layer$new(
+  out = layer$new(
     coef.dim = c(n.inputs, n.outputs),
     coefficients = matrix(0, nrow = n.inputs, ncol = n.outputs),
     biases = rep(0, n.outputs),
     grad.step = matrix(0, nrow = n.inputs, ncol = n.outputs),
     nonlinearity = get(nonlinearity.name, mode = "function"),
     nonlinearityGrad = get(paste0(nonlinearity.name, "Grad"), mode = "function"),
-    prior = prior,
-    inputs = array(NA, c(minibatch.size, n.inputs, n.importance.samples)),
-    activations = array(NA, c(minibatch.size, n.outputs, n.importance.samples)),
-    outputs = array(NA, c(minibatch.size, n.outputs, n.importance.samples)),
-    error.grads = array(NA, c(minibatch.size, n.outputs, n.importance.samples))
+    prior = prior
   )
+  out$resetState(minibatch.size, n.importance.samples)
+  
+  out
 }

@@ -66,6 +66,22 @@ layer = setRefClass(
         weighted.llik.grads <<- weighted.llik.grads + partial.llik.grad
         weighted.bias.grads <<- weighted.bias.grads + partial.bias.grad
       }
+    },
+    
+    resetState = function(minibatch.size, n.importance.samples){
+      inputs <<- array(
+        NA, 
+        c(minibatch.size, coef.dim[[1]], n.importance.samples)
+      )
+      
+      out.array = array(
+        NA, 
+        c(minibatch.size, coef.dim[[2]], n.importance.samples)
+      )
+      activations <<- out.array
+      outputs <<- out.array
+      error.grads <<- out.array
     }
+    
   )
 )

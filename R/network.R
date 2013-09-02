@@ -39,7 +39,20 @@ network = setRefClass(
     },
     
     selectMinibatch = function(row.nums){
-      minibatch.ids <<- sample.int(nrow(x), minibatch.size, replace = FALSE)
+      if(missing(row.nums)){
+        minibatch.ids <<- sample.int(nrow(x), minibatch.size, replace = FALSE)
+      }else{
+        if(length(row.nums) != minibatch.size){
+          minibatch.size <<- length(row.nums)
+          for(i in 1:n.layers){
+            layers[[i]]$resetState(
+              minibatch.size = minibatch.size, 
+              n.importance.samples
+            )
+          }
+        }
+        minibatch.ids <<- row.nums
+      }
     },
     
     estimateGradient = function(){
