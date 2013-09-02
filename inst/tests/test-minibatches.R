@@ -8,26 +8,26 @@ test_that("minibatch generation works",{
     x = matrix(1:n, nrow = n),
     minibatch.size = n + 1L
   )
-  expect_error(net$newMinibatch(), "replace = FALSE")
+  expect_error(net$selectMinibatch(), "replace = FALSE")
   
   
   net$minibatch.size = -1L
-  expect_error(net$newMinibatch(), "invalid 'size' argument")
+  expect_error(net$selectMinibatch(), "invalid 'size' argument")
   
   
   net$minibatch.size = n
-  net$newMinibatch()
+  net$selectMinibatch()
   expect_true(all(table(net$minibatch.ids) == 1))
   
   
   net$minibatch.size = as.integer(n/2)
-  net$newMinibatch()
+  net$selectMinibatch()
   expect_equal(length(net$minibatch.ids), net$minibatch.size)
   
   
   counts = integer(n)
   for(i in 1:niter){
-    net$newMinibatch()
+    net$selectMinibatch()
     counts[net$minibatch.ids] = counts[net$minibatch.ids] + 1
   }
   expect_equal(
