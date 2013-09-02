@@ -1,5 +1,3 @@
-# documentation should note that ranefSample should have mean zero.
-
 network = setRefClass(
   Class = "network",
   fields = list(
@@ -7,130 +5,138 @@ network = setRefClass(
     y = "matrix",
     layers = "list",
     n.layers = "integer",
+    dataset.size = "integer",
     minibatch.size = "integer",
     minibatch.ids = "integer",
     n.importance.samples = "integer",
+    importance.weights = "matrix",
     loss = "function",
     lossGradient = "function",
     ranefSample = "function",
     n.ranef = "integer",
-    importance.errors = "matrix"  
+    learning.rate = "numeric",
+    momentum = "numeric",
+    completed.iterations = "integer"
   ),
   methods = list(
-    newMinibatch = function(row.nums){
+    
+    fit = function(iterations){
+      if(iterations < 1L){
+        if(iterations == 0L){
+          return(NULL)
+        }else{
+          stop(paste0(iterations, " is not a valid number of iterations"))
+        }
+      }
+      # Maybe put some (optional) assertions here?
+      # Do I have an opinion about non-integer iteration counts?
+      for(i in 1:iterations){
+        selectMinibatch()
+        estimateGradient()
+        updateCoefficients()
+        completed.iterations <<- completed.iterations + 1L
+      }
+    },
+    
+    selectMinibatch = function(row.nums){
       if(missing(row.nums)){
         minibatch.ids <<- sample.int(nrow(x), minibatch.size, replace = FALSE)
       }else{
-        # Should this check that length(row.nums) == minibatch.size?
+        if(length(row.nums) != minibatch.size){
+          minibatch.size <<- length(row.nums)
+          for(i in 1:n.layers){
+            layers[[i]]$resetState(
+              minibatch.size = minibatch.size, 
+              n.importance.samples
+            )
+          }
+        }
         minibatch.ids <<- row.nums
       }
     },
-    feedForward = function(inputs){
-      # First layer gets its inputs from x
-      if(missing(inputs)){inputs = x[minibatch.ids, ]}
-      layers[[1]]$forwardPass(inputs)
-      
-      # Subsequent layers get their inputs from previous layers
+    
+    estimateGradient = function(){
+      for(i in 1:n.importance.samples){
+        feedForward(
+          cbind(
+            x[minibatch.ids, ], 
+            ranefSample(nrow = minibatch.size, ncol = n.ranef)
+          ),
+          i
+        )
+        backprop(i)
+      }
+      averageSampleGradients()
+    },
+    
+    updateCoefficients = function(){
+      for(i in 1:n.layers){
+        layers[[i]]$updateCoefficients(
+          learning.rate = learning.rate, 
+          momentum = momentum,
+          dataset.size = dataset.size
+        )
+      }
+    },
+    
+    feedForward = function(input, sample.num){
+      # First layer gets the specified inputs
+      layers[[1]]$forwardPass(input, sample.num)
+      # Subsequent layers get their inputs from the layer preceding them
       if(n.layers > 1){
-        for(i in 2:n.layers){
-          layers[[i]]$forwardPass(layers[[i - 1]]$output)
+        for(j in 2:n.layers){
+          layers[[j]]$forwardPass(
+            layers[[j - 1]]$outputs[ , , sample.num], 
+            sample.num
+          )
         }
       }
     },
-    backprop = function(){
-      
-      # Final layer just sees error from the loss gradient
+    
+    backprop = function(sample.num){
+      # Final layer gets its error from the loss gradient
+      net.output = layers[[n.layers]]$outputs[ , , sample.num]
       layers[[n.layers]]$backwardPass(
-        lossGradient(y = y[minibatch.ids, ], yhat = returnOutput())
+        lossGradient(y = y[minibatch.ids, ], yhat = net.output),
+        sample.num
       )
       
       # Earlier layers' error gradients are filtered through the coefficients of
       # the layer above.
       if(n.layers > 1){
         for(i in (n.layers - 1):1){
-          layers[[i]]$backwardPass(
+          incoming.error.grad = layers[[i]]$backwardPass(
             tcrossprod(
-              layers[[i + 1]]$error.grad, 
+              layers[[i + 1]]$error.grads[ , , sample.num], 
               layers[[i + 1]]$coefficients
-            )
+            ),
+            sample.num = sample.num
           )
         }
       }
     },
-    updateCoefficients = function(){
-      for(lay in layers){
-        lay$updateCoefficients()
+    
+    averageSampleGradients = function(){
+      findImportanceWeights()
+      for(i in 1:n.layers){
+        layers[[i]]$combineSampleGradients(
+          weights = importance.weights,     
+          n.importance.samples = n.importance.samples
+        )
       }
     },
-    predict = function(newdata){
-      feedForward(newdata)
-      return(output)
-    },
-    fit = function(iterations){
-      for(i in 1:iterations){
-        
-        # Step 1: pick a minibatch.
-        newMinibatch()
-        
-        # Step 2: Find gradients on that minibatch.
-        if(n.importance.samples == 1L){
-          feedForward()
-          backprop()
-        }else{
-          findImportanceSampleGradients()
-        }
-        
-        # Step 3: Update coefficients.
-        updateCoefficients()
-      }
-    },
-    findImportanceSampleGradients = function(){
-      for(j in 1:n.importance.samples){
-        feedForward(
-          cbind(
-            x[minibatch.ids, ], 
-            ranefSample(nrow = minibatch.size, ncol = n.ranef)
+    
+    findImportanceWeights = function(){
+      importance.errors = zeros(minibatch.size, n.importance.samples)
+      for(i in 1:n.importance.samples){
+        importance.errors[ , i] = rowSums(
+          loss(
+            y = y[minibatch.ids, ], 
+            yhat = layers[[n.layers]]$outputs[ , , i]
           )
         )
-        backprop()
-        saveGradients(j)
-        saveImportanceError(j)
       }
-      
-      averageSampleGradients()
-    },
-    saveGradients = function(sample.number){
-      for(lay in layers){
-        lay$importance.bias.grads[ , sample.number] = lay$bias.grad
-        lay$importance.llik.grads[ , , sample.number] = lay$llik.grad
-      }
-    },
-    averageSampleGradients = function(){
-      unscaled.weights = t(apply(
-        importance.errors, 
-        1,
-        function(x) exp(min(x) - x)
-      ))
-      weights = colMeans(unscaled.weights / rowSums(unscaled.weights))
-      
-      for(lay in layers){
-        lay$bias.grad = 0 * lay$bias.grad
-        lay$llik.grad = 0 * lay$llik.grad
-        for(i in 1:n.importance.samples){
-          w = weights[i]
-          lay$bias.grad = lay$bias.grad + w * lay$importance.bias.grads[ , i]
-          lay$llik.grad = lay$llik.grad + w * lay$importance.llik.grads[ , , i]
-        }
-      }
-    },
-    saveImportanceError = function(sample.number){
-      importance.errors[ , sample.number] <<- rowSums(reportLoss())
-    },
-    reportLoss = function(){
-      loss(y = y[minibatch.ids, ], yhat = layers[[n.layers]]$output)
-    },
-    returnOutput = function(){
-      layers[[n.layers]]$output
+      importance.weights <<- weighImportance(importance.errors)
     }
   )
 )

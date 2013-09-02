@@ -3,57 +3,35 @@ load("birds.Rdata")
 library(fastICA)
 
 n.ranef = 3L
-n.importance.samples = 2L
+n.importance.samples = 25L
 
 n.layer1 = 20L
-n.layer2 = 4L
+n.layer2 = 10L
 
 minibatch.size = 50L
 
 f = fastICA(scale(env), 10)
 xx = f$S[in.train, ]
 
-net = network$new(
+net = mistnet(
   x = xx,
   y = route.presence.absence[in.train, ],
-  layers = list(
-    createLayer(
-      dim = c(ncol(env) + n.ranef, n.layer1),
-      learning.rate = 1E-4,
-      momentum = 0,
-      prior = gaussian.prior(mean = 0, var = .0001),
-      dataset.size = nrow(env),
-      nonlinearity.name = "rectify",
-      n.importance.samples = n.importance.samples,
-      dropout = FALSE
-    ),
-    createLayer(
-      dim = c(n.layer1, n.layer2),
-      learning.rate = 1E-4,
-      momentum = 0,
-      prior = gaussian.prior(mean = 0, var = .0001),
-      dataset.size = nrow(env),
-      nonlinearity.name = "linear",
-      n.importance.samples = n.importance.samples
-    ),
-    createLayer(
-      dim = c(n.layer2, ncol(route.presence.absence)),
-      learning.rate = 1E-4,
-      momentum = 0,
-      prior = gaussian.prior(mean = 0, var = .0001),
-      dataset.size = nrow(env),
-      nonlinearity.name = "sigmoid",
-      n.importance.samples = n.importance.samples
-    )
+  nonlinearity.names = c("rectify", "linear", "sigmoid"),
+  hidden.dims = c(n.layer1, n.layer2),
+  priors = list(
+    gaussian.prior(mean = 0, var = .0001),
+    gaussian.prior(mean = 0, var = .0001),
+    gaussian.prior(mean = 0, var = .0001)
   ),
+  learning.rate = 1E-4,
+  momentum = .9,
   loss = crossEntropy,
-  lossGradient = crossEntropyGrad,
+  lossGrad = crossEntropyGrad,
   minibatch.size = minibatch.size,
-  n.layers = 3L,
   n.importance.samples = n.importance.samples,
   n.ranef = n.ranef,
   ranefSample = gaussianRanefSample,
-  importance.errors = matrix(NA, nrow = minibatch.size, ncol = n.importance.samples)
+  training.iterations = 0L
 )
 
 net$layers[[3]]$biases = qlogis(colMeans(route.presence.absence))
@@ -64,25 +42,25 @@ net$layers[[3]]$coefficients[,] = rt(length(net$layers[[3]]$coefficients), df = 
 
 net$fit(1)
 
-losses = numeric(2E2)
+losses = numeric(1E3)
 for(i in 1:(length(losses))){
   net$fit(1)
-  losses[i] = mean(rowSums(net$reportLoss()))
+  #losses[i] = mean(rowSums(net$reportLoss()))
   if(i%%100 == 0){
     for(layer in 1:net$n.layers){
-      net$layers[[layer]]$momentum = min((1 + i / 10000) / 2, .99)
-      net$layers[[layer]]$learning.rate = 2E-4 / (1 + 1E-5 * i) * (1 - net$layers[[layer]]$momentum)
+      net$momentum = min((1 + i / 10000) / 2, .99)
+      net$learning.rate = 2E-4 / (1 + 1E-5 * i) * (1 - net$momentum)
     }
     cat(i, "\n")
     net$layers[[3]]$prior$mean = 
       c(0 * net$layers[[3]]$coefficients + rowMeans(net$layers[[3]]$coefficients))
     if(i %% 1000 == 0){
-      plot(losses[1:1E4], type = "l")
-      abline(h = mean(losses[(i-100):i]))
+      #plot(losses[1:1E4], type = "l")
+      #abline(h = mean(losses[(i-100):i]))
     }
   }
 }
-plot(losses, type = "l")
+#plot(losses, type = "l")
 
 zz = apply(net$layers[[3]]$coefficients, 2, function(x) x / sqrt(sum(x^2)))
 z = crossprod(zz)
@@ -90,28 +68,31 @@ dimnames(z) = list(colnames(route.presence.absence), colnames(route.presence.abs
 head(sort(z[,"Yellow-headed Blackbird"], decreasing=TRUE), 11)[-1]
 head(sort(z[,"Veery"], decreasing=TRUE), 11)[-1]
 
-net$minibatch.size = nrow(xx)
-net$minibatch.ids = 1:nrow(xx)
+net$selectMinibatch(1:nrow(xx))
 net$feedForward(
   cbind(
     xx, 
     net$ranefSample(nrow = net$minibatch.size, ncol = n.ranef)
-  )
+  ), 
+  1
 )
 
-mean(rowSums(net$reportLoss()))
-plot(prcomp(net$layers[[2]]$output))
+#mean(rowSums(net$reportLoss()))
+#plot(prcomp(net$layers[[2]]$output))
 
 
-
-net$feedForward(
-  cbind(
-    f$S, 
-    net$ranefSample(nrow = nrow(f$S), ncol = n.ranef)
+net$selectMinibatch(1:nrow(f$S))
+for(i in 1:n.importance.samples){
+  net$feedForward(
+    cbind(
+      f$S, 
+      net$ranefSample(nrow = nrow(f$S), ncol = n.ranef)
+    ),
+    i
   )
-)
+}
 library(ggplot2)
-color = predict(prcomp(net$layers[[2]]$output))[,1]
+color = predict(prcomp(net$layers[[2]]$outputs[,,1]))[,1]
 qplot(
   latlon[,1],
   latlon[,2],

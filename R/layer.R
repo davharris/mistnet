@@ -2,52 +2,42 @@
 layer = setRefClass(
   Class = "layer",
   fields = list(
+    coef.dim = "integer",
     coefficients = "matrix",
     biases = "numeric",
-    input = "matrix",
-    activation = "matrix",
-    output = "matrix",
-    error.grad = "matrix",
-    llik.grad = "matrix",
-    bias.grad = "numeric",
-    grad.step = "matrix",
-    dim = "integer",
-    learning.rate = "numeric",
-    momentum = "numeric",
     nonlinearity = "function",
     nonlinearityGrad = "function",
     prior = "prior",
-    dataset.size = "numeric",
-    dropout = "logical",
-    importance.llik.grads = "array",
-    importance.bias.grads = "matrix",
-    n.importance.samples = "integer"
+    inputs = "array",
+    activations = "array",
+    outputs = "array",
+    error.grads = "array",
+    weighted.bias.grads = "numeric",
+    weighted.llik.grads = "matrix",
+    grad.step = "matrix"
   ),
   
   methods = list(
     
-    forwardPass = function(input){
-      input <<- input
-      activation <<- (input %*% coefficients) %plus% biases
-      output <<- .self$nonlinearity(activation)
-      if(dropout){
-        output <<- output * dropoutMask(nrow(output), dim[[2]])
-      }
+    forwardPass = function(input, sample.num){
+      if(missing(sample.num)){stop("sample.num is missing in forwardPass")}
+      activation = (input %*% coefficients) %plus% biases
+      
+      inputs[ , , sample.num] <<- input
+      activations[ , , sample.num] <<- activation
+      outputs[ , , sample.num] <<- nonlinearity(activation)
     },
     
-    backwardPass = function(incoming.error.grad){
-      error.grad <<- nonlinearityGrad(activation) * incoming.error.grad
-      llik.grad <<- matrixMultiplyGrad(
-        n.in = dim[[1]],
-        n.out = dim[[2]],
-        error.grad = error.grad,
-        input = input
-      )
-      bias.grad <<- colSums(error.grad)
+    backwardPass = function(incoming.error.grad, sample.num){
+      # Chain rule: multiply incoming error gradient by the nonlinearity's own 
+      # gradient.
+      nonlinear.grad = nonlinearityGrad(activations[ , , sample.num])
+      error.grads[ , , sample.num] <<- incoming.error.grad * nonlinear.grad
     },
     
-    updateCoefficients = function(){
-      grad = -llik.grad + prior$getLogGrad(coefficients) / dataset.size
+    updateCoefficients = function(learning.rate, momentum, dataset.size){
+      log.prior.grad = prior$getLogGrad(coefficients) / dataset.size
+      grad = -weighted.llik.grads + log.prior.grad
       grad.step <<- grad * learning.rate + momentum * grad.step
       coefficients <<- coefficients + grad.step
       
@@ -56,49 +46,42 @@ layer = setRefClass(
       # to estimate reliably, so we can move farther along them.
       # Also, I don't have any momentum for biases at the moment, so this should
       # allow them to keep up better.
-      biases <<- biases - bias.grad * learning.rate * 10
+      biases <<- biases - weighted.bias.grads * learning.rate * 10
+    },
+    
+    combineSampleGradients = function(weights, n.importance.samples){
+      weighted.llik.grads <<- zeros(coef.dim[[1]], coef.dim[[2]])
+      weighted.bias.grads <<- rep(0, coef.dim[[2]])
+      for(i in 1:n.importance.samples){
+        partial.error.grad = error.grads[ , , i] * weights[ , i]
+        
+        partial.llik.grad = matrixMultiplyGrad(
+          n.in = coef.dim[[1]],
+          n.out = coef.dim[[2]],
+          error.grad = partial.error.grad,
+          input = inputs[ , , i]
+        )
+        partial.bias.grad = colSums(partial.error.grad)
+        
+        weighted.llik.grads <<- weighted.llik.grads + partial.llik.grad
+        weighted.bias.grads <<- weighted.bias.grads + partial.bias.grad
+      }
+    },
+    
+    resetState = function(minibatch.size, n.importance.samples){
+      inputs <<- array(
+        NA, 
+        c(minibatch.size, coef.dim[[1]], n.importance.samples)
+      )
+      
+      out.array = array(
+        NA, 
+        c(minibatch.size, coef.dim[[2]], n.importance.samples)
+      )
+      activations <<- out.array
+      outputs <<- out.array
+      error.grads <<- out.array
     }
+    
   )
 )
-
-createLayer = function(
-  dim,
-  learning.rate,
-  momentum,
-  prior,
-  dataset.size,
-  nonlinearity.name,
-  n.importance.samples = 1L,
-  dropout = FALSE
-){
-  if(learning.rate > 1 | learning.rate <= 0){
-    stop("learning.rate must be greater than 0 and less than or equal to one")
-  }
-  if(momentum >=1 | momentum < 0){
-    stop("momentum cannot be negative and must be less than one")
-  }
-  
-  layer$new(
-    coefficients = matrix(0, nrow = dim[[1]], ncol = dim[[2]]),
-    biases = rep(0, dim[[2]]),
-    grad.step = matrix(0, nrow = dim[[1]], ncol = dim[[2]]),
-    dim = dim,
-    learning.rate = learning.rate,
-    momentum = momentum,
-    nonlinearity = get(nonlinearity.name, mode = "function"),
-    nonlinearityGrad = get(paste0(nonlinearity.name, "Grad"), mode = "function"),
-    prior = prior,
-    dataset.size = dataset.size,
-    n.importance.samples = n.importance.samples,
-    dropout = dropout,
-    importance.llik.grads = array(
-      NA, 
-      dim = c(dim[[1]], dim[[2]], n.importance.samples)
-    ),
-    importance.bias.grads = matrix(
-      NA, 
-      nrow = dim[[2]], 
-      ncol = n.importance.samples
-    )
-  )
-}
