@@ -21,11 +21,10 @@ layer = setRefClass(
     
     forwardPass = function(input, sample.num){
       if(missing(sample.num)){stop("sample.num is missing in forwardPass")}
-      activation = (input %*% coefficients) %plus% biases
       
       inputs[ , , sample.num] <<- input
-      activations[ , , sample.num] <<- activation
-      outputs[ , , sample.num] <<- nonlinearity(activation)
+      activations[ , , sample.num] <<- (input %*% coefficients) %plus% biases
+      outputs[ , , sample.num] <<- nonlinearity(activations[ , , sample.num])
     },
     
     backwardPass = function(incoming.error.grad, sample.num){
