@@ -89,7 +89,7 @@ routes = routes[
     makeRouteID(runs[match(routeDataIDs, runs$RouteDataId), ]),
     makeRouteID(routes)
   ),
-]
+  ]
 
 latlon = routes[,c("Longi", "Lati")]
 
@@ -117,7 +117,7 @@ row.names(route.presence.absence) = routeDataIDs
 colnames(route.presence.absence) = valid.species.df[
   sort(unique(stop.data$AOU)), 
   "English_Common_Name"
-]
+  ]
 
 
 
@@ -154,7 +154,14 @@ route.presence.absence = route.presence.absence[ , is.not.too.rare]
 
 # save --------------------------------------------------------------------
 
-
+species.data = valid.species.df[
+  match(
+    colnames(route.presence.absence), 
+    valid.species.df$English_Common_Name
+  ), 
+]
+names(species.data)[names(species.data) == "Spanish_Common_Name"] = "Latin_name"
+rownames(species.data) = gsub(" ", "_", species.data$English_Common_Name)
 
 save(
   route.presence.absence = route.presence.absence,
@@ -162,6 +169,7 @@ save(
   in.test = in.test,
   in.train = in.train,
   env = env,
+  species.data = species.data,
   file = "birds.Rdata"
 )
 
