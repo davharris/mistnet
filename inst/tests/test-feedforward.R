@@ -49,9 +49,10 @@ test_that("Multi-layer feedforward works", {
   net = mistnet(
     x = matrix(rnorm(100), nrow = 20, ncol = 5),
     y = matrix(rnorm(100), nrow = 20, ncol = 5),
-    nonlinearity.names = c("rectify", "sigmoid"),
-    hidden.dims = c(13L),
+    nonlinearity.names = c("rectify", "rectify", "sigmoid"),
+    hidden.dims = c(13L, 17L),
     priors = list(
+      gaussian.prior(mean = 0, var = .001),
       gaussian.prior(mean = 0, var = .001),
       gaussian.prior(mean = 0, var = .001)
     ),
@@ -60,9 +61,9 @@ test_that("Multi-layer feedforward works", {
     loss = crossEntropy,
     lossGrad = crossEntropyGrad,
     minibatch.size = 4L,
-    n.importance.samples = 2L,
+    n.importance.samples = 27L,
     n.ranef = 3L,
-    ranefSample = zeros,
+    ranefSample = gaussianRanefSample,
     training.iterations = 0L
   )
   
@@ -97,5 +98,14 @@ test_that("Multi-layer feedforward works", {
       nonlinearity((inputs[,,2] %*% coefficients) %plus% biases)
     ),
     net$layers[[2]]$outputs[,,2]
+  )
+  
+  
+  expect_equal(
+    with(
+      net$layers[[3]],
+      nonlinearity((inputs[,,2] %*% coefficients) %plus% biases)
+    ),
+    net$layers[[3]]$outputs[,,2]
   )
 })
