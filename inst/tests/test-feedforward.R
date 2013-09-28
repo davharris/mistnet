@@ -46,49 +46,56 @@ test_that("Single-layer feedforward works", {
 
 
 test_that("Multi-layer feedforward works", {
-  net = network$new(
+  net = mistnet(
     x = matrix(rnorm(100), nrow = 20, ncol = 5),
-    layers = list(
-      l1 = layer$new(
-        biases = rnorm(6),
-        coefficients = matrix(rnorm(30), nrow = 5),
-        nonlinearity = rectify,
-        dim = c(5L, 6L),
-        dropout = FALSE
-      ),
-      l2 = layer$new(
-        biases = rnorm(7),
-        coefficients = matrix(rnorm(42), nrow = 6),
-        nonlinearity = sigmoid,
-        dropout = FALSE
-      )
+    y = matrix(rnorm(100), nrow = 20, ncol = 5),
+    nonlinearity.names = c("rectify", "sigmoid"),
+    hidden.dims = c(13L),
+    priors = list(
+      gaussian.prior(mean = 0, var = .001),
+      gaussian.prior(mean = 0, var = .001)
     ),
-    n.layers = 2L,
-    minibatch.size = 5L
+    learning.rate = 1E-3,
+    momentum = .5,
+    loss = crossEntropy,
+    lossGrad = crossEntropyGrad,
+    minibatch.size = 4L,
+    n.importance.samples = 2L,
+    n.ranef = 3L,
+    ranefSample = zeros,
+    training.iterations = 0L
   )
   
-  
-  net$newMinibatch()
-  net$feedForward()
+  ranefs = net$ranefSample(nrow = net$minibatch.size, ncol = net$n.ranef)
+  net$selectMinibatch()
+  net$feedForward(
+    cbind(
+      net$x[net$minibatch.ids, ], 
+      ranefs
+    ),
+    2
+  )
   
   expect_equal(
     with(
       net$layers[[1]],
-      nonlinearity((input %*% coefficients) %plus% biases)
+      nonlinearity(
+        (cbind(ranefs, net$x[net$minibatch.ids, ]) %*% coefficients) %plus% biases
+      )
     ),
-    net$layers[[1]]$output
+    net$layers[[1]]$outputs[,,2]
   )
   
   expect_equal(
-    net$layers[[1]]$output,
-    net$layers[[2]]$input
+    net$layers[[1]]$outputs,
+    net$layers[[2]]$inputs
   )
   
   expect_equal(
     with(
       net$layers[[2]],
-      nonlinearity((input %*% coefficients) %plus% biases)
+      nonlinearity((inputs[,,2] %*% coefficients) %plus% biases)
     ),
-    net$layers[[2]]$output
+    net$layers[[2]]$outputs[,,2]
   )
 })
