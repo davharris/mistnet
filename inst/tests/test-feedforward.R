@@ -33,7 +33,7 @@ test_that("Single-layer feedforward works", {
     l$outputs[ , , 2],
     l$nonlinearity((l$inputs[ , , 2] %*% l$coefficients) %plus% l$biases)
   )
-
+  
   # Nothing should change during feedforward except the three listed fields
   for(name in layer$fields()){
     name.shouldnt.change = name %in% c("inputs", "activations", "outputs")
@@ -78,11 +78,8 @@ test_that("Multi-layer feedforward works", {
   )
   
   expect_equal(
-    with(
-      net$layers[[1]],
-      nonlinearity(
-        (cbind(ranefs, net$x[net$minibatch.ids, ]) %*% coefficients) %plus% biases
-      )
+    net$layers[[1]]$nonlinearity(
+      (cbind(ranefs, net$x[net$minibatch.ids, ]) %*% net$layers[[1]]$coefficients) %plus% net$layers[[1]]$biases
     ),
     net$layers[[1]]$outputs[,,2]
   )
