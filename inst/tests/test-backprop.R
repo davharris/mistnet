@@ -1,135 +1,80 @@
-context("Backpropagation")
+context("3-layer backprop")
+set.seed(1)
 
-test_that("Backpropagation works",{
-  
+test_that("3-layer backprop works", {
+  # Need a test with three layers because the code treats the first and last
+  # layers differently.  Need to make sure the code still works with the
+  # intermediate layers that are neither first nor last.
   eps = 1E-5
   
-  net = network$new(
-    x = matrix(rnorm(99), nrow = 33, ncol = 3),
-    y = dropoutMask(99, 7),
-    layers = list(
-      l1 = createLayer(
-        dim = c(3L, 6L),
-        learning.rate = .01,
-        momentum = .8,
-        prior = gaussian.prior$new(mean = 0, var = 1),
-        dataset.size = 1000,
-        nonlinearity.name = "sigmoid",
-        dropout = FALSE
-      ),
-      l2 = createLayer(
-        dim = c(6L, 7L),
-        learning.rate = .01,
-        momentum = .8,
-        prior = gaussian.prior$new(mean = 0, var = 1),
-        dataset.size = 1000,
-        nonlinearity.name = "sigmoid",
-        dropout = FALSE
-      )
-    ),
-    n.layers = 2L,
-    minibatch.size = 15L,
-    loss = crossEntropy,
-    lossGradient = crossEntropyGrad
-  )
+  x = matrix(rnorm(1819), ncol = 17, nrow = 107)
+  y = dropoutMask(107, 14)
   
-  
-  net$newMinibatch()
-  net$feedForward()
-  net$backprop()
-  
-  # If all the coefficients in layer 2 are 0, then the
-  # weights in layer 1 can't possibly matter
-  expect_true(all(net$layers[[1]]$llik.grad == 0))
-  
-  
-  # Set coefficients to random values
-  net$layers[[1]]$coefficients[ , ] = rnorm(net$layers[[1]]$coefficients)
-  net$layers[[2]]$coefficients[ , ] = rnorm(net$layers[[2]]$coefficients)
-  
-  # Compare the computed gradient for layer 2 with a finite difference 
-  # approximation
-  net$feedForward()
-  net$backprop()
-  grad = net$layers[[2]]$llik.grad
-  
-  net$layers[[2]]$coefficients[1,1] = eps + net$layers[[2]]$coefficients[1,1]
-  net$feedForward()
-  net$backprop()
-  plus.error = net$loss(
-    y = net$y[net$minibatch.ids, ], 
-    yhat = net$layers[[2]]$output
-  )
-  
-  # subtract 2 * eps: once to undo the addition above and once to actually
-  # decrement by eps
-  net$layers[[2]]$coefficients[1,1] = -2 * eps + net$layers[[2]]$coefficients[1,1]
-  net$feedForward()
-  net$backprop()
-  minus.error = net$loss(
-    y = net$y[net$minibatch.ids, ], 
-    yhat = net$layers[[2]]$output
-  )
-  
-  expect_equal(
-    sum((plus.error - minus.error)) / 2 / eps,
-    grad[1,1]
-  )
-})
-
-
-test_that("Single-layer networks work",{
-  eps = 1E-5
-  x = matrix(rnorm(600), nrow = 30)
-  y = matrix(rnorm(300), nrow = 30)
-  net = network$new(
+  net = mistnet(
     x = x,
     y = y,
-    layers = list(
-      createLayer(
-        dim = c(ncol(x), ncol(y)),
-        learning.rate = 1,
-        momentum = 0.5,
-        prior = gaussian.prior$new(mean = 0, var = 1),
-        dataset.size = 100,
-        nonlinearity.name = "sigmoid"
-      )
+    nonlinearity.names = c("rectify", "rectify", "sigmoid"),
+    hidden.dims = c(13L, 17L),
+    priors = list(
+      gaussian.prior(mean = 0, var = .001),
+      gaussian.prior(mean = 0, var = .001),
+      gaussian.prior(mean = 0, var = .001)
     ),
-    n.layers = 1L,
-    minibatch.size = 23L,
+    learning.rate = 1E-3,
+    momentum = .5,
     loss = crossEntropy,
-    lossGradient = crossEntropyGrad
+    lossGrad = crossEntropyGrad,
+    minibatch.size = 13L,
+    n.importance.samples = 1L,
+    n.ranef = 7L,
+    ranefSample = gaussianRanefSample,
+    training.iterations = 0L
   )
   
-  starting.coef = matrix(
-    rnorm(length(net$layers[[1]]$coefficients)),
-    nrow = net$layers[[1]]$dim[[1]]
+  net$fit(1)
+  # If all the coefficients in layer 2 are 0, then the
+  # weights in layer 1 can't possibly matter
+  expect_true(all(net$layers[[1]]$weighted.llik.grads == 0))
+  
+  
+  
+  net$layers[[1]]$coefficients[ , ] = rnorm(length(net$layers[[1]]$coefficients[ , ])) / 1000
+  net$layers[[2]]$coefficients[ , ] = rnorm(length(net$layers[[2]]$coefficients[ , ]))
+  net$layers[[3]]$coefficients[ , ] = rnorm(length(net$layers[[3]]$coefficients[ , ]))
+  
+  net$selectMinibatch()
+  set.seed(1)
+  # feedforward, backprop, average sample gradients. Don't update.
+  net$estimateGradient() 
+  grad = net$layers[[1]]$weighted.llik.grads[1,1]
+  
+  net$layers[[1]]$coefficients[1, 1] = net$layers[[1]]$coefficients[1, 1] + eps
+  set.seed(1)
+  net$estimateGradient()
+  plus.loss = mean(
+    rowSums(
+      net$loss(
+        y = net$y[net$minibatch.ids, ], 
+        yhat = net$layers[[3]]$outputs[,,1]
+      )
+    )
   )
   
-  net$layers[[1]]$coefficients = starting.coef
-  
-  
-  net$newMinibatch()
-  net$feedForward()
-  net$backprop()
-  
-  grad = net$layers[[1]]$llik.grad
-  
-  
-  net$layers[[1]]$coefficients[1,1] = net$layers[[1]]$coefficients[1,1] + eps
-  net$feedForward()
-  net$backprop()
-  plus.loss = net$reportLoss()
-  
-  
-  net$layers[[1]]$coefficients[1,1] = net$layers[[1]]$coefficients[1,1] - 2 * eps
-  net$feedForward()
-  net$backprop()
-  minus.loss = net$reportLoss()
-  
+  # 2*eps: once to undo the plus above, once to actually decrement
+  net$layers[[1]]$coefficients[1, 1] = net$layers[[1]]$coefficients[1, 1] - 2 * eps
+  set.seed(1)
+  net$estimateGradient()
+  minus.loss = mean(
+    rowSums(
+      net$loss(
+        y = net$y[net$minibatch.ids, ], 
+        yhat = net$layers[[3]]$outputs[,,1]
+      )
+    )
+  )
   expect_equal(
-    sum((plus.loss - minus.loss) / 2 / eps),
-    grad[1,1],
-    tolerance = eps
+    grad,
+    (plus.loss - minus.loss)/2 /eps,
+    tolerance = 1E-7
   )
 })
