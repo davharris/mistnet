@@ -10,7 +10,7 @@ test_that("Importance weighting works", {
   true.probs = outcomes / rowSums(outcomes)
   
   # each row can have a different baseline log-probability
-  raw.errors = -log(true.probs) + rnorm(nrow)
+  raw.errors = -log(true.probs) + rnorm(nrow, mean = 100)
   
   expect_equal(weighImportance(raw.errors), true.probs)
 })
