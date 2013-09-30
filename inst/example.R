@@ -47,17 +47,20 @@ net$layers[[1]]$coefficients[,] = rt(prod(net$layers[[1]]$coef.dim), df = 5) / 5
 net$layers[[2]]$coefficients[,] = rt(prod(net$layers[[2]]$coef.dim), df = 5) / 5
 net$layers[[3]]$coefficients[,] = rt(prod(net$layers[[3]]$coef.dim), df = 5) / 5
 
+# Fill things in so while loop stuff below doesn't break
+net$selectMinibatch()
+net$estimateGradient()
+
 while(
   as.double(Sys.time() - start.time, units = "secs") < hyperparameters$cv.seconds
 ){
-  net$fit(10)
+  # Update optimization hyperparameters
+  net$momentum = min((1 + net$completed.iterations / 1000) / 2, .99)
+  net$learning.rate = 2 * hyperparameters$starting.rate / 
+    (1 + 1E-5 * net$completed.iterations) * (1 - net$momentum)
   
+  # Hack to keep rectified units alive
   for(layer.num in 1:net$n.layers){
-    net$momentum = min((1 + net$completed.iterations / 1000) / 2, .99)
-    net$learning.rate = 2 * hyperparameters$starting.rate / 
-      (1 + 1E-5 * net$completed.iterations) * (1 - net$momentum)
-    
-    # Hack to keep rectified units alive
     if(identical(net$layers[[layer.num]]$nonlinearity,rectify)){
       for(hidden.num in 1:net$layers[[layer.num]]$coef.dim[[2]]){
         if(max(net$layers[[layer.num]]$activations[,hidden.num,]) < 0){
@@ -67,5 +70,9 @@ while(
       }
     }
   }
+  
+  net$fit(10)
   cat(net$completed.iterations, "\n")
 }
+
+p = net$predict(scale(env)[in.test, ], 50L)
