@@ -152,13 +152,13 @@ network = setRefClass(
       # Create an input matrix with the correct dimensions & correct values
       # everywhere that's fixed.
       inputs = cbind(
-        f$S[in.test, ], 
+        newdata, 
         zeros(nrow = sum(in.test), ncol = n.ranef)
       )
       
       
       for(i in 1:copy$n.importance.samples){
-        inputs[, -(1:ncol(f$S))] = copy$ranefSample(
+        inputs[, -(1:ncol(newdata))] = copy$ranefSample(
           nrow = sum(in.test), 
           ncol = n.ranef
         )
