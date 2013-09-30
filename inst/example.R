@@ -13,7 +13,7 @@ hyperparameters = list(
   prior.var2 = .001,
   prior.var3 = .001,
   starting.rate = 1E-3,
-  cv.seconds = 60
+  cv.seconds = 10
 )
 
 in.fold = TRUE
@@ -39,33 +39,33 @@ net = mistnet(
   training.iterations = 0L
 )
 
-net$layers[[3]]$biases = qlogis(colMeans(route.presence.absence[in.train, ][in.fold, ]))
+# Initialize coefficients and biases
+net$layers[[3]]$biases = qlogis(
+  colMeans(route.presence.absence[in.train, ][in.fold, ])
+)
+net$layers[[1]]$coefficients[,] = rt(prod(net$layers[[1]]$coef.dim), df = 5) / 5
+net$layers[[2]]$coefficients[,] = rt(prod(net$layers[[2]]$coef.dim), df = 5) / 5
+net$layers[[3]]$coefficients[,] = rt(prod(net$layers[[3]]$coef.dim), df = 5) / 5
 
-net$layers[[1]]$coefficients[,] = rt(length(net$layers[[1]]$coefficients), df = 3) / 10
-net$layers[[2]]$coefficients[,] = rt(length(net$layers[[2]]$coefficients), df = 3) / 10
-net$layers[[3]]$coefficients[,] = rt(length(net$layers[[3]]$coefficients), df = 3) / 10
-
-net$fit(1)
-
-while(as.double(Sys.time() - start.time, units = "secs") < hyperparameters$cv.seconds){
-  net$fit(1)
-
-  if(net$completed.iterations %% 100 == 0){
-    for(layer.num in 1:net$n.layers){
-      net$momentum = min((1 + net$completed.iterations / 1000) / 2, .99)
-      net$learning.rate = 2 * hyperparameters$starting.rate / 
-        (1 + 1E-5 * net$completed.iterations) * (1 - net$momentum)
-      
-      # Hack to keep rectified units alive
-      if(identical(net$layers[[layer.num]]$nonlinearity,rectify)){
-        for(hidden.num in 1:net$layers[[layer.num]]$coef.dim[[2]]){
-          if(max(net$layers[[layer.num]]$activations[,hidden.num,]) < 0){
-            net$layers[[layer.num]]$biases[[hidden.num]] = 
-              net$layers[[layer.num]]$biases[[hidden.num]] + .1
-          }
+while(
+  as.double(Sys.time() - start.time, units = "secs") < hyperparameters$cv.seconds
+){
+  net$fit(10)
+  
+  for(layer.num in 1:net$n.layers){
+    net$momentum = min((1 + net$completed.iterations / 1000) / 2, .99)
+    net$learning.rate = 2 * hyperparameters$starting.rate / 
+      (1 + 1E-5 * net$completed.iterations) * (1 - net$momentum)
+    
+    # Hack to keep rectified units alive
+    if(identical(net$layers[[layer.num]]$nonlinearity,rectify)){
+      for(hidden.num in 1:net$layers[[layer.num]]$coef.dim[[2]]){
+        if(max(net$layers[[layer.num]]$activations[,hidden.num,]) < 0){
+          net$layers[[layer.num]]$biases[[hidden.num]] = 
+            net$layers[[layer.num]]$biases[[hidden.num]] + .1
         }
       }
     }
-    cat(net$completed.iterations, "\n")
   }
+  cat(net$completed.iterations, "\n")
 }
