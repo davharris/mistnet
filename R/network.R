@@ -153,13 +153,13 @@ network = setRefClass(
       # everywhere that's fixed.
       inputs = cbind(
         newdata, 
-        zeros(nrow = sum(in.test), ncol = n.ranef)
+        zeros(nrow = nrow(newdata), ncol = n.ranef)
       )
       
       
       for(i in 1:copy$n.importance.samples){
         inputs[, -(1:ncol(newdata))] = copy$ranefSample(
-          nrow = sum(in.test), 
+          nrow = nrow(newdata), 
           ncol = n.ranef
         )
         copy$feedForward(
