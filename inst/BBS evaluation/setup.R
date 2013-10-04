@@ -22,9 +22,9 @@ stopifnot(min(min.max) > 0, max(min.max) < 1)
 # Select hyperparameters --------------------------------------------------
 
 # priors distributed log-uniformly between .001 and 1
-prior1 = 10^(runif(1, min = -4, max = 0))
-prior2 = 10^(runif(1, min = -4, max = 0))
-prior3 = 10^(runif(1, min = -4, max = 0))
+prior.var1 = 10^(runif(1, min = -4, max = 0))
+prior.var1 = 10^(runif(1, min = -4, max = 0))
+prior.var1 = 10^(runif(1, min = -4, max = 0))
 
 # minibatch.size distributed uniformly between 10 and 100
 minibatch.size = sample(10:100, 1)
