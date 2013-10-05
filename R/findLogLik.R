@@ -14,9 +14,8 @@ findLogExpectedLik = function(importance.errors, weights){
     function(i){
       smallest.error = min(importance.errors[i, ])
       log(
-        sum(exp(smallest.error - importance.errors[i, ]) * weights[i, ]) * 
-          exp(-smallest.error)
-      )
+        sum(exp(smallest.error - importance.errors[i, ]) * weights[i, ])
+      ) - smallest.error
     }
   )
 }
