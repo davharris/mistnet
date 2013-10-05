@@ -5,6 +5,7 @@
 library(geosphere) # for regularCoordinates
 library(raster)    # for worldclim
 library(caret)     # for findCorrelations
+library(lubridate) # for dates and times
 
 year = 2011     # year of BBS data
 min.train = 10  # species must be observed this many times in the training set to be included
@@ -84,12 +85,33 @@ makeRouteID = function(mat) apply(
 )
 
 
+# Do I really need two `match` statements?
 routes = routes[
   match(
     makeRouteID(runs[match(routeDataIDs, runs$RouteDataId), ]),
     makeRouteID(routes)
   ),
-  ]
+]
+
+which.runs = match(routeDataIDs, runs$RouteDataId)
+
+ydays = yday(
+  ymd(
+    paste(
+      year,
+      runs$Month[which.runs], 
+      runs$Day[match(routeDataIDs, runs$RouteDataId)], 
+      sep = "-"
+    )
+  )
+)
+
+stopifnot(all(nchar(runs$StartTime[which.runs]) == 3))
+start.times = as.numeric(
+  as.difftime(
+    hm(gsub("^(.)(.*)$", "\\1:\\2", runs$StartTime[which.runs]))
+  )
+) / 60 / 60
 
 latlon = routes[,c("Longi", "Lati")]
 
@@ -117,13 +139,13 @@ row.names(route.presence.absence) = routeDataIDs
 colnames(route.presence.absence) = valid.species.df[
   sort(unique(stop.data$AOU)), 
   "English_Common_Name"
-  ]
+]
 
 
 
 # handling NA environmental data
 omitted = attr(na.omit(env), "na.action")
-env = env[-omitted,]
+x = cbind(env, start.times, ydays)[-omitted,]
 route.presence.absence = route.presence.absence[-omitted, ]
 latlon = latlon[-omitted, ]
 
@@ -168,7 +190,7 @@ save(
   latlon = latlon,
   in.test = in.test,
   in.train = in.train,
-  env = env,
+  x = x,
   species.data = species.data,
   file = "birds.Rdata"
 )
