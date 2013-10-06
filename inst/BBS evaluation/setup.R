@@ -40,15 +40,15 @@ n.ranef = sample(10:50, 1)
 # n.importance.samples distributed uniformly between 10 and 50
 n.importance.samples = sample(10:50, 1)
 
-# n.layer2 triangularly distributed between 3 and 25
+# n.layer2 triangularly distributed between 3 and 50
 triangle = function(min, max){
   unscaled = max:min - min + 1
   unscaled / sum(unscaled)
 }
-n.layer2 = sample(3:25, 1, prob = triangle(3, 25))
+n.layer2 = sample(3:50, 1, prob = triangle(3, 50))
 
-# n.layer1 triangluarly distributed between n.layer2 and 50
-n.layer1 = sample(n.layer2:50, 1, prob = triangle(n.layer2, 50))
+# n.layer1 uniformly distributed between n.layer2 and 50
+n.layer1 = sample(n.layer2:50, 1)
 
 # Starting learning rate currently fixed at 1E-3
 starting.rate = 1E-3
