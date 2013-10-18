@@ -1,0 +1,39 @@
+Okay, so let's say you have two species.
+There are four possible assemblages (one where both species are present, one where both species are absent, and two where one species is present and the other is absent).
+Our goal is to determine how likely each of these four scenarios is.
+For mathematical convenience, let's say that we fit an SDM for each species, and both came back saying that their species had a 50% probability of being present/observed at some site.
+
+**A.** If we "stack" the two models by combining their probabilities independently, as suggested in [refs], then we would predict that each of the four possible assemblages are equally likely.
+
+**B** If we relax the independence assumption, then 
+
+
+```{r A}
+library(MASS)
+
+p.list = list(
+  A = matrix(.5, ncol = 2, nrow = 2),
+  B = plogis(mvrnorm(100, c(0, 0), SigmaB))
+)
+
+n.panels = length(p.list)
+
+par(mfrow = c(2, n.panels))
+
+
+
+for(i in 1:n.panels){
+  plot(p.list[[i]], xlim = c(0,1), ylim = c(0,1), asp = 1)
+  plot(p.list[[i]], xlim = c(0,1), ylim = c(0,1), asp = 1, type = "n", axes = FALSE)
+  abline(v = .5, h = .5)
+  text(.75, .75, labels = "both")
+  text(.75, .25, labels = "x only")
+  text(.25, .75, labels = "y only ")
+  text(.25, .25, labels = "neither")
+}
+
+
+
+par(mfrow = c(1,1))
+```
+
