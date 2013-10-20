@@ -10,30 +10,121 @@ For mathematical convenience, let's say that we fit an SDM for each species, and
 
 ```{r A}
 library(MASS)
+set.seed(1)
+
+n = 1E6
+SigmaB = matrix(c(1/2, 0, 0, 1/2), nrow = 2)
+SigmaC = matrix(c(4, 3.9, 3.9, 4), nrow = 2)
+SigmaD = matrix(c(1/2, -.499, -.499, 1/2) * 100, nrow = 2)
 
 p.list = list(
-  A = matrix(.5, ncol = 2, nrow = 2),
-  B = plogis(mvrnorm(100, c(0, 0), SigmaB))
+  A = matrix(.5, ncol = 2, nrow = n),
+  B = plogis(mvrnorm(n, c(0, 0), SigmaB)),
+  C = plogis(mvrnorm(n, c(0, 0), SigmaC))#,
+  #D = plogis(mvrnorm(n, c(0, 0), SigmaD))
 )
 
 n.panels = length(p.list)
 
-par(mfrow = c(2, n.panels))
+pdf("a.pdf", width = 6, height = 6)
+par(mfcol = c(3, n.panels))
+par(mar = c(4, 5, 2, 1) + .1)
 
-
-
-for(i in 1:n.panels){
-  plot(p.list[[i]], xlim = c(0,1), ylim = c(0,1), asp = 1)
-  plot(p.list[[i]], xlim = c(0,1), ylim = c(0,1), asp = 1, type = "n", axes = FALSE)
-  abline(v = .5, h = .5)
-  text(.75, .75, labels = "both")
-  text(.75, .25, labels = "x only")
-  text(.25, .75, labels = "y only ")
-  text(.25, .25, labels = "neither")
+boxprobs = function(x){
+  matrix(
+    c(
+      both = mean(x[,1] * x[,2]),
+      first = mean((1-x[,1]) * x[,2]),
+      second = mean(x[,1] * (1-x[,2])),
+      neither = mean((1-x[,1]) * (1-x[,2]))
+    ),
+    nrow = 2,
+    ncol = 2
+  )
 }
 
 
+for(i in 1:n.panels){
+  # Top panel: monte carlo points
+  plot(p.list[[i]][1:250, ], xlim = c(0,1), ylim = c(0,1), asp = 1, pch = 16, col = "#00000025", main = LETTERS[i], xlab = "P(X)", ylab = "P(Y)", xaxs = "i", yaxs = "i")
+  
+  # Middle panel: boxes
+  plot(
+    p.list[[i]], 
+    xlim = c(0,1), 
+    ylim = c(0,1), 
+    asp = 1, 
+    type = "n", 
+    axes = FALSE, 
+    xlab = "No         Yes\nSpecies X observed", 
+    ylab = "Species Y observed\nNo         Yes", 
+    xaxs = "i", 
+    yaxs = "i"
+  )
+  abline(v = .5, h = .5)
+  abline(v = c(0, 1), h = c(0, 1))
+  text(.75, .75, labels = round(boxprobs(p.list[[i]])[1], 2), cex = 3 * sqrt(boxprobs(p.list[[i]])[1]))
+  text(.75, .25, labels = round(boxprobs(p.list[[i]])[2], 2), cex = 3 * sqrt(boxprobs(p.list[[i]])[2]))
+  text(.25, .75, labels = round(boxprobs(p.list[[i]])[3], 2), cex = 3 * sqrt(boxprobs(p.list[[i]])[3]))
+  text(.25, .25, labels = round(boxprobs(p.list[[i]])[4], 2), cex = 3 * sqrt(boxprobs(p.list[[i]])[1]))
+  
+  # Bottom panel: richness
+  barplot(
+    names.arg = 0:2,
+    c(
+      boxprobs(p.list[[i]])[4], 
+      sum(boxprobs(p.list[[i]])[2:3]), 
+      boxprobs(p.list[[i]])[1]
+      ),
+    ylim = c(0, .5),
+    ylab = "probability",
+    xlab = "richness"
+  )
+}
+dev.off()
+
 
 par(mfrow = c(1,1))
+```
+
+```{r real-model}
+set.seed(NULL)
+i = sample.int(nrow(prediction.array), 1)
+covs = cov(t(prediction.array[i, , ]))
+dimnames(covs) = list(colnames(route.presence.absence), colnames(route.presence.absence))
+sp.1 = which.min(covs[cbind(1:368, apply(covs, 1, which.min))])
+sp.2 = which.min(covs[, sp.1])
+
+spp = c(sp.1, sp.2)
+
+sp.covs = covs[, spp[1]]
+sp.covs[spp] = 0
+sp.3 = which.max(abs(sp.covs))
+
+p = t(prediction.array[i,spp,])
+colnames(p) = colnames(route.presence.absence)[spp]
+
+weights = prediction.array[i,sp.3,] / sum(prediction.array[i,sp.3,])
+areas = weights
+radii = sqrt(areas * nrow(p))
+cex = .4
+
+par(mfrow = c(1, 2))
+plot(p, xlim = c(0,1), ylim = c(0,1), asp = 1, pch = 16, col = "#00000050",
+     main = "baseline samples", cex = cex)
+points(mean(p[,1]), mean(p[,2]), pch = "*", cex = 3, col = 2)
+
+plot(p, xlim = c(0,1), ylim = c(0,1), asp = 1, cex = radii * cex, pch = 16, col = "#00000050", main = paste("samples given known\n", colnames(route.presence.absence)[sp.3]))
+arrows(
+  x0 = mean(p[,1]), y0 = mean(p[,2]),
+  x1 = sum(p[,1] * weights), y1 = sum(p[,2] * weights), 
+  col = "red",
+  lwd = 4,
+  length = .2
+)
+par(mfrow = c(1, 1))
+
+colMeans(p) - colSums(p * weights)
+
 ```
 
