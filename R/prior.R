@@ -38,17 +38,21 @@ laplace.prior = setRefClass(
   )
 )
 
-t.prior = setRefClass(
-  Class = "t.prior",
+# Why a Student-t distribution with 3 degrees of fredom?
+# Because it's the one with the most (non-infinite) degrees of freedom that 
+# Wikipedia has a simple formula for. I don't want to deal with derivatives
+# of gamma functions, so I'm not sure if I'll make a more general t prior.
+t3.prior = setRefClass(
+  Class = "t3.prior",
   fields = list(
     location = "numeric",
-    scale = "numeric",
-    df = "numeric"
+    scale = "numeric"
   ),
   contains = "prior",
   methods = list(
     getLogGrad = function(x){
-      stop("t.prior gradient not yet defined")
+      z = (x - location) / scale
+      - 4 * x / (x^2 + 3)
     }
   )
 )
