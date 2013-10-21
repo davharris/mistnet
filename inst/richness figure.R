@@ -28,7 +28,11 @@ plot(
   #pch = ifelse(inside.ci, 1, 19)
 )
 abline(0,1)
-abline(mean(richness.sd) * 1.96, 1, lty = 2)
-abline(mean(richness.sd) * -1.96, 1, lty = 2)
+abline(mean(richness.sd) * 1.96, 1, lty = 2, lwd = 2, col = "darkgray")
+abline(mean(richness.sd) * -1.96, 1, lty = 2, lwd = 2, col = "darkgray")
 
-richness.sd + 
+# This is also a Guassian approximation, but it's probably not very good.
+z = sqrt(mean(richness.sd^2) + mean(apply(prediction.array, 1, function(x) var(colSums(x)))))
+
+abline(z * 1.96, 1, lty = 3, lwd = 2)
+abline(z * -1.96, 1, lty = 3, lwd = 2)
