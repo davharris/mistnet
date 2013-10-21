@@ -1,40 +1,34 @@
+# What about the variance of the random effects?
+
 devtools::load_all()
 load("birds.Rdata")
+source("inst/BBS evaluation/setup.R")
 
+cv.seconds = 200
+n.prediction.samples = 500L
 start.time = Sys.time()
+i = 3
 
-hyperparameters = list(
-  n.ranef = 25L,
-  n.importance.samples = 25L,
-  n.layer1 = 50L,
-  n.layer2 = 20L,
-  minibatch.size = 50L,
-  prior.var1 = 1,
-  prior.var2 = .001,
-  prior.var3 = .001,
-  starting.rate = 1E-3,
-  cv.seconds = 10
-)
+env = x[,1:8]
 
-in.fold = TRUE
-
+in.fold = fold.ids != i
 net = mistnet(
   x = scale(env)[in.train, ][in.fold, ],
   y = route.presence.absence[in.train, ][in.fold, ],
-  nonlinearity.names = c("rectify", "rectify", "sigmoid"),
-  hidden.dims = c(hyperparameters$n.layer1, hyperparameters$n.layer2),
+  nonlinearity.names = c("rectify", "linear", "sigmoid"),
+  hidden.dims = c(n.layer1, n.layer2),
   priors = list(
-    gaussian.prior(mean = 0, var = hyperparameters$prior.var1),
-    gaussian.prior(mean = 0, var = hyperparameters$prior.var2),
-    gaussian.prior(mean = 0, var = hyperparameters$prior.var3)
+    gaussian.prior(mean = 0, var = prior.var1),
+    gaussian.prior(mean = 0, var = prior.var2),
+    gaussian.prior(mean = 0, var = prior.var3)
   ),
-  learning.rate = hyperparameters$starting.rate,
+  learning.rate = starting.rate,
   momentum = .5,
   loss = crossEntropy,
   lossGrad = crossEntropyGrad,
-  minibatch.size = hyperparameters$minibatch.size,
-  n.importance.samples = hyperparameters$n.importance.samples,
-  n.ranef = hyperparameters$n.ranef,
+  minibatch.size = minibatch.size,
+  n.importance.samples = n.importance.samples,
+  n.ranef = n.ranef,
   ranefSample = gaussianRanefSample,
   training.iterations = 0L
 )
@@ -52,11 +46,11 @@ net$selectMinibatch()
 net$estimateGradient()
 
 while(
-  as.double(Sys.time() - start.time, units = "secs") < hyperparameters$cv.seconds
+  as.double(Sys.time() - start.time, units = "secs") < cv.seconds
 ){
   # Update optimization hyperparameters
   net$momentum = min((1 + net$completed.iterations / 1000) / 2, .99)
-  net$learning.rate = 2 * hyperparameters$starting.rate / 
+  net$learning.rate = 2 * starting.rate / 
     (1 + 1E-5 * net$completed.iterations) * (1 - net$momentum)
   
   # Hack to keep rectified units alive
@@ -75,4 +69,24 @@ while(
   cat(net$completed.iterations, "\n")
 }
 
-p = net$predict(scale(env)[in.test, ], 50L)
+cat(dim(net$layers[[1]]$inputs))
+prediction.array = predict(
+  net,
+  scale(env)[in.train, ][!in.fold, ], 
+  n.prediction.samples
+)
+dim(net$layers[[1]]$inputs)
+
+
+pp = apply(prediction.array, 2, rowMeans)
+
+cv.losses = apply(
+  prediction.array,
+  3,
+  function(x){
+    rowSums(net$loss(y = route.presence.absence[in.train, ][!in.fold, ], yhat = x))
+  }
+)
+
+cv.llik = mean(findLogExpectedLik(cv.losses))
+
