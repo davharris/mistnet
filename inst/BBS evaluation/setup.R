@@ -9,11 +9,14 @@ triangle = function(min, max){
 
 
 # Build CV folds ----------------------------------------------------------
-# Setting a RNG seed so that I can ensure that all methods see the same CV 
-# splits
-set.seed(1)
 n.folds = 5L
+
+# Setting a RNG seed so that I can ensure that all methods see the same CV 
+# splits.  Then randomize the seed.
+set.seed(1)
 fold.ids = sample(rep(1:n.folds, length = sum(in.train)))
+set.seed(NULL)
+
 
 # Ensure that no folds have completely missing or completely present species
 # during CV training.  
@@ -28,11 +31,7 @@ stopifnot(min(range.colmeans) > 0, max(range.colmeans) < 1)
 
 # Select hyperparameters --------------------------------------------------
 
-# hyperparameter selection should be random; not based on the seed used above
-# for selecting CV folds
-set.seed(NULL)
-
-# priors distributed log-uniformly between .001 and 1
+# priors distributed log-uniformly between .0001 and 1
 prior.var1 = 10^(runif(1, min = -4, max = 0))
 prior.var2 = 10^(runif(1, min = -4, max = 0))
 prior.var3 = 10^(runif(1, min = -4, max = 0))
