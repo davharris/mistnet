@@ -36,3 +36,25 @@ z = sqrt(mean(richness.sd^2) + mean(apply(prediction.array, 1, function(x) var(c
 
 abline(z * 1.96, 1, lty = 3, lwd = 2)
 abline(z * -1.96, 1, lty = 3, lwd = 2)
+
+
+
+p.values = sapply(
+  1:nrow(expected.values), 
+  function(i){
+    ppoibin(richness[i], expected.values[i, ])
+  }
+)
+
+n.bars = 100
+hist(
+  p.values * 100, 
+  breaks = seq(0, 1, length = n.bars + 1) * 100, 
+  xlab = "Percentile of predicted distribution", 
+  col = "gray", 
+  border = "#888888", 
+  yaxs = "i", 
+  freq = FALSE, 
+  main = ""
+)
+abline(h = 1 / 100, lty = 2)
