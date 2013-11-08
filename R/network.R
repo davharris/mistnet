@@ -137,42 +137,6 @@ network = setRefClass(
         )
       }
       importance.weights <<- weighImportance(importance.errors)
-    },
-    
-    
-    predict = function(newdata, n.importance.samples = 1000L, return.model.copy = FALSE){
-      copy = .self$copy()
-      copy$n.importance.samples = n.importance.samples
-      # ensure that selectMinibatch triggers its extra routines for changing
-      # the number of importance samples.
-      # In retrospect, this is a screwy way to control things.
-      copy$selectMinibatch(1L)
-      copy$selectMinibatch(1:nrow(newdata))
-      
-      # Create an input matrix with the correct dimensions & correct values
-      # everywhere that's fixed.
-      inputs = cbind(
-        newdata, 
-        zeros(nrow = nrow(newdata), ncol = n.ranef)
-      )
-      
-      
-      for(i in 1:copy$n.importance.samples){
-        inputs[, -(1:ncol(newdata))] = copy$ranefSample(
-          nrow = nrow(newdata), 
-          ncol = n.ranef
-        )
-        copy$feedForward(
-          inputs,
-          i
-        )
-      }
-      
-      if(return.model.copy){
-        return(copy)
-      }else{
-        return(copy$layers[[length(copy$layers)]]$outputs)
-      }
     }
   )
 )
