@@ -12,8 +12,8 @@ BEGIN_RCPP
     SEXP __sexp_result;
     {
         Rcpp::RNGScope __rngScope;
-        NumericMatrix m = Rcpp::as<NumericMatrix >(mSEXP);
-        NumericVector v = Rcpp::as<NumericVector >(vSEXP);
+        Rcpp::traits::input_parameter< NumericMatrix >::type m(mSEXP );
+        Rcpp::traits::input_parameter< NumericVector >::type v(vSEXP );
         NumericMatrix __result = rcpp_add_biases(m, v);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
@@ -28,7 +28,7 @@ BEGIN_RCPP
     SEXP __sexp_result;
     {
         Rcpp::RNGScope __rngScope;
-        NumericMatrix m = Rcpp::as<NumericMatrix >(mSEXP);
+        Rcpp::traits::input_parameter< NumericMatrix >::type m(mSEXP );
         NumericMatrix __result = rectify(m);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
