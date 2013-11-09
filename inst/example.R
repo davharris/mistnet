@@ -2,9 +2,10 @@
 
 devtools::load_all()
 load("birds.Rdata")
+load("fold.ids.Rdata")
 source("inst/BBS evaluation/setup.R")
 
-cv.seconds = 200
+cv.seconds = 100
 n.prediction.samples = 500L
 start.time = Sys.time()
 i = 3
