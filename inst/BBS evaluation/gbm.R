@@ -1,0 +1,51 @@
+load("birds.Rdata")
+library(gbm)
+
+set.seed(1)
+
+interaction.depths = c(1, 2, 3, 5, 8)
+
+env = as.data.frame(x[ , grep("^bio", colnames(x))])
+
+species.gbm = function(species.num, interaction.depths){
+  # For each interaction depth, find the number of trees that minimizes the 
+  # species' CV error.  Return the set of predictions from the model with the 
+  # best combination of tree number and tree depth.
+  
+  
+  cat(colnames(route.presence.absence)[[species.num]], "\n")
+  predictions = matrix(
+    NA, 
+    nrow = sum(in.test), 
+    ncol = length(interaction.depths)
+  )
+  errors = numeric(length(interaction.depths))
+  
+  for(i in seq_along(interaction.depths)){
+    
+    model = gbm(
+      route.presence.absence[in.train, species.num] ~ .,
+      distribution = "bernoulli",
+      data = env[in.train, ], 
+      n.trees = 1E4,
+      interaction.depth = interaction.depths[[i]],
+      shrinkage = 0.001,
+      cv.folds = 5
+    )
+    
+    errors[[i]] = min(model$cv.error)
+    
+    predictions[ , i] = predict(
+      model, 
+      env[in.test, ], 
+      gbm.perf(model, plot = FALSE), 
+      type = "response"
+    )
+  }
+
+  predictions[ , which.min(errors)]
+}
+
+system.time({
+  a = species.gbm(species.num = 363, interaction.depth = interaction.depths)
+})
