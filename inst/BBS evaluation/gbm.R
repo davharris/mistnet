@@ -35,6 +35,8 @@ species.gbm = function(species.num, interaction.depths){
     
     errors[[i]] = min(model$cv.error)
     
+    # Making predictions for each tree depth does eat some extra time, but
+    # it means I don't have to hold multiple models in memory.
     predictions[ , i] = predict(
       model, 
       env[in.test, ], 
@@ -42,10 +44,17 @@ species.gbm = function(species.num, interaction.depths){
       type = "response"
     )
   }
-
+  
   predictions[ , which.min(errors)]
 }
 
 system.time({
-  a = species.gbm(species.num = 363, interaction.depth = interaction.depths)
+  gbm.predictions = sapply(
+    seq_len(ncol(route.presence.absence)),
+    function(i){
+      species.gbm(species.num = i, interaction.depth = interaction.depths)
+    }
+  )
 })
+
+save(gbm.predictions, file = "gbm.predictions.Rdata")
