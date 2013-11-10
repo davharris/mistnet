@@ -10,32 +10,9 @@ triangle = function(min, max){
   unscaled / sum(unscaled)
 }
 
-
-# Build CV folds ----------------------------------------------------------
-# Setting a RNG seed so that I can ensure that all methods see the same CV 
-# splits
-set.seed(1)
-n.folds = 5L
-fold.ids = sample(rep(1:n.folds, length = sum(in.train)))
-
-# Ensure that no folds have completely missing or completely present species
-# during CV training.  
-range.colmeans = range(
-  sapply(
-    1:n.folds, 
-    function(i) colMeans(route.presence.absence[in.train, ][fold.ids != i, ])
-  )
-)
-stopifnot(min(range.colmeans) > 0, max(range.colmeans) < 1)
-
-
 # Select hyperparameters --------------------------------------------------
 
-# hyperparameter selection should be random; not based on the seed used above
-# for selecting CV folds
-set.seed(NULL)
-
-# priors distributed log-uniformly between .001 and 1
+# priors distributed log-uniformly between .0001 and 1
 prior.var1 = 10^(runif(1, min = -4, max = 0))
 prior.var2 = 10^(runif(1, min = -4, max = 0))
 prior.var3 = 10^(runif(1, min = -4, max = 0))
