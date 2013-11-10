@@ -53,7 +53,8 @@ while(
   net$learning.rate = 2 * starting.rate / 
     (1 + 1E-5 * net$completed.iterations) * (1 - net$momentum)
   
-  # Hack to keep rectified units alive
+  # Hack to keep rectified units alive: add a small amount to biases of "dead"
+  # units whose activations are always negative
   for(layer.num in 1:net$n.layers){
     if(identical(net$layers[[layer.num]]$nonlinearity,rectify)){
       for(hidden.num in 1:net$layers[[layer.num]]$coef.dim[[2]]){
