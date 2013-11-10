@@ -1,4 +1,11 @@
+load("birds.Rdata")
+devtools::load_all()
+load("fold.ids.Rdata")
+
 num.attempts = 15L
+
+total.time.start = Sys.time()
+
 for(attempt.num in 1:num.attempts){
   source("inst/BBS evaluation/setup.R")
   
@@ -20,3 +27,5 @@ for(attempt.num in 1:num.attempts){
     file = paste0("mistnet performance ", attempt.num, ".Rdata")
   )
 }
+
+print(Sys.time() - total.time.start)
