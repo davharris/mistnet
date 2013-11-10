@@ -1,6 +1,3 @@
-devtools::load_all()
-load("birds.Rdata")
-
 # Discrete triangular distribution PDF:
 # Defined so that small values in the allowed range have the highest frequency,
 # like the log-uniform. For some cases (e.g. limits between 10 and 25), 
