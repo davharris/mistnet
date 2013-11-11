@@ -7,7 +7,7 @@ install_github(
   repo = "BayesComm",
   ref = "35b0288ae7839b5976fcd453e3fd7f7b5b86d855"  
 )
-library(github)
+library(BayesComm)
 
 set.seed(1)
 
