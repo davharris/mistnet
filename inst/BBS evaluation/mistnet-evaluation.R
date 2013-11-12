@@ -3,11 +3,15 @@ devtools::load_all()
 load("fold.ids.Rdata")
 library(plyr)
 
+set.seed(1)
+
 num.attempts = 15L
 
 total.time.start = Sys.time()
 
 for(attempt.num in 1:num.attempts){
+  message("Evaluating parameter set #", attempt.num)
+  
   source("inst/BBS evaluation/setup.R")
   
   hyperparameters = list(
@@ -69,6 +73,38 @@ optimal.row = which(
     results$fold.id == 1
 )
 
-results[optimal.row, ]
+# Make sure the code below gets the optimal parameters, not whatever is floating
+# in the global environment
+rm(list = names(optimal.row))
+
+net = with(
+  as.list(results[optimal.row, ]),{
+    start.time = Sys.time()
+    
+    # direct buildNet to look in the local environment for parameters
+    localBuildNet = buildNet
+    
+    net = localBuildNet(
+      x = scale(env)[in.train, ],
+      y = route.presence.absence[in.train, ]
+    )
+    while(
+      as.double(Sys.time() - start.time, units = "secs") < seconds
+    ){
+      net$update_all(10L)
+    }
+    net
+  }
+)  
+
+mistnet.prediction.array = predict(
+  net, 
+  scale(env)[in.test, ],
+  n.importance.samples = as.integer(1E3)
+)
+
 
 print(Sys.time() - total.time.start)
+
+
+save(mistnet.prediction.array, file = "mistnet.predictions.Rdata")

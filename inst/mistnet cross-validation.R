@@ -6,7 +6,7 @@ env = as.data.frame(x[ , grep("^bio", colnames(x))])
 cv.seconds = 200
 
 # How many samples to generate when evaluating CV fit
-n.prediction.samples = 1000L
+n.prediction.samples = 500L
 
 # Number of times to do fit & evaluate loop. Total training time is thus up to
 # cv.seconds * n.iterations
@@ -19,6 +19,7 @@ output.df = data.frame(
   loglik = numeric()
 )
 
+cat("Fold number: ")
 
 i = 0
 for(fold.id in 1:max(fold.ids)){
@@ -39,4 +40,7 @@ for(fold.id in 1:max(fold.ids)){
     i = i + 1
     output.df[i, ] = c(fold.id, iteration * cv.seconds, cv.evaluate())
   }
+  cat(fold.id)
 }
+
+rm(net)
