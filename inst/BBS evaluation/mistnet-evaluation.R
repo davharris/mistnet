@@ -50,12 +50,22 @@ means = aggregate(
 )
 
 
+# as.character(as.numeric(factor)) avoids converting factors to their index
+# and instead treats the level names as numeric
 optimal.seconds = as.numeric(as.character(means$time[which.max(means$x)]))
-optimal.attempt.num = as.numeric(as.character(means$attempt[which.max(means$x)]))
+optimal.attempt.num = as.numeric(
+  as.character(means$attempt[which.max(means$x)])
+)
+
+# deal with stupid floating point errors introduced by conversion to and 
+# from factor
+approx.equal = function(x, y, eps = 1E-6){
+  abs(x - y) < eps
+}
 
 optimal.row = which(
   optimal.attempt.num == results$attempt.num & 
-    optimal.seconds == results$seconds & 
+    approx.equal(optimal.seconds, results$seconds) & 
     results$fold.id == 1
 )
 
