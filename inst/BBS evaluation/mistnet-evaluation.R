@@ -22,8 +22,9 @@ for(attempt.num in 1:num.attempts){
     starting.rate = starting.rate
   )
   
-  out = cbind(hyperparameters, attempt.num = attempt.num, output.df)
   source("inst/example.R")
+  out = cbind(hyperparameters, attempt.num = attempt.num, output.df)
+  
   save(
     out, 
     file = paste0("mistnet performance ", attempt.num, ".Rdata")
@@ -38,10 +39,19 @@ results = do.call(
   )
 )
 
-means = ddply(results, c("seconds", "attempt.num"), function(x) mean(x$loglik))
+# mistnet doesn't play nice with plyr for some reason: using this instead
+means = aggregate(
+  results$loglik, 
+  by = list(
+    time = as.factor(results$seconds), 
+    attempt = as.factor(results$attempt.num)
+  ), 
+  FUN = mean
+)
 
-optimal.seconds = means$seconds[which.max(means$V1)]
-optimal.attempt.num = means$attempt.num[which.max(means$V1)]
+
+optimal.seconds = as.numeric(as.character(means$time[which.max(means$x)]))
+optimal.attempt.num = as.numeric(as.character(means$attempt[which.max(means$x)]))
 
 optimal.row = which(
   optimal.attempt.num == results$attempt.num & 

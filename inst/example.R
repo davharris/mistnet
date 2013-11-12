@@ -37,6 +37,6 @@ for(fold.id in 1:max(fold.ids)){
     }
     
     i = i + 1
-    output.df[i, ] = c(fold.id, iteration * cv.seconds, evaluate())
+    output.df[i, ] = c(fold.id, iteration * cv.seconds, cv.evaluate())
   }
 }
