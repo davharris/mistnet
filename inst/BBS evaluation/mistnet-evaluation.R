@@ -26,7 +26,7 @@ for(attempt.num in 1:num.attempts){
     starting.rate = starting.rate
   )
   
-  source("inst/example.R")
+  source("inst/mistnet cross-validation.R")
   out = cbind(hyperparameters, attempt.num = attempt.num, output.df)
   
   save(
