@@ -1,11 +1,10 @@
 load("birds.Rdata")
 devtools::load_all()
 load("fold.ids.Rdata")
-library(plyr)
 
 set.seed(1)
 
-num.attempts = 15L
+num.attempts = 10L
 
 total.time.start = Sys.time()
 
@@ -77,25 +76,22 @@ optimal.row = which(
 # in the global environment
 rm(list = names(optimal.row))
 
-net = with(
-  as.list(results[optimal.row, ]),{
-    start.time = Sys.time()
-    
-    # direct buildNet to look in the local environment for parameters
-    localBuildNet = buildNet
-    
-    net = localBuildNet(
-      x = scale(env)[in.train, ],
-      y = route.presence.absence[in.train, ]
-    )
-    while(
-      as.double(Sys.time() - start.time, units = "secs") < seconds
-    ){
-      net$update_all(10L)
-    }
-    net
-  }
-)  
+start.time = Sys.time()
+
+attach(as.list(results[optimal.row, ]))
+
+net = buildNet(
+  x = scale(env)[in.train, ],
+  y = route.presence.absence[in.train, ]
+)
+while(
+  as.double(Sys.time() - start.time, units = "secs") < seconds
+){
+  net$update_all(10L)
+}
+
+
+  
 
 mistnet.prediction.array = predict(
   net, 
@@ -108,3 +104,5 @@ print(Sys.time() - total.time.start)
 
 
 save(mistnet.prediction.array, file = "mistnet.predictions.Rdata")
+save(net, file = "mistnet.model.Rdata")
+save(results, file = "mistnet.cv.results.Rdata")
