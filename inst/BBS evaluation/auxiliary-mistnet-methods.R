@@ -2,8 +2,10 @@ network$methods(
   update_all = function(n.steps){
     # Update optimization hyperparameters
     .self$momentum = min((1 + .self$completed.iterations / 1000) / 2, .99)
+    
+    # The two undoes the 50% momentum at start.
     .self$learning.rate = 2 * starting.rate / 
-      (1 + 1E-5 * .self$completed.iterations) * (1 - .self$momentum)
+      (1 + 1E-4 * .self$completed.iterations) * (1 - .self$momentum)
     
     # Hack to keep rectified units alive: add a small amount to biases of "dead"
     # units whose activations are always negative
