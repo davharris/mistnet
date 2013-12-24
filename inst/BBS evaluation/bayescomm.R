@@ -3,9 +3,9 @@ library(devtools)
 
 # Install the same version of BayesComm that I used for the analysis
 install_github(
-  username = "goldingn",
+  username = "davharris",
   repo = "BayesComm",
-  ref = "35b0288ae7839b5976fcd453e3fd7f7b5b86d855"  
+  ref = "63fc30773cf57f8c6411789da58ffbd3439b3e62"  
 )
 library(BayesComm)
 
