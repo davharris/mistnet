@@ -34,4 +34,5 @@ system.time({
 })
 print(object.size(bc.model), units = "Mb")
 
+save(bc.model, file = "bc.model.Rdata")
 save(bc.predictions, file = "bc.predictions.Rdata")
