@@ -91,12 +91,25 @@ while(
 }
 
 
-  
+save(net, file = "mistnet.model.Rdata")
+save(results, file = "mistnet.cv.results.Rdata")
+
+
+# Clear out the memory so everything is available for the prediction array:
+rm(list = ls())
+
+load("mistnet.model.Rdata")
+load("birds.Rdata")
+env = as.data.frame(x[ , grep("^bio", colnames(x))])
+rm(latlon, x, route.presence.absence, species.data, in.train)
+gc()
+
+n.ranef = net$n.ranef # Some sort of bug requires this in the global environment??
 
 mistnet.prediction.array = predict(
   net, 
   scale(env)[in.test, ],
-  n.importance.samples = as.integer(1E3)
+  n.importance.samples = as.integer(2E3)
 )
 
 
@@ -104,5 +117,3 @@ print(Sys.time() - total.time.start)
 
 
 save(mistnet.prediction.array, file = "mistnet.predictions.Rdata")
-save(net, file = "mistnet.model.Rdata")
-save(results, file = "mistnet.cv.results.Rdata")

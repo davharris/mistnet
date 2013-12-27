@@ -89,4 +89,5 @@ net = nnet(
 
 nnet.predictions = predict(net, scale(env)[in.test, ])
 
-save(nnet.predictions, "nnet.predictions.Rdata")
+save(nnet.predictions, file = "nnet.predictions.Rdata")
+Sys.time() - start.time
