@@ -1,6 +1,6 @@
 findLogExpectedLik = function(importance.errors, weights){
   # Result should be equivalent to log(mean(exp(-x)))
-  # This should make the floating point more when the amount of error is large
+  # This should make the floating point more accurate when the amount of error is large
   
   if(missing(weights)){
     weights = matrix(
