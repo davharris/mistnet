@@ -1,4 +1,6 @@
 findLogExpectedLik = function(importance.errors, weights){
+  # importance.errors should be a matrix. Rows are transects. Columns are samples.
+  # Entries should be errors associated with the whole transect (all species).
   # Result should be equivalent to log(mean(exp(-x)))
   # This should make the floating point more accurate when the amount of error is large
   
