@@ -74,7 +74,8 @@ network = setRefClass(
         layers[[i]]$updateCoefficients(
           learning.rate = learning.rate, 
           momentum = momentum,
-          dataset.size = dataset.size
+          dataset.size = dataset.size,
+          minibatch.size = minibatch.size
         )
       }
     },

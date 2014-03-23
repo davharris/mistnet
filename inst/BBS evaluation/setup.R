@@ -26,4 +26,4 @@ n.layer1 = sample(n.layer2:50, 1)
 # don't want any exploding gradients and I already have two other ways to
 # trade off speed versus accuracy during gradient descent (# of samples and 
 # minibatch size).
-starting.rate = 1E-3
+starting.rate =5E-3

@@ -1,5 +1,0 @@
-.gitignore
-^\.Rproj
-^.*\.Rproj$
-proprietary.data/*
-wc10/*

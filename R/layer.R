@@ -34,9 +34,14 @@ layer = setRefClass(
       error.grads[ , , sample.num] <<- incoming.error.grad * nonlinear.grad
     },
     
-    updateCoefficients = function(learning.rate, momentum, dataset.size){
+    updateCoefficients = function(
+      learning.rate, 
+      momentum, 
+      dataset.size, 
+      minibatch.size
+    ){
       log.prior.grad = prior$getLogGrad(coefficients) / dataset.size
-      grad = -weighted.llik.grads + log.prior.grad
+      grad = -weighted.llik.grads / minibatch.size + log.prior.grad
       grad.step <<- grad * learning.rate + momentum * grad.step
       coefficients <<- coefficients + grad.step
       
