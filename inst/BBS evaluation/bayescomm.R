@@ -1,12 +1,7 @@
 load("birds.Rdata")
-library(devtools)
 
-# Install the same version of BayesComm that I used for the analysis
-install_github(
-  username = "goldingn",
-  repo = "BayesComm",
-  ref = "140831e585b0fd5eabd397cf786bd61984dd0ffa"  
-)
+# Used version from
+# https://github.com/davharris/BayesComm/commit/39362df4df82d69c5c472a99284e3aabc682ad34
 library(BayesComm)
 
 set.seed(1)
@@ -24,7 +19,8 @@ system.time({
     model = "full",
     its  = 35000,
     thin = 60,
-    burn = 5000
+    burn = 5000,
+    verbose = 1
   )
   
   bc.predictions = BayesComm:::predict.bayescomm(
