@@ -114,10 +114,10 @@ test_that("backprop works",{
   delta = crossEntropyGrad(y = y, yhat = o) * sigmoidGrad(x = a)
   
   x = matrixMultiplyGrad(
-    n.in = n.hid, 
-    n.out = n.out, 
-    error.grad = delta,
-    input = h
+    n_in = n.hid,
+    n_out = n.out,
+    error_grad = delta,
+    input_act = h
   )
   
   expect_equal(x[target.hidden, ], rowSums(observed.grad), tolerance = eps)

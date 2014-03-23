@@ -14,12 +14,3 @@ rectifyGrad = function(x){
 linearGrad = function(x){
   1
 }
-
-matrixMultiplyGrad = function(n.in, n.out, error.grad, input){
-  vapply(
-    1:n.out,
-    function(i){error.grad[, i] %*% input},
-    FUN.VALUE = numeric(n.in),
-    USE.NAMES = FALSE
-  )
-}

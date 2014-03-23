@@ -9,10 +9,9 @@ Description: More about what it does (maybe more than one
     line)
 License: MIT
 Depends:
-    Rcpp (>= 0.10.3),
-    testthat,
-    devtools
-LinkingTo: Rcpp
+    Rcpp, RcppArmadillo, testthat, devtools
+Imports: Rcpp (>= 0.11.1), RcppArmadillo (>= 0.4.100.2.1)
+LinkingTo: Rcpp, RcppArmadillo
 Collate:
     'RcppExports.R'
     'gradients.R'
@@ -23,3 +22,6 @@ Collate:
     'network.R'
     'ranefSample.R'
     'creation-functions.R'
+    'PCPlot.R'
+    'findLogLik.R'
+    'predict.R'

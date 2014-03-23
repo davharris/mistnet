@@ -55,10 +55,10 @@ layer = setRefClass(
         partial.error.grad = error.grads[ , , i] * weights[ , i]
         
         partial.llik.grad = matrixMultiplyGrad(
-          n.in = coef.dim[[1]],
-          n.out = coef.dim[[2]],
-          error.grad = partial.error.grad,
-          input = inputs[ , , i]
+          n_in = coef.dim[[1]],
+          n_out = coef.dim[[2]],
+          error_grad = partial.error.grad,
+          input_act = inputs[ , , i]
         )
         partial.bias.grad = colSums(partial.error.grad)
         

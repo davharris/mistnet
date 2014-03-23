@@ -5,6 +5,10 @@ rcpp_add_biases <- function(m, v) {
     .Call('mistnet_rcpp_add_biases', PACKAGE = 'mistnet', m, v)
 }
 
+matrixMultiplyGrad <- function(n_in, n_out, error_grad, input_act) {
+    .Call('mistnet_matrixMultiplyGrad', PACKAGE = 'mistnet', n_in, n_out, error_grad, input_act)
+}
+
 rectify <- function(m) {
     .Call('mistnet_rectify', PACKAGE = 'mistnet', m)
 }

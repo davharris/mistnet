@@ -1,2 +1,4 @@
 useDynLib(mistnet)
+import(RcppArmadillo)
+importFrom(Rcpp, evalCpp)
 exportPattern("^[[:alpha:]]+")
