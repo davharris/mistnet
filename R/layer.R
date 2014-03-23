@@ -50,7 +50,7 @@ layer = setRefClass(
       # to estimate reliably, so we can move farther along them.
       # Also, I don't have any momentum for biases at the moment, so this should
       # allow them to keep up better.
-      biases <<- biases - weighted.bias.grads * learning.rate * 10
+      biases <<- biases - weighted.bias.grads * learning.rate / minibatch.size * 10
     },
     
     combineSampleGradients = function(weights, n.importance.samples){
