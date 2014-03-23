@@ -20,10 +20,34 @@ network$methods(
       }
     }
     
+    # Update priors
+    for(layer.num in 1:.self$n.layers){
+      # Update prior variance of all layers
+      .self$layers[[layer.num]]$prior$var = apply(
+        .self$layers[[layer.num]]$coefficients, 
+        1, 
+        var
+      )
+      #  (prior variance must exceed 0.001)
+      .self$layers[[layer.num]]$prior$var = pmax(
+        .self$layers[[layer.num]]$prior$var, 
+        .001
+      )
+      if(layer.num == .self$n.layers){
+        # Update prior mean of last layer
+        .self$layers[[layer.num]]$prior$mean = rowMeans(
+          .self$layers[[layer.num]]$coefficients
+        )
+      }
+    }
+    
     .self$fit(n.steps)
   }
 )
 
+
+# Warning: This function grabs hyperparameters from the global environment
+# for some reason.
 buildNet = function(x, y){
   net = mistnet(
     x = x,
@@ -31,9 +55,9 @@ buildNet = function(x, y){
     nonlinearity.names = c("rectify", "linear", "sigmoid"),
     hidden.dims = c(n.layer1, n.layer2),
     priors = list(
-      gaussian.prior(mean = 0, var = prior.var1),
-      gaussian.prior(mean = 0, var = prior.var2),
-      gaussian.prior(mean = 0, var = prior.var3)
+      gaussian.prior(mean = 0, var = 0 * NA),
+      gaussian.prior(mean = 0, var = 0 * NA),
+      gaussian.prior(mean = 0, var = 0 * NA)
     ),
     learning.rate = starting.rate,
     momentum = .5,
