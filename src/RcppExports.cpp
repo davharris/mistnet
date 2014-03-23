@@ -23,17 +23,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // matrixMultiplyGrad
-NumericMatrix matrixMultiplyGrad(int n_in, int n_out, NumericMatrix error_grad, NumericMatrix input_act);
-RcppExport SEXP mistnet_matrixMultiplyGrad(SEXP n_inSEXP, SEXP n_outSEXP, SEXP error_gradSEXP, SEXP input_actSEXP) {
+NumericMatrix matrixMultiplyGrad(int n_out, NumericMatrix error_grad, NumericMatrix input_act);
+RcppExport SEXP mistnet_matrixMultiplyGrad(SEXP n_outSEXP, SEXP error_gradSEXP, SEXP input_actSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
         Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< int >::type n_in(n_inSEXP );
         Rcpp::traits::input_parameter< int >::type n_out(n_outSEXP );
         Rcpp::traits::input_parameter< NumericMatrix >::type error_grad(error_gradSEXP );
         Rcpp::traits::input_parameter< NumericMatrix >::type input_act(input_actSEXP );
-        NumericMatrix __result = matrixMultiplyGrad(n_in, n_out, error_grad, input_act);
+        NumericMatrix __result = matrixMultiplyGrad(n_out, error_grad, input_act);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);

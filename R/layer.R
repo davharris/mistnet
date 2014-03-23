@@ -55,7 +55,6 @@ layer = setRefClass(
         partial.error.grad = error.grads[ , , i] * weights[ , i]
         
         partial.llik.grad = matrixMultiplyGrad(
-          n_in = coef.dim[[1]],
           n_out = coef.dim[[2]],
           error_grad = partial.error.grad,
           input_act = inputs[ , , i]
