@@ -95,9 +95,11 @@ network = setRefClass(
     
     backprop = function(sample.num){
       # Final layer gets its error from the loss gradient
-      net.output = layers[[n.layers]]$outputs[ , , sample.num]
       layers[[n.layers]]$backwardPass(
-        lossGradient(y = y[minibatch.ids, ], yhat = net.output),
+        lossGradient(
+          y = y[minibatch.ids, ], 
+          yhat = layers[[n.layers]]$outputs[ , , sample.num]
+        ),
         sample.num
       )
       
