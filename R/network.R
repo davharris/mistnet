@@ -40,7 +40,9 @@ network = setRefClass(
     
     selectMinibatch = function(row.nums){
       if(missing(row.nums)){
-        minibatch.ids <<- sample.int(nrow(x), minibatch.size, replace = FALSE)
+        stopifnot(minibatch.size > 0)
+        start = (completed.iterations * minibatch.size) %% nrow(x)
+        minibatch.ids <<- 1L + (seq(start, start + minibatch.size - 1) %% nrow(x))
       }else{
         if(length(row.nums) != minibatch.size){
           minibatch.size <<- length(row.nums)
