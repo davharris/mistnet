@@ -3,9 +3,9 @@ network$methods(
     # Update optimization hyperparameters
     .self$momentum = min((1 + .self$completed.iterations / 1000) / 2, .99)
     
-    # The two undoes the 50% momentum at start.
-    .self$learning.rate = 2 * starting.rate / 
-      (1 + 1E-4 * .self$completed.iterations) * (1 - .self$momentum)
+    # Dividing at the end to undo the 80% initial momentum
+    .self$learning.rate = starting.rate / 
+      (1 + 1E-4 * .self$completed.iterations) * (1 - .self$momentum) / .8
     
     # Hack to keep rectified units alive: add a small amount to biases of "dead"
     # units whose activations are always negative
@@ -34,10 +34,12 @@ network$methods(
         .0001
       )
       if(layer.num == .self$n.layers){
-        # Update prior mean of last layer
+        dim = .self$layers[[layer.num]]$coef.dim[2]
+        # Update prior mean of last layer.  Pull it in sligthly from the
+        # observed mean, as if there were one observation at exactly 0.
         .self$layers[[layer.num]]$prior$mean = rowMeans(
           .self$layers[[layer.num]]$coefficients
-        )
+        ) * dim / (dim + 1)
       }
     }
     
@@ -61,7 +63,7 @@ buildNet = function(x, y){
       gaussian.prior(mean = 0, var = 0 * NA)
     ),
     learning.rate = starting.rate,
-    momentum = .5,
+    momentum = .8,
     loss = crossEntropy,
     lossGrad = crossEntropyGrad,
     minibatch.size = minibatch.size,

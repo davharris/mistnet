@@ -13,7 +13,7 @@ n.layer2 = sample(5:20, 1)
 
 # This layer does basis expansion, so it should be at least as wide as layer2,
 # which does dimensionality reduction
-n.layer1 = sample(n.layer2:50, 1)
+n.layer1 = sample(25:50, 1)
 
 # Starting learning rate currently fixed.
 # Found this through trial and error.  Haven't messed with it much, since I 

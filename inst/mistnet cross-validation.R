@@ -3,14 +3,14 @@ source("inst/BBS evaluation/auxiliary-mistnet-methods.R")
 env = as.data.frame(x[ , grep("^bio", colnames(x))])
 
 # Number of seconds to fit the model during CV before stopping to evaluate fit
-cv.seconds = 500
+cv.seconds = 1000
 
 # How many samples to generate when evaluating CV fit
 n.prediction.samples = 500L
 
 # Number of times to do fit & evaluate loop. Total training time is thus up to
 # cv.seconds * n.iterations
-n.iterations = 2L
+n.iterations = 1L
 
 
 output.df = data.frame(
