@@ -49,9 +49,10 @@ network$methods(
 # Warning: This function grabs hyperparameters from the global environment
 # for some reason.
 buildNet = function(x, y){
+  order = sample.int(nrow(x))
   net = mistnet(
-    x = x,
-    y = y,
+    x = x[order, ],
+    y = y[order, ],
     nonlinearity.names = c("rectify", "linear", "sigmoid"),
     hidden.dims = c(n.layer1, n.layer2),
     priors = list(
