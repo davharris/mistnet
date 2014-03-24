@@ -25,7 +25,7 @@ while(
   cat(i, "\n")
   # hyperparameters:
   decay = rexp(1, rate = 1)
-  size = floor(runif(1, min = 2, max = 11)) # integer between 2 and 10
+  size = floor(runif(1, min = 1, max = 51)) # integer between 1 and 50
   
   
   for(fold.id in 1:max(fold.ids)){
