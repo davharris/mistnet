@@ -14,7 +14,7 @@ network$methods(
         for(hidden.num in 1:.self$layers[[layer.num]]$coef.dim[[2]]){
           if(max(.self$layers[[layer.num]]$activations[,hidden.num,]) < 0){
             .self$layers[[layer.num]]$biases[[hidden.num]] = 
-              .self$layers[[layer.num]]$biases[[hidden.num]] + .1
+              .self$layers[[layer.num]]$biases[[hidden.num]] + .01
           }
         }
       }
@@ -28,10 +28,10 @@ network$methods(
         1, 
         var
       )
-      #  (prior variance must exceed 0.001)
+      #  (prior variance must exceed 0.0001)
       .self$layers[[layer.num]]$prior$var = pmax(
         .self$layers[[layer.num]]$prior$var, 
-        .001
+        .0001
       )
       if(layer.num == .self$n.layers){
         # Update prior mean of last layer
