@@ -1,5 +1,5 @@
 crossEntropyGrad = function(y, yhat){
-  - ((y / yhat) - (1 - y) / (1 - yhat))
+  (1 - y) / (1 - yhat) - (y / yhat)
 }
 
 sigmoidGrad = function(x){
