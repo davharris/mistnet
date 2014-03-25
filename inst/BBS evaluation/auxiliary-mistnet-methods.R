@@ -21,25 +21,31 @@ network$methods(
     }
     
     # Update priors
-    for(layer.num in 1:.self$n.layers){
-      # Update prior variance of all layers
-      .self$layers[[layer.num]]$prior$var = apply(
-        .self$layers[[layer.num]]$coefficients, 
-        1, 
-        var
-      )
-      #  (prior variance must exceed 0.0001)
-      .self$layers[[layer.num]]$prior$var = pmax(
-        .self$layers[[layer.num]]$prior$var, 
-        .0001
-      )
-      if(layer.num == .self$n.layers){
-        dim = .self$layers[[layer.num]]$coef.dim[2]
-        # Update prior mean of last layer.  Pull it in sligthly from the
-        # observed mean, as if there were one observation at exactly 0.
-        .self$layers[[layer.num]]$prior$mean = rowMeans(
-          .self$layers[[layer.num]]$coefficients
-        ) * dim / (dim + 1)
+    if(.self$completed.iterations > 100){
+      for(layer.num in 1:.self$n.layers){
+        # Update prior variance of all layers
+        .self$layers[[layer.num]]$prior$var = apply(
+          .self$layers[[layer.num]]$coefficients, 
+          1, 
+          var
+        )
+        #  (prior variance has a lower bound)
+        .self$layers[[layer.num]]$prior$var = pmax(
+          .self$layers[[layer.num]]$prior$var, 
+          .001
+        )
+        if(layer.num == .self$n.layers){
+          dim = .self$layers[[layer.num]]$coef.dim[2]
+          # Update prior mean of last layer.  Pull it in sligthly from the
+          # observed mean, as if there were one observation at exactly 0.
+          .self$layers[[layer.num]]$prior$mean = rowMeans(
+            .self$layers[[layer.num]]$coefficients
+          ) * dim / (dim + 1)
+        }
+        # Variances are drawn toward a common value.
+        var = .self$layers[[layer.num]]$prior$var
+        newvar = (var * length(var) + mean(var)) / (length(var)  + 1)
+        .self$layers[[layer.num]]$prior$var = newvar
       }
     }
     
@@ -58,9 +64,9 @@ buildNet = function(x, y){
     nonlinearity.names = c("rectify", "linear", "sigmoid"),
     hidden.dims = c(n.layer1, n.layer2),
     priors = list(
-      gaussian.prior(mean = 0, var = 0 * NA),
-      gaussian.prior(mean = 0, var = 0 * NA),
-      gaussian.prior(mean = 0, var = 0 * NA)
+      gaussian.prior(mean = 0, var = 1),
+      gaussian.prior(mean = 0, var = 1),
+      gaussian.prior(mean = 0, var = 1)
     ),
     learning.rate = starting.rate,
     momentum = .8,
