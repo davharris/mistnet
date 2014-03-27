@@ -5,8 +5,7 @@ layer = setRefClass(
     coef.dim = "integer",
     coefficients = "matrix",
     biases = "numeric",
-    nonlinearity = "function",
-    nonlinearityGrad = "function",
+    nonlinearity = "nonlinearity",
     prior = "prior",
     inputs = "array",
     activations = "array",
@@ -24,13 +23,15 @@ layer = setRefClass(
       
       inputs[ , , sample.num] <<- input
       activations[ , , sample.num] <<- (input %*% coefficients) %plus% biases
-      outputs[ , , sample.num] <<- nonlinearity(activations[ , , sample.num])
+      outputs[ , , sample.num] <<- nonlinearity$f(activations[ , , sample.num])
     },
     
     backwardPass = function(incoming.error.grad, sample.num){
       # Chain rule: multiply incoming error gradient by the nonlinearity's own 
       # gradient.
-      nonlinear.grad = nonlinearityGrad(activations[ , , sample.num])
+      nonlinear.grad = nonlinearity$grad(
+        activations[ , , sample.num]
+      )
       error.grads[ , , sample.num] <<- incoming.error.grad * nonlinear.grad
     },
     

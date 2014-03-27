@@ -83,8 +83,9 @@ createLayer = function(
     coefficients = matrix(0, nrow = n.inputs, ncol = n.outputs),
     biases = rep(0, n.outputs),
     grad.step = matrix(0, nrow = n.inputs, ncol = n.outputs),
-    nonlinearity = get(nonlinearity.name, mode = "function"),
-    nonlinearityGrad = get(paste0(nonlinearity.name, "Grad"), mode = "function"),
+    nonlinearity = new(
+      paste(nonlinearity.name, "nonlinearity", sep = ".")
+    ),
     prior = prior
   )
   out$resetState(minibatch.size, n.importance.samples)

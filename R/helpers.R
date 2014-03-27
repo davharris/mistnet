@@ -6,17 +6,6 @@ crossEntropy = function(y, yhat){
   -(y * log(yhat) + (1 - y) * log(1 - yhat))
 }
 
-sigmoid = function(x){
-  # Benchmarking suggests that this is 20% faster than plogis()  
-  storage.mode(x) = "numeric"
-  binomial()$linkinv(x)
-}
-
-linear = function(x){
-  x
-}
-
-# Note: rectify is defined in src/rectify.cpp
 
 # based on the "josh" function from 
 # https://gist.github.com/SChamberlain/3639688
