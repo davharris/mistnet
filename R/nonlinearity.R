@@ -91,6 +91,7 @@ mf_mrf.nonlinearity = setRefClass(
   ),
   contains = "nonlinearity",
   methods = list(
-    f = mrf_meanfield
+    f = mrf_meanfield,
+    grad = sigmoidGrad
   )
 )
