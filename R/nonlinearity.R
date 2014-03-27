@@ -50,3 +50,13 @@ rectify.nonlinearity = setRefClass(
     }
   )
 )
+
+
+mf_mrf.nonlinearity = setRefClass(
+  Class = "mf_mrf.nonlinearity",
+  fields = list(),
+  contains = "nonlinearity",
+  methods = list(
+    f = mrf_meanfield
+  )
+)
