@@ -80,7 +80,15 @@ rectify.nonlinearity = setRefClass(
 
 mf_mrf.nonlinearity = setRefClass(
   Class = "mf_mrf.nonlinearity",
-  fields = list(),
+  fields = list(
+    lateral = "matrix",
+    maxit = "integer",
+    damp = "numeric",
+    tol = "numeric",
+    delta = "matrix",
+    l1.decay = "numeric",
+    lr.multiplier = "numeric"
+  ),
   contains = "nonlinearity",
   methods = list(
     f = mrf_meanfield
