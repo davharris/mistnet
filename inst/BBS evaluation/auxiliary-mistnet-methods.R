@@ -10,7 +10,7 @@ network$methods(
     # Hack to keep rectified units alive: add a small amount to biases of "dead"
     # units whose activations are always negative
     for(layer.num in 1:.self$n.layers){
-      if(identical(.self$layers[[layer.num]]$nonlinearity,rectify)){
+      if(identical(.self$layers[[layer.num]]$nonlinearity$f,rectify)){
         for(hidden.num in 1:.self$layers[[layer.num]]$coef.dim[[2]]){
           if(max(.self$layers[[layer.num]]$activations[,hidden.num,]) < 0){
             .self$layers[[layer.num]]$biases[[hidden.num]] = 

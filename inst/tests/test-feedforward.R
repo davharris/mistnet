@@ -31,7 +31,7 @@ test_that("Single-layer feedforward works", {
   )
   expect_equal(
     l$outputs[ , , 2],
-    l$nonlinearity((l$inputs[ , , 2] %*% l$coefficients) %plus% l$biases)
+    l$nonlinearity$f((l$inputs[ , , 2] %*% l$coefficients) %plus% l$biases)
   )
   
   # Nothing should change during feedforward except the three listed fields
@@ -78,7 +78,7 @@ test_that("Multi-layer feedforward works", {
   )
   
   expect_equal(
-    net$layers[[1]]$nonlinearity(
+    net$layers[[1]]$nonlinearity$f(
       (cbind(ranefs, net$x[net$minibatch.ids, ]) %*% net$layers[[1]]$coefficients) %plus% net$layers[[1]]$biases
     ),
     net$layers[[1]]$outputs[,,2]
@@ -92,7 +92,7 @@ test_that("Multi-layer feedforward works", {
   expect_equal(
     with(
       net$layers[[2]],
-      nonlinearity((inputs[,,2] %*% coefficients) %plus% biases)
+      nonlinearity$f((inputs[,,2] %*% coefficients) %plus% biases)
     ),
     net$layers[[2]]$outputs[,,2]
   )
@@ -101,7 +101,7 @@ test_that("Multi-layer feedforward works", {
   expect_equal(
     with(
       net$layers[[3]],
-      nonlinearity((inputs[,,2] %*% coefficients) %plus% biases)
+      nonlinearity$f((inputs[,,2] %*% coefficients) %plus% biases)
     ),
     net$layers[[3]]$outputs[,,2]
   )

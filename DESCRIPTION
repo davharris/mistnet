@@ -19,7 +19,6 @@ Imports:
 LinkingTo: Rcpp, RcppArmadillo
 Collate:
     'RcppExports.R'
-    'gradients.R'
     'helpers.R'
     'initializeMars.R'
     'prior.R'
@@ -31,3 +30,4 @@ Collate:
     'findLogLik.R'
     'predict.R'
     'nonlinearity.R'
+    'error_gradients.R'
