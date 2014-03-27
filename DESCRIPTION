@@ -23,6 +23,7 @@ Collate:
     'helpers.R'
     'initializeMars.R'
     'prior.R'
+    'nonlinearity.R'
     'layer.R'
     'network.R'
     'ranefSample.R'
@@ -30,5 +31,4 @@ Collate:
     'PCPlot.R'
     'findLogLik.R'
     'predict.R'
-    'nonlinearity.R'
     'error_gradients.R'

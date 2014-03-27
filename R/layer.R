@@ -1,4 +1,5 @@
 #' @include prior.R
+#' @include nonlinearity.R
 layer = setRefClass(
   Class = "layer",
   fields = list(
