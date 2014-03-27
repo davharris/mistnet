@@ -1,3 +1,38 @@
+# Activation functions ----------------------------------------------------
+
+sigmoid = function(x){
+  # Benchmarking suggests that this is 20% faster than plogis()  
+  storage.mode(x) = "numeric"
+  binomial()$linkinv(x)
+}
+
+linear = function(x){
+  x
+}
+
+# Note: rectify is defined in src/rectify.cpp
+
+
+
+# Gradients ---------------------------------------------------------------
+
+
+sigmoidGrad = function(x){
+  s = sigmoid(x)
+  s * (1 - s)
+}
+
+rectifyGrad = function(x){
+  x > 0
+}
+
+linearGrad = function(x){
+  1
+}
+
+
+# Nonlinearity classes ----------------------------------------------------
+
 nonlinearity = setRefClass(
   Class = "nonlinearity",
   fields = list(),
@@ -16,8 +51,8 @@ linear.nonlinearity = setRefClass(
   fields = list(),
   contains = "nonlinearity",
   methods = list(
-    f = function(x){x},
-    grad = function(x){1}
+    f = linear,
+    grad = linearGrad
   )
 )
 
@@ -26,15 +61,8 @@ sigmoid.nonlinearity = setRefClass(
   fields = list(),
   contains = "nonlinearity",
   methods = list(
-    f = function(x){
-      # Benchmarking suggests that this is 20% faster than plogis()  
-      storage.mode(x) = "numeric"
-      binomial()$linkinv(x)
-    },
-    grad = function(x){
-      s = sigmoid(x)
-      s * (1 - s)
-    }
+    f = sigmoid,
+    grad = sigmoidGrad
   )
 )
 
@@ -45,9 +73,7 @@ rectify.nonlinearity = setRefClass(
   contains = "nonlinearity",
   methods = list(
     f = rectify,
-    grad = function(x){
-      x > 0
-    }
+    grad = rectifyGrad
   )
 )
 
