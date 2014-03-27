@@ -39,6 +39,25 @@ BEGIN_RCPP
     return __sexp_result;
 END_RCPP
 }
+// mrf_meanfield
+NumericMatrix mrf_meanfield(NumericMatrix rinput, NumericMatrix rlateral, int maxit, double damp, double tol);
+RcppExport SEXP mistnet_mrf_meanfield(SEXP rinputSEXP, SEXP rlateralSEXP, SEXP maxitSEXP, SEXP dampSEXP, SEXP tolSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< NumericMatrix >::type rinput(rinputSEXP );
+        Rcpp::traits::input_parameter< NumericMatrix >::type rlateral(rlateralSEXP );
+        Rcpp::traits::input_parameter< int >::type maxit(maxitSEXP );
+        Rcpp::traits::input_parameter< double >::type damp(dampSEXP );
+        Rcpp::traits::input_parameter< double >::type tol(tolSEXP );
+        NumericMatrix __result = mrf_meanfield(rinput, rlateral, maxit, damp, tol);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
 // rectify
 NumericMatrix rectify(NumericMatrix m);
 RcppExport SEXP mistnet_rectify(SEXP mSEXP) {

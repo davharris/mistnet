@@ -9,6 +9,10 @@ matrixMultiplyGrad <- function(n_out, error_grad, input_act) {
     .Call('mistnet_matrixMultiplyGrad', PACKAGE = 'mistnet', n_out, error_grad, input_act)
 }
 
+mrf_meanfield <- function(rinput, rlateral, maxit, damp, tol) {
+    .Call('mistnet_mrf_meanfield', PACKAGE = 'mistnet', rinput, rlateral, maxit, damp, tol)
+}
+
 rectify <- function(m) {
     .Call('mistnet_rectify', PACKAGE = 'mistnet', m)
 }
