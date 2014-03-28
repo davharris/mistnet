@@ -42,5 +42,17 @@ test_that("mean field MRF works", {
   )
   
   expect_equal(mrfprob2, damped.prob)
+  
+  # When `all(lateral == 0)`, the output should be the same as a sigmoid
+  expect_equal(
+    mrf_meanfield(
+      rinput=input, 
+      rlateral=lateral * 0, 
+      maxit = 200L, 
+      damp = damp, 
+      tol = tol
+    ),
+    sigmoid(input)
+  )
 })
 
