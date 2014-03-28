@@ -140,10 +140,10 @@ findPredictedCrossprod = function(predicted, importance.weights){
     nrow = dim(predicted)[[2]]
   )
   for(i in 1:ncol(importance.weights)){
-    # I have no idea if this is the correct way to use importance weights.
-    # Seems plausible, but needs testing.
+    # The square root is necessary because things get multiplied together in
+    # the cross product.
     crossprod.increment = crossprod(
-      predicted[ , , i] * importance.weights[ , i]
+      predicted[ , , i] * sqrt(importance.weights[ , i])
     )
     predicted.crossprod = predicted.crossprod + crossprod.increment
   }
