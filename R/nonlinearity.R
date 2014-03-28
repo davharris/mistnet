@@ -114,10 +114,11 @@ mf_mrf.nonlinearity = setRefClass(
       observed.crossprod = crossprod(observed)
       predicted.crossprod = observed.crossprod * 0
       
-      for(i in 1:n.importance.samples){
-        # Probably inaccurate... make sure the right elements get multiplied.
+      
+      for(i in 1:ncol(importance.weights)){
+        # I have no idea if this is the correct way to use importance weights.
         crossprod.increment = crossprod(
-          predicted[ , , i] * importance.weights[i, ]
+          predicted[ , , i] * importance.weights[ , i]
         )
         predicted.crossprod = predicted.crossprod + crossprod.increment
       }
