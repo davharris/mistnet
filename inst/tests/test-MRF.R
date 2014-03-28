@@ -2,7 +2,7 @@
 # Tolerance behaves as expected
 
 context("MRF")
-test_that("mean field MRF works", {
+test_that("mean field MRF feeds forward", {
   input = matrix(rnorm(110), nrow = 11, ncol = 10)
   lateral = matrix(rnorm(100), nrow = 10, ncol = 10)
   diag(lateral) = 0
@@ -54,5 +54,45 @@ test_that("mean field MRF works", {
     ),
     sigmoid(input)
   )
+})
+
+
+
+test_that("findPredictedCrossprod works", {
+  nrow = 7
+  ncol = 11
+  n.importance.weights = 1
+  
+  # If there's just one importance sample, it should return the same as
+  # crossprod.
+  predicted = array(
+    runif(nrow * ncol * n.importance.weights),
+    dim = c(nrow, ncol, n.importance.weights)
+  )
+  importance.weights = matrix(rep(1, nrow), ncol = 1)
+  
+  expect_equal(
+    findPredictedCrossprod(predicted, importance.weights),
+    crossprod(predicted[,,1])
+  )
+  
+  # Test with three samples ##############################
+  n.importance.weights = 3
+  predicted = array(
+    runif(nrow * ncol * n.importance.weights),
+    dim = c(nrow, ncol, n.importance.weights)
+  )
+  importance.weights = rdirichlet(nrow, rep(1, n.importance.weights))
+  
+  x = findPredictedCrossprod(predicted, importance.weights)
+  
+  x2 = x * 0
+  for(i in 1:nrow){
+    for(j in 1:n.importance.weights){
+      x2 = x2 + tcrossprod(predicted[i, , j]) * importance.weights[i, j]
+    }
+  }
+  
+  expect_equal(x, x2)
 })
 
