@@ -96,3 +96,66 @@ test_that("findPredictedCrossprod works", {
   expect_equal(x, x2)
 })
 
+test_that("lateral updates work", {
+  nrow = 7
+  ncol = 11
+  n.importance.weights = 1
+  
+  # If there's just one importance sample, it should return the same as
+  # crossprod.
+  predicted = array(
+    runif(nrow * ncol * n.importance.weights),
+    dim = c(nrow, ncol, n.importance.weights)
+  )
+  importance.weights = rdirichlet(nrow, rep(1, n.importance.weights))
+  
+  l = layer$new(
+    activations = qlogis(predicted),
+    nonlinearity = mf_mrf.nonlinearity$new(
+      lateral = matrix(0, nrow = ncol, ncol = ncol),
+      maxit = 10L,
+      damp = .2,
+      tol = .01,
+      delta = matrix(0, nrow = ncol, ncol = ncol),
+      l1.decay = 0
+    )
+  )
+  
+  y = matrix(
+    rbinom(length(predicted), prob = predicted, size = 1),
+    ncol = ncol(predicted)
+  )
+  
+  l$nonlinearity$update(
+    observed = y, 
+    predicted = predicted,
+    learning.rate = 0,
+    momentum = 0,
+    importance.weights = importance.weights
+  )
+  
+  # Since learning rate was zero, nothing should happen
+  expect_true(all(l$nonlinearity$lateral == 0))
+  
+  
+  
+  
+  
+  # Confirm that momentum works as expected.
+  # No learning from the data, but a bunch of twos should get carried forward
+  # from delta * momentum as 1.8s.  (The diagonal should be zeros, per usual)
+  l$nonlinearity$delta[,] = 2
+  l$nonlinearity$update(
+    observed = y, 
+    predicted = predicted,
+    learning.rate = 0,
+    momentum = .9,
+    importance.weights = importance.weights
+  )
+  
+  expect_equal(
+    l$nonlinearity$lateral,
+    2 * .9 * (1 - diag(ncol))
+  )
+  
+})
