@@ -100,6 +100,7 @@ test_that("lateral updates work", {
   nrow = 7
   ncol = 11
   n.importance.weights = 1
+  momentum = 0.75
   
   # If there's just one importance sample, it should return the same as
   # crossprod.
@@ -149,13 +150,48 @@ test_that("lateral updates work", {
     observed = y, 
     predicted = predicted,
     learning.rate = 0,
-    momentum = .9,
+    momentum = momentum,
     importance.weights = importance.weights
   )
   
   expect_equal(
     l$nonlinearity$lateral,
-    2 * .9 * (1 - diag(ncol))
+    2 * momentum * (1 - diag(ncol))
   )
+  
+  # With no learning and initialization with no lateral coefficients, lateral
+  # should come straight from delta.
+  expect_equal(
+    l$nonlinearity$lateral,
+    l$nonlinearity$delta
+  )
+  
+  
+  
+  # Test a real update
+  old.delta = l$nonlinearity$delta
+  old.lateral = l$nonlinearity$lateral
+  learning.rate = 0.01
+  l$nonlinearity$update(
+    observed = y, 
+    predicted = predicted,
+    learning.rate = learning.rate,
+    momentum = momentum,
+    importance.weights = importance.weights
+  )
+  
+  
+  diff = crossprod(y) - findPredictedCrossprod(
+    predicted = predicted, 
+    importance.weights = importance.weights
+  )
+  
+  delta = old.delta * momentum + diff * learning.rate
+  diag(delta) = 0
+  expect_equal(
+    l$nonlinearity$lateral,
+    delta + old.lateral
+  )
+  
   
 })
