@@ -42,6 +42,9 @@ nonlinearity = setRefClass(
     },
     grad = function(x){
       stop("gradient not defined for this nonlinearity")
+    },
+    update = function(x){
+      stop("parameter updating not defined for this nonlinearity")
     }
   )
 )
@@ -86,12 +89,37 @@ mf_mrf.nonlinearity = setRefClass(
     damp = "numeric",
     tol = "numeric",
     delta = "matrix",
-    l1.decay = "numeric",
-    lr.multiplier = "numeric"
+    l1.decay = "numeric"
   ),
   contains = "nonlinearity",
   methods = list(
     f = mrf_meanfield,
-    grad = sigmoidGrad
+    grad = sigmoidGrad,
+    update = function(
+      observed, 
+      predicted, 
+      learning.rate,
+      importance.weights,
+      n.importance.samples,
+      momentum
+    ){
+      observed.crossprod = crossprod(observed)
+      predicted.crossprod = observed.crossprod * 0
+      
+      for(i in 1:n.importance.samples){
+        # Probably inaccurate... make sure the right elements get multiplied.
+        crossprod.increment = crossprod(
+          predicted[ , , i] * importance.weights[i, ]
+        )
+        predicted.crossprod = predicted.crossprod + crossprod.increment
+      }
+      
+      penalty = sign(lateral) * l1.decay
+      
+      delta <<- momentum * delta + learning.rate * (diff - penalty)
+      diag(delta) <<- 0
+      
+      lateral <<- lateral + delta
+    }
   )
 )
