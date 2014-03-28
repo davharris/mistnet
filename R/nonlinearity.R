@@ -109,23 +109,27 @@ mf_mrf.nonlinearity = setRefClass(
       learning.rate,
       importance.weights,
       n.importance.samples,
-      momentum
+      momentum,
+      dataset.size
     ){
       observed.crossprod = crossprod(observed)
       predicted.crossprod = observed.crossprod * 0
       
-      
       for(i in 1:ncol(importance.weights)){
         # I have no idea if this is the correct way to use importance weights.
+        # Seems plausible, but needs testing.
         crossprod.increment = crossprod(
           predicted[ , , i] * importance.weights[ , i]
         )
         predicted.crossprod = predicted.crossprod + crossprod.increment
       }
       
+      diff = observed.crossprod - predicted.crossprod
       penalty = sign(lateral) * l1.decay
       
-      delta <<- momentum * delta + learning.rate * (diff - penalty)
+      # Need to scale by dataset size and minibatch size.
+      
+      delta <<- momentum * delta + learning.rate * (diff - penalty) 
       diag(delta) <<- 0
       
       lateral <<- lateral + delta
