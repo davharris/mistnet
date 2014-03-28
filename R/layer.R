@@ -47,9 +47,9 @@ layer = setRefClass(
       grad.step <<- grad * learning.rate + momentum * grad.step
       coefficients <<- coefficients + grad.step
       
-      # Hinton suggested the factor of 10 in his "practical guide" for RBMs,
-      # if I recall correctly.  The idea is that biases' gradients are easier
-      # to estimate reliably, so we can move farther along them.
+      # Hinton suggested that biases should have higher learning rates in his
+      # "practical guide" for RBMs. The sign is more reliable, so we can move
+      # farther.
       # Also, I don't have any momentum for biases at the moment, so this should
       # allow them to keep up better.
       biases <<- biases - weighted.bias.grads * learning.rate / minibatch.size * 10
