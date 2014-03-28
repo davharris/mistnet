@@ -122,10 +122,9 @@ mf_mrf.nonlinearity = setRefClass(
       diff = observed.crossprod - predicted.crossprod
       penalty = sign(lateral) * l1.decay
       
-      # Need to scale by dataset size and minibatch size, to match 
-      # layer coefficients.
-      
-      delta <<- momentum * delta + learning.rate * (diff - penalty) 
+
+      scaled.learning.rate = learning.rate/ nrow(observed)
+      delta <<- momentum * delta + scaled.learning.rate * (diff - penalty) 
       diag(delta) <<- 0
       
       lateral <<- lateral + delta

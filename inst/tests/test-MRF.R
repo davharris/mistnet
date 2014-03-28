@@ -186,12 +186,11 @@ test_that("lateral updates work", {
     importance.weights = importance.weights
   )
   
-  delta = old.delta * momentum + diff * learning.rate
+  delta = old.delta * momentum + diff * learning.rate / nrow
   diag(delta) = 0
   expect_equal(
     l$nonlinearity$lateral,
     delta + old.lateral
   )
-  
   
 })
