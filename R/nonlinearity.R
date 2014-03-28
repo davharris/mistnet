@@ -93,7 +93,15 @@ mf_mrf.nonlinearity = setRefClass(
   ),
   contains = "nonlinearity",
   methods = list(
-    f = mrf_meanfield,
+    f = function(x){
+      mrf_meanfield(
+        rinput = x, 
+        rlateral = lateral, 
+        maxit = maxit, 
+        damp = damp, 
+        tol = tol
+      )
+    },
     grad = sigmoidGrad,
     update = function(
       observed, 
