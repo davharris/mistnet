@@ -33,6 +33,21 @@ test_that("Poisson loss is correct",{
   # No other tests should be needed; dpois is already tested by R-core.
 })
 
+test_that("Binomial loss is correct",{
+  N = 1E3
+  n = 1E2
+  yhat = matrix(runif(N), ncol = 10)
+  y = matrix(rbinom(N, 5, prob = runif(N)), ncol = 10)
+  expect_equal(
+    binomialLoss(y = y, yhat = yhat, n = n),
+    - dbinom(x = y, prob = yhat, size = n, log = TRUE)
+  )
+  
+  expect_equal(dim(binomialLoss(y = y, yhat = yhat, n = n)), dim(yhat))
+  
+  # No other tests should be needed; dpois is already tested by R-core.
+})
+
 test_that("Squared loss is correct",{
   N = 1E3
   yhat = matrix(rnorm(N), ncol = 10)

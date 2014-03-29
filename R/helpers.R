@@ -14,6 +14,10 @@ squaredLoss = function(y, yhat){
   (y - yhat)^2
 }
 
+binomialLoss = function(y, yhat, n){
+  -dbinom(x = y, size = n, prob = yhat, log = TRUE)
+}
+
 
 # based on the "josh" function from 
 # https://gist.github.com/SChamberlain/3639688

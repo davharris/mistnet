@@ -74,6 +74,36 @@ test_that("squaredLossGrad is accurate", {
 
 
 
+test_that("binomialLossGrad is accurate", {
+  eps = 1E-5
+  x = seq(0, 1, by = .1)
+  n = 17L
+  y = binomialLoss(y = 1, yhat = x, n = n)
+  expect_warning(
+    {
+      y.plus  = binomialLoss(y = 1, yhat = x + eps, n = n)
+      y.minus = binomialLoss(y = 1, yhat = x - eps, n = n)
+    },
+    "NaN"
+  )
+  grad = binomialLossGrad(y = 1, yhat = x, n = n)
+  
+  finite.elements = is.finite(y)
+  
+  expect_equal(
+    (y.plus - y.minus)[finite.elements] / 2 / eps,
+    grad[finite.elements]
+  )
+  
+  # Ensure that zero and one are the non-finite elements of y
+  expect_equal(
+    finite.elements,
+    !(x %in% c(0, 1))
+  )
+})
+
+
+
 eps = 1E-7
 n = 37
 n.out = 17

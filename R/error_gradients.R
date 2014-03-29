@@ -9,3 +9,8 @@ poissonLossGrad = function(y, yhat){
 squaredLossGrad = function(y, yhat){
   2 * (yhat - y)
 }
+
+binomialLossGrad = function(y, yhat, n){
+  (n * yhat - y) / (yhat - yhat^2)
+}
+
