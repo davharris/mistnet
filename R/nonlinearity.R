@@ -43,8 +43,8 @@ nonlinearity = setRefClass(
     grad = function(x){
       stop("gradient not defined for this nonlinearity")
     },
-    update = function(x){
-      stop("parameter updating not defined for this nonlinearity")
+    update = function(...){
+      # Do nothing
     }
   )
 )

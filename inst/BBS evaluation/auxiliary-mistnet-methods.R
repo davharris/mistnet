@@ -1,7 +1,7 @@
 network$methods(
   update_all = function(n.steps){
     # Update optimization hyperparameters
-    .self$momentum = min((1 + .self$completed.iterations / 1000) / 2, .99)
+    .self$momentum = min((1 + .self$completed.iterations / 1000) / 2, .95)
     
     # Dividing at the end to undo the 80% initial momentum
     .self$learning.rate = starting.rate / 
@@ -81,13 +81,29 @@ buildNet = function(x, y){
   
   # Initialize coefficients and biases
   net$layers[[3]]$biases = qlogis(colMeans(y))
-  net$layers[[1]]$coefficients[,] = rt(prod(net$layers[[1]]$coef.dim), df = 5) / 5
-  net$layers[[2]]$coefficients[,] = rt(prod(net$layers[[2]]$coef.dim), df = 5) / 5
-  net$layers[[3]]$coefficients[,] = rt(prod(net$layers[[3]]$coef.dim), df = 5) / 5
+  net$layers[[1]]$coefficients[,] = rt(prod(net$layers[[1]]$coef.dim), df = 5) / 20
+  net$layers[[2]]$coefficients[,] = rt(prod(net$layers[[2]]$coef.dim), df = 5) / 20
+  net$layers[[3]]$coefficients[,] = rt(prod(net$layers[[3]]$coef.dim), df = 5) / 20
+  
   
   # Fill things in so fitting doesn't break on the very first iteration
   net$selectMinibatch()
   net$estimateGradient()
+  
+  
+  # Add mrf nonlinearity
+  net$layers[[3]]$nonlinearity = mf_mrf.nonlinearity$new()
+  net$layers[[3]]$nonlinearity$lateral = matrix(
+    0, 
+    nrow = net$layers[[3]]$coef.dim[[2]],
+    ncol = net$layers[[3]]$coef.dim[[2]]
+  )
+  net$layers[[3]]$nonlinearity$delta = net$layers[[3]]$nonlinearity$lateral
+  net$layers[[3]]$nonlinearity$maxit = 25L
+  net$layers[[3]]$nonlinearity$damp = 0.2
+  net$layers[[3]]$nonlinearity$l1.decay = .1
+  net$layers[[3]]$nonlinearity$tol = 1E-3
+  
   
   net
 }

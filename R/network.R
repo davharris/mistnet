@@ -79,6 +79,13 @@ network = setRefClass(
           dataset.size = dataset.size,
           minibatch.size = minibatch.size
         )
+        layers[[i]]$nonlinearity$update(
+          observed = y[minibatch.ids, ],
+          predicted = layers[[i]]$outputs, 
+          learning.rate = learning.rate / 10,
+          importance.weights = importance.weights,
+          momentum = momentum
+        )
       }
     },
     

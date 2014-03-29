@@ -34,6 +34,9 @@ for(fold.id in 1:max(fold.ids)){
     while(
       as.double(Sys.time() - start.time, units = "secs") < cv.seconds
     ){
+      if(is.nan(net$layers[[3]]$outputs[[1]])){
+        stop("NaNs detected :-(")
+      }
       net$update_all(10L)
     }
     
