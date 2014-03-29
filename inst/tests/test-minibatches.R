@@ -1,3 +1,4 @@
+context("Minibatches")
 test_that("minibatches work", {
   
   net = network$new(
