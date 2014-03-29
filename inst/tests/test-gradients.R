@@ -43,6 +43,36 @@ test_that("crossEntropyGrad is accurate", {
 })
 
 
+test_that("poissonLossGrad is accurate", {
+  eps = 1E-5
+  x = seq(.1, 10, by = .1)
+  y = poissonLoss(y = 1, yhat = x)
+  y.plus  = poissonLoss(y = 1, yhat = x + eps)
+  y.minus = poissonLoss(y = 1, yhat = x - eps)
+  grad = poissonLossGrad(y = 1, yhat = x)
+  
+  expect_equal(
+    (y.plus - y.minus)/2 / eps,
+    grad
+  )
+})
+
+
+test_that("squaredLossGrad is accurate", {
+  eps = 1E-5
+  x = seq(-10, 10, by = .1)
+  y = squaredLoss(y = 1, yhat = x)
+  y.plus  = squaredLoss(y = 1, yhat = x + eps)
+  y.minus = squaredLoss(y = 1, yhat = x - eps)
+  grad = squaredLossGrad(y = 1, yhat = x)
+  
+  expect_equal(
+    (y.plus - y.minus)/2 / eps,
+    grad
+  )
+})
+
+
 
 eps = 1E-7
 n = 37
