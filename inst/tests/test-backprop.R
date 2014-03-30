@@ -1,4 +1,4 @@
-context("3-layer backprop")
+context("Backprop")
 set.seed(1)
 
 test_that("3-layer backprop works", {
