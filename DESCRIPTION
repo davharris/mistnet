@@ -20,16 +20,16 @@ Imports:
     RcppArmadillo (>= 0.4.100.2.1)
 LinkingTo: Rcpp, RcppArmadillo
 Collate:
+    'PCPlot.R'
     'RcppExports.R'
+    'creation-functions.R'
+    'error_gradients.R'
+    'findLogLik.R'
     'helpers.R'
     'initializeMars.R'
     'prior.R'
     'nonlinearity.R'
     'layer.R'
     'network.R'
-    'ranefSample.R'
-    'creation-functions.R'
-    'PCPlot.R'
-    'findLogLik.R'
     'predict.R'
-    'error_gradients.R'
+    'ranefSample.R'
