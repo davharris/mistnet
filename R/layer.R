@@ -114,7 +114,6 @@ layer = setRefClass(
       activations <<- out.array
       outputs <<- out.array
       error.grads <<- out.array
-      grad.step <<- out.array
     }
     
   )
