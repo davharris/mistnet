@@ -8,7 +8,7 @@ Maintainer: David J. Harris <DavHarris@UCDavis.edu>
 Description: mistnet is a package for building stochastic feed-forward
     neural networks.  These models describe a joint distribution over
     a set of variables, conditional on some observed predictors.
-License: MIT
+License: GPL-2 | GPL-3
 Depends:
     Rcpp,
     RcppArmadillo,
