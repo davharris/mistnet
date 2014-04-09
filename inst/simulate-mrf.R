@@ -1,25 +1,23 @@
+devtools::load_all()
 set.seed(1)
 
-n.species = 300
-n.sites = 1500
+n.species = 10
+n.sites = 500
 n.factors = 5 # Rank of env %*% coefs
-iter = 1E2
+iter = 1E3
 
 env = matrix(rnorm(n.sites * n.factors), ncol = n.factors)
 coefs = matrix(rnorm(n.species * n.factors, sd = 1/2), nrow = n.factors)
-biases = rnorm(n.species, mean = -3, sd = 2)
+biases = rnorm(n.species, mean = 0, sd = 1)
 
 
 inputs = (env %*% coefs) %plus% biases
 
-# Take the output of a Laplace distribution and square it.
-# This makes the lateral coefficients look like what mistnet finds with
-# real data (at least visually).
-pre.lateral = sample(
-  c(-.005, .005) * rexp(n.species^2)^2
+lateral = sample(
+  c(-.1, .1) * rexp(n.species^2)
 )
-dim(pre.lateral) = c(n.species, n.species)
-lateral = pre.lateral + t(pre.lateral) # Make symmetric
+dim(lateral) = c(n.species, n.species)
+lateral = lateral + t(lateral) # Make symmetric
 diag(lateral) = 0
 
 
