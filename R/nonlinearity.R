@@ -96,6 +96,7 @@ mf_mrf.nonlinearity = setRefClass(
     f = function(x){
       mrf_meanfield(
         rinput = x, 
+        rprob = sigmoid(x) < runif(length(x)),
         rlateral = lateral, 
         maxit = maxit, 
         damp = damp, 
