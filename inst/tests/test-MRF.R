@@ -19,7 +19,6 @@ test_that("mean field MRF feeds forward", {
   mrfprob = mrf_meanfield(
     rinput=input, 
     rlateral=lateral, 
-    rprob = sigmoid(input),
     maxit = maxit, 
     damp = damp, 
     tol = tol
@@ -37,7 +36,6 @@ test_that("mean field MRF feeds forward", {
   mrfprob2 = mrf_meanfield(
     rinput=input, 
     rlateral=lateral, 
-    rprob = sigmoid(input),
     maxit = 2L, 
     damp = damp, 
     tol = tol
@@ -49,7 +47,6 @@ test_that("mean field MRF feeds forward", {
   expect_equal(
     mrf_meanfield(
       rinput=input, 
-      rprob = sigmoid(input),
       rlateral=lateral * 0, 
       maxit = 200L, 
       damp = damp, 
