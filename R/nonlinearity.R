@@ -114,7 +114,7 @@ mf_mrf.nonlinearity = setRefClass(
     ){
       observed.crossprod = crossprod(observed)
       
-      predicted.crossprod = findPredictedCrossprod = findPredictedCrossprod(
+      predicted.crossprod = findPredictedCrossprod(
         predicted, 
         importance.weights
       )
