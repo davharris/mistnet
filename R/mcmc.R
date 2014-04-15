@@ -23,12 +23,15 @@ metropolisStep = function(object, y, proposal.scale = 1/4){
       ) 
     )
   
-  # Make predictions for proposals in all rows
+  
+  
+  # One multivariate proposal per row.
   latent = old.latent + proposal.scale * object$ranefSample(
     nrow = object$minibatch.size, 
     ncol = object$n.ranef
   )
   
+  # Make predictions for each proposal
   # The "ones" are because we're using the first slice only.
   object$feedForward(
     cbind(
@@ -53,6 +56,7 @@ metropolisStep = function(object, y, proposal.scale = 1/4){
   # Replace rejected proposals with their previous values
   object$layers[[1]]$inputs[!accept, -(1:ncol(object$x)), 1] = old.latent[!accept, ]
   
-  # Return post-rejection loss
-  ifelse(accept, loss, old.loss)
+  # Return post-rejection loss.
+  ##### This should not include loss from the prior!! ####
+  ifelse(accept, loss, old.loss) 
 }
