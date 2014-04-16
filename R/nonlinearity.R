@@ -11,8 +11,7 @@ linear = function(x){
 }
 
 # Note: rectify is defined in src/rectify.cpp
-
-
+#       Also, exp is just base::exp
 
 # Gradients ---------------------------------------------------------------
 
@@ -28,6 +27,10 @@ rectifyGrad = function(x){
 
 linearGrad = function(x){
   1
+}
+
+expGrad = function(x){
+  exp(x)
 }
 
 
@@ -81,6 +84,26 @@ rectify.nonlinearity = setRefClass(
 )
 
 
+
+exp.nonlinearity = setRefClass(
+  Class = "exp.nonlinearity",
+  fields = list(),
+  contains = "nonlinearity",
+  methods = list(
+    f = function(x){
+      # Wrapping exp(x) in a function is apparently necessary becuase exp() is
+      # primitive and thus not a closure.  There does not seem to be a speed
+      # penalty for this wrapper.
+      exp(x)
+    },
+    grad = expGrad
+  )
+)
+
+
+
+
+
 mf_mrf.nonlinearity = setRefClass(
   Class = "mf_mrf.nonlinearity",
   fields = list(
@@ -122,7 +145,7 @@ mf_mrf.nonlinearity = setRefClass(
       diff = observed.crossprod - predicted.crossprod
       penalty = sign(lateral) * l1.decay
       
-
+      
       scaled.learning.rate = learning.rate/ nrow(observed)
       delta <<- momentum * delta + scaled.learning.rate * (diff - penalty) 
       diag(delta) <<- 0
