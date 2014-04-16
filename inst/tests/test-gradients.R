@@ -28,6 +28,15 @@ test_that("linearGrad is accurate", {
 })
 
 
+test_that("expGrad is accurate", {
+  x = matrix(seq(-10, 10, length = 1E3), ncol = 2)
+  expect_equal(
+    expGrad(x) * 2E-6,
+    exp(x + 1E-6) - exp(x - 1E-6)
+  )
+})
+
+
 test_that("crossEntropyGrad is accurate", {
   eps = 1E-5
   x = seq(.1, .9, by = .1)
