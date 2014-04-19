@@ -225,6 +225,14 @@ test_that("MRF loss works" , {
     }
   )
   
+  # If lateral is zero, MRF loss should equal cross Entropy
+  expect_equal(
+    mrfLoss(y, sigmoid(inputs), 0 * lateral),
+    rowSums(crossEntropy(y, sigmoid(inputs)))
+  )
+  
+  
+  
   losses = sapply(
     1:nrow,
     function(i){
