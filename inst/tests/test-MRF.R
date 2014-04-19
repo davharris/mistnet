@@ -232,6 +232,9 @@ test_that("MRF loss works" , {
     }
   )
   
+  expect_equal(losses, mrfLoss(y, sigmoid(inputs), lateral))
+  
+  
   expected.frequencies = exp(-losses) / sum(exp(-losses))
   
   
