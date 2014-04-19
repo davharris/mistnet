@@ -2,23 +2,6 @@
   rcpp_add_biases(matrix, vector)
 }
 
-crossEntropy = function(y, yhat){
-  -(y * log(yhat) + (1 - y) * log(1 - yhat))
-}
-
-poissonLoss = function(y, yhat){
-   - dpois(x = y, lambda = yhat, log = TRUE)
-}
-
-squaredLoss = function(y, yhat){
-  (y - yhat)^2
-}
-
-binomialLoss = function(y, yhat, n){
-  -dbinom(x = y, size = n, prob = yhat, log = TRUE)
-}
-
-
 # based on the "josh" function from 
 # https://gist.github.com/SChamberlain/3639688
 dropoutMask = function(nrow, ncol) {
