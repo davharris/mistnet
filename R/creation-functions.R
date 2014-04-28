@@ -83,13 +83,23 @@ createLayer = function(
   out = layer$new(
     coef.dim = c(n.inputs, n.outputs),
     coefficients = matrix(0, nrow = n.inputs, ncol = n.outputs),
-    biases = rep(0, n.outputs),
+    biases = matrix(rep(0, n.outputs), nrow = 1),
     coef.updater = do.call(
       new,
       c(
         list(
           Class = paste(updater.name, "updater", sep = "."),
           delta = matrix(0, nrow = n.inputs, ncol = n.outputs)
+        ),
+        updater.arguments
+      )
+    ),
+    bias.updater = do.call(
+      new,
+      c(
+        list(
+          Class = paste(updater.name, "updater", sep = "."),
+          delta = matrix(0, nrow = 1, ncol = n.outputs)
         ),
         updater.arguments
       )

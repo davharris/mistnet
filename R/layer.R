@@ -15,7 +15,7 @@
 #' @field error.grads a numeric array
 #' @field weighted.bias.grads a numeric vector
 #' @field weighted.llik.grads a numeric matrix
-#' @field coef.updater is an \code{updater}
+#' @field coef.updater an \code{updater} object
 #' 
 #' @include prior.R
 #' @include updater.R
@@ -26,7 +26,7 @@ layer = setRefClass(
   fields = list(
     coef.dim = "integer",
     coefficients = "matrix",
-    biases = "numeric",
+    biases = "matrix",
     nonlinearity = "nonlinearity",
     prior = "prior",
     inputs = "array",
@@ -35,7 +35,8 @@ layer = setRefClass(
     error.grads = "array",
     weighted.bias.grads = "numeric",
     weighted.llik.grads = "matrix",
-    coef.updater = "updater"
+    coef.updater = "updater",
+    bias.updater = "updater"
   ),
   
   methods = list(
@@ -73,7 +74,9 @@ layer = setRefClass(
       coefficients <<- coefficients + coef.updater$delta
       
       # Setting learning rate to one for the biases!
-      biases <<- biases - weighted.bias.grads / minibatch.size
+      bias.grads = weighted.bias.grads / minibatch.size
+      bias.updater$computeDelta(bias.grads)
+      biases <<- biases - bias.updater$delta
     },
     
     combineSampleGradients = function(weights, n.importance.samples){
