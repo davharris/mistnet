@@ -15,11 +15,12 @@ momentum.updater = setRefClass(
   contains = "updater",
   fields = list(
     momentum = "numeric",
+    learning.rate = "numeric",
     delta = "matrix"
   ),
   methods = list(
     computeDelta = function(gradient){
-      delta <<- delta * momentum + gradient
+      delta <<- delta * momentum + gradient * learning.rate
     }
   )
 )
