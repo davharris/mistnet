@@ -247,7 +247,7 @@ test_that("MRF loss works" , {
   
   
   ### Estimate the frequencies by Gibbs sampling
-  maxit = 2500
+  maxit = 500
   matches = NULL
   for(i in 1:maxit){
     for(col in 1:ncol){
