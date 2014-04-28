@@ -69,6 +69,7 @@ layer = setRefClass(
       "Calculate coef.delta and add it to coefficients. Update biases"
       log.prior.grad = prior$getLogGrad(coefficients) / dataset.size
       grad = weighted.llik.grads / minibatch.size + log.prior.grad
+      
       coef.updater$computeDelta(grad)
       
       coefficients <<- coefficients + coef.updater$delta

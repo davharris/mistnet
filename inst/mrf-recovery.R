@@ -4,6 +4,7 @@ load("inst/fakedata.Rdata")
 n.importance.samples = 20L
 minibatch.size = 21L
 n.ranef = 4L
+learning.rate = .01
 
 net = network$new(
   x = env[ , 1:3],
@@ -16,8 +17,10 @@ net = network$new(
       minibatch.size = minibatch.size,
       n.importance.samples = n.importance.samples,
       nonlinearity.name = "sigmoid",
-      updater.name = "sgd",
-      updater.arguments = c(learning.rate = 1E-1, momentum = 0.5)
+      updater.name = "adagrad",
+      updater.arguments = list(
+        learning.rate = learning.rate
+      )
     )
   ),
   n.layers = 1L,
@@ -38,16 +41,20 @@ net$layers[[1]]$resetState(minibatch.size, n.importance.samples)
 net$layers[[1]]$biases = matrix(qlogis(colMeans(fakedata)), nrow = 1)
 
 
-# Fill in all the stuff for the MRF nonlinearity
-scale = mean(abs(lateral[upper.tri(lateral)]))
-net$layers[[1]]$nonlinearity = mf_mrf.nonlinearity(
-  lateral = matrix(0, nrow = ncol(fakedata), ncol = ncol(fakedata)),
-  maxit = 50L,
-  damp = 0.2,
-  tol = 1E-4,
-  delta = matrix(0, nrow = ncol(fakedata), ncol = ncol(fakedata)),
-  l1.decay = 1/scale/nrow(env)
-)
+# # Fill in all the stuff for the MRF nonlinearity
+# scale = mean(abs(lateral[upper.tri(lateral)]))
+# net$layers[[1]]$nonlinearity = mf_mrf.nonlinearity(
+#   lateral = matrix(0, nrow = ncol(fakedata), ncol = ncol(fakedata)),
+#   maxit = 50L,
+#   damp = 0.2,
+#   tol = 1E-4,
+#   updater = new(
+#     "adagrad.updater",
+#     delta = matrix(0, nrow = ncol(fakedata), ncol = ncol(fakedata)),
+#     learning.rate = learning.rate
+#   ),
+#   l1.decay = 1/scale/nrow(env)
+# )
 
 
 
@@ -65,7 +72,6 @@ for(iter in 1:5){
     if(is.nan(net$layers[[1]]$outputs[[1]])){
       stop("NaNs detected :-(")
     }
-    net$learning.rate = 0.2/(1 + net$completed.iterations / 500)
   }
 }
 

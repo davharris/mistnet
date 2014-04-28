@@ -5,7 +5,7 @@ mistnet = function(
   hidden.dims,
   priors,
   updater.name = "sgd",
-  updater.arguments = c(learning.rate = .001, momentum = .9),
+  updater.arguments = list(learning.rate = .001, momentum = .9),
   n.ranef,
   ranefSample,
   n.importance.samples,

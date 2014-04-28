@@ -32,6 +32,7 @@ adagrad.updater = setRefClass(
   Class = "adagrad.updater",
   contains = "updater",
   fields = list(
+    delta = "matrix",
     learning.rate = "numeric",
     squared.grad = "matrix"
   ),
@@ -39,7 +40,12 @@ adagrad.updater = setRefClass(
     computeDelta = function(gradient){
       squared.grad <<- squared.grad + gradient^2
       
-      delta <<- learning.rate / sqrt(squared.grad) * gradient
+      delta <<- -learning.rate / sqrt(squared.grad) * gradient
+    },
+    initialize = function(delta, learning.rate, ...){
+      delta <<- delta
+      learning.rate <<- learning.rate
+      squared.grad <<- delta * 0
     }
   )
 )

@@ -36,7 +36,7 @@ test_that("adagrad works",{
   )
   
   for(i in 1:1000){
-    updater$computeDelta(true.coefs - coefs)
+    updater$computeDelta(coefs - true.coefs)
     coefs = coefs + updater$delta
   }
   
