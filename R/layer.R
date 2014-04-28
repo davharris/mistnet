@@ -15,9 +15,10 @@
 #' @field error.grads a numeric array
 #' @field weighted.bias.grads a numeric vector
 #' @field weighted.llik.grads a numeric matrix
-#' @field coef.delta a numeric matrix
+#' @field coef.updater is an \code{updater}
 #' 
 #' @include prior.R
+#' @include updater.R
 #' @include nonlinearity.R
 #' @exportClass
 layer = setRefClass(
@@ -34,7 +35,7 @@ layer = setRefClass(
     error.grads = "array",
     weighted.bias.grads = "numeric",
     weighted.llik.grads = "matrix",
-    coef.delta = "matrix"
+    coef.updater = "updater"
   ),
   
   methods = list(
@@ -69,8 +70,9 @@ layer = setRefClass(
       "Calculate coef.delta and add it to coefficients. Update biases"
       log.prior.grad = prior$getLogGrad(coefficients) / dataset.size
       grad = -weighted.llik.grads / minibatch.size + log.prior.grad
-      coef.delta <<- grad * learning.rate + momentum * coef.delta
-      coefficients <<- coefficients + coef.delta
+      coef.updater$computeDelta(grad)
+      
+      coefficients <<- coefficients + coef.updater$delta
       
       # Hinton suggested that biases should have higher learning rates in his
       # "practical guide" for RBMs. The sign is more reliable, so we can move

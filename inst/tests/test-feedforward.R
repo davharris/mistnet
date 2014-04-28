@@ -7,7 +7,9 @@ test_that("Single-layer feedforward works", {
     prior = gaussian.prior$new(mean = 0, var = 1),
     nonlinearity.name = "sigmoid",
     minibatch.size = 5L,
-    n.importance.samples = 3L
+    n.importance.samples = 3L,
+    updater.name = "sgd",
+    updater.arguments = NULL
   )
   l.copy = l$copy()
   
