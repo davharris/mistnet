@@ -10,6 +10,7 @@ updater = setRefClass(
   )
 )
 
+# Stochastic gradient descent (with momentum)
 sgd.updater = setRefClass(
   Class = "sgd.updater",
   contains = "updater",
@@ -25,7 +26,8 @@ sgd.updater = setRefClass(
   )
 )
 
-
+# Adagrad allows different coefficients to have different effective learning
+#   rates, depending on how much that parameter has moved so far.
 adagrad.updater = setRefClass(
   Class = "adagrad.updater",
   contains = "updater",
@@ -43,6 +45,9 @@ adagrad.updater = setRefClass(
 )
 
 
+# Adadelta modifies adagrad by decaying the squared gradients and multiplying
+#    by an extra term to keep the units consistent.  Supposed to be more robust
+#    to hyperparameter choice than adagrad or sgd.
 # Rho is a decay rate. Controls how long the updater remembers the squared
 #    magnitude of previous updates
 # Epsilon is a fudge factor that determines initial rates and keeps things from
