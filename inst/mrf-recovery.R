@@ -1,7 +1,7 @@
 devtools::load_all()
 load("inst/fakedata.Rdata")
 
-n.importance.samples = 20L
+n.importance.samples = 25L
 minibatch.size = 21L
 n.ranef = 4L
 learning.rate = .1
@@ -13,7 +13,7 @@ net = network$new(
     createLayer(
       n.inputs = 3L + n.ranef,
       n.outputs = ncol(fakedata),
-      prior = gaussian.prior$new(mean = 0, var = 1/4),
+      prior = gaussian.prior$new(mean = 0, var = 1),
       minibatch.size = minibatch.size,
       n.importance.samples = n.importance.samples,
       nonlinearity.name = "sigmoid",
@@ -53,7 +53,7 @@ net$layers[[1]]$nonlinearity = mf_mrf.nonlinearity(
     delta = matrix(0, nrow = ncol(fakedata), ncol = ncol(fakedata)),
     learning.rate = learning.rate
   ),
-  l1.decay = 1/scale/nrow(env)
+  l1.decay = 1 / scale / nrow(env)
 )
 
 
@@ -87,6 +87,8 @@ plot(
   pch = 16
 )
 abline(0,1)
+abline(0,0)
+abline(v = c(-.05, .05))
 
 summary(lm(coefs[4, ] ~ 0 + t(net$layers[[1]]$coefficients[4:(3 + n.ranef), ])))
 summary(lm(coefs[5, ] ~ 0 + t(net$layers[[1]]$coefficients[4:(3 + n.ranef), ])))
@@ -95,7 +97,4 @@ square = function(x){x^2}
 1-mean(square(net$layers[[1]]$nonlinearity$lateral - lateral))/mean(square(lateral))
 
 mean(abs(net$layers[[1]]$nonlinearity$lateral - lateral))
-
-# Should test out of sample to see if this is overfitting or just
-# a quirk of my regularizers.
 

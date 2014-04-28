@@ -158,8 +158,8 @@ findPredictedCrossprod = function(predicted, importance.weights){
     nrow = dim(predicted)[[2]]
   )
   for(i in 1:ncol(importance.weights)){
-    # The square root is necessary because things get multiplied together in
-    # the cross product.
+    # The square root is there because things get multiplied together in
+    # the cross product. Sqrt undoes this multiplication.
     crossprod.increment = crossprod(
       predicted[ , , i] * sqrt(importance.weights[ , i])
     )

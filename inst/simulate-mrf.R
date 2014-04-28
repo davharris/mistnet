@@ -1,14 +1,14 @@
 devtools::load_all()
 set.seed(1)
 
-n.species = 10
-n.sites = 500
+n.species = 100
+n.sites = 2000
 n.factors = 5 # Rank of env %*% coefs
 iter = 1E3
 
 env = matrix(rnorm(n.sites * n.factors), ncol = n.factors)
 coefs = matrix(rnorm(n.species * n.factors, sd = 1/2), nrow = n.factors)
-biases = rnorm(n.species, mean = 0, sd = 1)
+biases = rnorm(n.species, mean = 0, sd = 1/2)
 
 
 inputs = (env %*% coefs) %plus% biases
