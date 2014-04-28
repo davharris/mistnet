@@ -26,7 +26,9 @@ rectifyGrad = function(x){
 }
 
 linearGrad = function(x){
-  1
+  out = rep(1, length(x))
+  dim(out) = dim(x)
+  out
 }
 
 expGrad = function(x){

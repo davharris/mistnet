@@ -4,9 +4,14 @@ test_that("sigmoidGrad is accurate", {
   expect_equal(sigmoidGrad(x = 0), 1/4)
   expect_equal(sigmoidGrad(x = Inf), 0)
   expect_equal(sigmoidGrad(x = -Inf), 0)
+  
+  x = matrix(seq(-10, 10, length = 1E3), ncol = 2)
+  
+  nl = new("sigmoid.nonlinearity")
+  
   expect_equal(
-    sigmoid(1 + 1E-6) - sigmoid(1 - 1E-6), 
-    sigmoidGrad(x = 1) * 2E-6
+    nl$f(x + 1E-6) - nl$f(x - 1E-6), 
+    nl$grad(x) * 2E-6
   )
 })
 
@@ -16,23 +21,33 @@ test_that("rectifyGrad is accurate", {
   expect_true(
     all(rectifyGrad(x) == (x > 0))
   )
+  nl = new("rectify.nonlinearity")
+  
   expect_equal(
-    rectifyGrad(x) * 2E-6,
-    rectify(x + 1E-6) - rectify(x - 1E-6)
+    nl$f(x + 1E-6) - nl$f(x - 1E-6), 
+    nl$grad(x = x) * 2E-6
   )
 })
 
 test_that("linearGrad is accurate", {
   x = matrix(1:1000, nrow = 10)
-  expect_equal(linearGrad(x), 1)
+  nl = new("linear.nonlinearity")
+  
+  expect_equal(
+    nl$f(x + 1E-6) - nl$f(x - 1E-6), 
+    nl$grad(x) * 2E-6
+  )
+  expect_true(all(nl$grad(x) == 1))
 })
 
 
 test_that("expGrad is accurate", {
   x = matrix(seq(-10, 10, length = 1E3), ncol = 2)
+  nl = new("exp.nonlinearity")
+  
   expect_equal(
-    expGrad(x) * 2E-6,
-    exp(x + 1E-6) - exp(x - 1E-6)
+    nl$f(x + 1E-6) - nl$f(x - 1E-6), 
+    nl$grad(x) * 2E-6
   )
 })
 
