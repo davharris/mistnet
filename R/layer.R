@@ -73,7 +73,6 @@ layer = setRefClass(
       
       coefficients <<- coefficients + coef.updater$delta
       
-      # Setting learning rate to one for the biases!
       bias.grads = weighted.bias.grads / minibatch.size
       bias.updater$computeDelta(bias.grads)
       biases <<- biases - bias.updater$delta
