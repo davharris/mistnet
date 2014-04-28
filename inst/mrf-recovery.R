@@ -51,7 +51,7 @@ net$layers[[1]]$nonlinearity = mf_mrf.nonlinearity(
   updater = new(
     "adagrad.updater",
     delta = matrix(0, nrow = ncol(fakedata), ncol = ncol(fakedata)),
-    learning.rate = learning.rate
+    learning.rate = learning.rate / 10
   ),
   l1.decay = 1 / scale / nrow(env)
 )
