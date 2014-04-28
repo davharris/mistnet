@@ -4,10 +4,8 @@ mistnet = function(
   nonlinearity.names,
   hidden.dims,
   priors,
-  learning.rate,
   updater.name = "sgd",
-  updater.arguments = c(learning.rate = learning.rate, momentum = momentum),
-  momentum,
+  updater.arguments = c(learning.rate = .001, momentum = .9),
   n.ranef,
   ranefSample,
   n.importance.samples,
@@ -59,8 +57,6 @@ mistnet = function(
     lossGradient = lossGrad,
     ranefSample = ranefSample,
     n.ranef = n.ranef,
-    learning.rate = learning.rate,
-    momentum = momentum,
     completed.iterations = 0L
   ) 
   

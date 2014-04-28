@@ -14,8 +14,6 @@ test_that("Correct behavior for fewer than one iteration",{
       gaussian.prior(mean = 0, var = 1),
       gaussian.prior(mean = 0, var = 1)
     ),
-    learning.rate = 1E-4,
-    momentum = .8,
     n.ranef = 3L,
     ranefSample = gaussianRanefSample,
     n.importance.samples = 10L,

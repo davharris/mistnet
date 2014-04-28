@@ -62,8 +62,6 @@ layer = setRefClass(
     },
     
     updateCoefficients = function(
-      learning.rate, 
-      momentum, 
       dataset.size, 
       minibatch.size
     ){
@@ -74,12 +72,8 @@ layer = setRefClass(
       
       coefficients <<- coefficients + coef.updater$delta
       
-      # Hinton suggested that biases should have higher learning rates in his
-      # "practical guide" for RBMs. The sign is more reliable, so we can move
-      # farther.
-      # Also, I don't have any momentum for biases at the moment, so this should
-      # allow them to keep up better.
-      biases <<- biases - weighted.bias.grads * learning.rate / minibatch.size * 10
+      # Setting learning rate to one for the biases!
+      biases <<- biases - weighted.bias.grads / minibatch.size
     },
     
     combineSampleGradients = function(weights, n.importance.samples){

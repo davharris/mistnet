@@ -14,8 +14,6 @@ network = setRefClass(
     lossGradient = "function",
     ranefSample = "function",
     n.ranef = "integer",
-    learning.rate = "numeric",
-    momentum = "numeric",
     completed.iterations = "integer"
   ),
   methods = list(
@@ -104,17 +102,13 @@ network = setRefClass(
     updateCoefficients = function(){
       for(i in 1:n.layers){
         layers[[i]]$updateCoefficients(
-          learning.rate = learning.rate, 
-          momentum = momentum,
           dataset.size = dataset.size,
           minibatch.size = minibatch.size
         )
         layers[[i]]$nonlinearity$update(
           observed = y[minibatch.ids, ],
           predicted = layers[[i]]$outputs, 
-          learning.rate = learning.rate / 10,
-          importance.weights = importance.weights,
-          momentum = momentum
+          importance.weights = importance.weights
         )
       }
     },
