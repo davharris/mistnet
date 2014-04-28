@@ -143,7 +143,7 @@ mf_mrf.nonlinearity = setRefClass(
       diff = predicted.crossprod - observed.crossprod
       penalty = sign(lateral) * l1.decay
       
-      updater$computeDelta((diff - penalty) / nrow(observed))
+      updater$computeDelta((diff + penalty) / nrow(observed))
       diag(updater$delta) <<- 0
       
       lateral <<- lateral + updater$delta
