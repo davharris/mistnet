@@ -117,8 +117,13 @@ test_that("lateral updates work", {
       maxit = 10L,
       damp = .2,
       tol = .01,
-      delta = matrix(0, nrow = ncol, ncol = ncol),
-      l1.decay = 0
+      l1.decay = 0,
+      updater = new(
+        "sgd.updater", 
+        delta = matrix(0, nrow = ncol, ncol = ncol), 
+        momentum = momentum,
+        learning.rate = 0
+      )
     )
   )
   
@@ -130,8 +135,6 @@ test_that("lateral updates work", {
   l$nonlinearity$update(
     observed = y, 
     predicted = predicted,
-    learning.rate = 0,
-    momentum = 0,
     importance.weights = importance.weights
   )
   
@@ -145,12 +148,10 @@ test_that("lateral updates work", {
   # Confirm that momentum works as expected.
   # No learning from the data, but a bunch of twos should get carried forward
   # from delta * momentum as 1.8s.  (The diagonal should be zeros, per usual)
-  l$nonlinearity$delta[,] = 2
+  l$nonlinearity$updater$delta[,] = 2
   l$nonlinearity$update(
     observed = y, 
     predicted = predicted,
-    learning.rate = 0,
-    momentum = momentum,
     importance.weights = importance.weights
   )
   
@@ -163,20 +164,19 @@ test_that("lateral updates work", {
   # should come straight from delta.
   expect_equal(
     l$nonlinearity$lateral,
-    l$nonlinearity$delta
+    l$nonlinearity$updater$delta
   )
   
   
   
   # Test a real update
-  old.delta = l$nonlinearity$delta
+  old.delta = l$nonlinearity$updater$delta
   old.lateral = l$nonlinearity$lateral
-  learning.rate = 0.01
+  learning.rate = 0.1
+  l$nonlinearity$updater$learning.rate = learning.rate
   l$nonlinearity$update(
     observed = y, 
     predicted = predicted,
-    learning.rate = learning.rate,
-    momentum = momentum,
     importance.weights = importance.weights
   )
   
@@ -190,7 +190,7 @@ test_that("lateral updates work", {
   diag(delta) = 0
   expect_equal(
     l$nonlinearity$lateral,
-    delta + old.lateral
+    old.lateral + delta
   )
   
 })

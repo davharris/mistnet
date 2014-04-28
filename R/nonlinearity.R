@@ -111,8 +111,8 @@ mf_mrf.nonlinearity = setRefClass(
     maxit = "integer",
     damp = "numeric",
     tol = "numeric",
-    delta = "matrix",
-    l1.decay = "numeric"
+    l1.decay = "numeric",
+    updater = "updater"
   ),
   contains = "nonlinearity",
   methods = list(
@@ -129,10 +129,8 @@ mf_mrf.nonlinearity = setRefClass(
     update = function(
       observed, 
       predicted, 
-      learning.rate,
       importance.weights,
       n.importance.samples,
-      momentum,
       dataset.size
     ){
       observed.crossprod = crossprod(observed)
@@ -142,15 +140,13 @@ mf_mrf.nonlinearity = setRefClass(
         importance.weights
       )
       
-      diff = observed.crossprod - predicted.crossprod
+      diff = predicted.crossprod - observed.crossprod
       penalty = sign(lateral) * l1.decay
       
+      updater$computeDelta((diff - penalty) / nrow(observed))
+      diag(updater$delta) <<- 0
       
-      scaled.learning.rate = learning.rate/ nrow(observed)
-      delta <<- momentum * delta + scaled.learning.rate * (diff - penalty) 
-      diag(delta) <<- 0
-      
-      lateral <<- lateral + delta
+      lateral <<- lateral + updater$delta
     }
   )
 )

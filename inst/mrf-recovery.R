@@ -15,7 +15,9 @@ net = network$new(
       prior = gaussian.prior$new(mean = 0, var = 1/4),
       minibatch.size = minibatch.size,
       n.importance.samples = n.importance.samples,
-      nonlinearity.name = "sigmoid"
+      nonlinearity.name = "sigmoid",
+      updater.name = "sgd",
+      updater.arguments = c(learning.rate = 1E-1, momentum = 0.5)
     )
   ),
   n.layers = 1L,
@@ -26,8 +28,6 @@ net = network$new(
   lossGradient = crossEntropyGrad,
   ranefSample = gaussianRanefSample,
   n.ranef = n.ranef,
-  learning.rate = 1E-1,
-  momentum = .5,
   completed.iterations = 0L
 )
 
@@ -35,23 +35,7 @@ net = network$new(
 net$layers[[1]]$resetState(minibatch.size, n.importance.samples)
 
 # initialize biases
-net$layers[[1]]$biases = qlogis(colMeans(fakedata))
-
-
-
-
-
-for(i in 1:500){
-  if(i%%50 == 0){
-    cat("\n")
-  }
-  cat(".")
-  net$fit(10)
-  if(is.nan(net$layers[[1]]$outputs[[1]])){
-    stop("NaNs detected :-(")
-  }
-  net$learning.rate = 0.2/(1 + net$completed.iterations / 500)
-}
+net$layers[[1]]$biases = matrix(qlogis(colMeans(fakedata)), nrow = 1)
 
 
 # Fill in all the stuff for the MRF nonlinearity
@@ -77,7 +61,7 @@ for(iter in 1:5){
       cat("\n")
     }
     cat(".")
-    net$fitFinalNonlinearityOnly(10)
+    net$fit(10)
     if(is.nan(net$layers[[1]]$outputs[[1]])){
       stop("NaNs detected :-(")
     }

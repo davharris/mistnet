@@ -68,14 +68,14 @@ layer = setRefClass(
     ){
       "Calculate coef.delta and add it to coefficients. Update biases"
       log.prior.grad = prior$getLogGrad(coefficients) / dataset.size
-      grad = -weighted.llik.grads / minibatch.size + log.prior.grad
+      grad = weighted.llik.grads / minibatch.size + log.prior.grad
       coef.updater$computeDelta(grad)
       
       coefficients <<- coefficients + coef.updater$delta
       
       bias.grads = weighted.bias.grads / minibatch.size
       bias.updater$computeDelta(bias.grads)
-      biases <<- biases - bias.updater$delta
+      biases <<- biases + bias.updater$delta
     },
     
     combineSampleGradients = function(weights, n.importance.samples){
