@@ -15,7 +15,7 @@
 #' @field error.grads a numeric array
 #' @field weighted.bias.grads a numeric vector
 #' @field weighted.llik.grads a numeric matrix
-#' @field grad.step a numeric matrix
+#' @field coef.delta a numeric matrix
 #' 
 #' @include prior.R
 #' @include nonlinearity.R
@@ -34,7 +34,7 @@ layer = setRefClass(
     error.grads = "array",
     weighted.bias.grads = "numeric",
     weighted.llik.grads = "matrix",
-    grad.step = "matrix"
+    coef.delta = "matrix"
   ),
   
   methods = list(
@@ -66,11 +66,11 @@ layer = setRefClass(
       dataset.size, 
       minibatch.size
     ){
-      "Calculate grad.step and add it to coefficients. Update biases"
+      "Calculate coef.delta and add it to coefficients. Update biases"
       log.prior.grad = prior$getLogGrad(coefficients) / dataset.size
       grad = -weighted.llik.grads / minibatch.size + log.prior.grad
-      grad.step <<- grad * learning.rate + momentum * grad.step
-      coefficients <<- coefficients + grad.step
+      coef.delta <<- grad * learning.rate + momentum * coef.delta
+      coefficients <<- coefficients + coef.delta
       
       # Hinton suggested that biases should have higher learning rates in his
       # "practical guide" for RBMs. The sign is more reliable, so we can move
@@ -101,7 +101,7 @@ layer = setRefClass(
     },
     
     resetState = function(minibatch.size, n.importance.samples){
-      "Reset inputs, activations, outputs, error.grads, and grad.step to NA"
+      "Reset inputs, activations, outputs, error.grads, and coef.delta to NA"
       inputs <<- array(
         NA, 
         c(minibatch.size, coef.dim[[1]], n.importance.samples)

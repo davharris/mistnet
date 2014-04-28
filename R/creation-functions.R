@@ -82,7 +82,7 @@ createLayer = function(
     coef.dim = c(n.inputs, n.outputs),
     coefficients = matrix(0, nrow = n.inputs, ncol = n.outputs),
     biases = rep(0, n.outputs),
-    grad.step = matrix(0, nrow = n.inputs, ncol = n.outputs),
+    coef.delta = matrix(0, nrow = n.inputs, ncol = n.outputs),
     nonlinearity = new(
       paste(nonlinearity.name, "nonlinearity", sep = ".")
     ),
