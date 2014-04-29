@@ -43,9 +43,13 @@ adagrad.updater = setRefClass(
       delta <<- -learning.rate / sqrt(squared.grad) * gradient
     },
     initialize = function(delta, learning.rate, ...){
-      delta <<- delta
-      learning.rate <<- learning.rate
-      squared.grad <<- delta * 0
+      if(!missing(delta)){
+        delta <<- delta
+        squared.grad <<- delta * 0
+      }
+      if(!missing(learning.rate)){
+        learning.rate <<- learning.rate
+      }
     }
   )
 )
