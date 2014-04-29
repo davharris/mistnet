@@ -1,23 +1,31 @@
-findLogExpectedLik = function(importance.errors, weights){
-  # importance.errors should be a matrix. Rows are transects. Columns are samples.
-  # Entries should be errors associated with the whole transect (all species).
-  # Result should be equivalent to log(mean(exp(-x)))
-  # This should make the floating point more accurate when the amount of error is large
-  
+# Result should be equivalent to log(mean(exp(x))).
+# The extra work is to deal with floating point error, overflow, and weights.
+# Oddly enough, floating point precision doesn't seem to cause problems.
+logMeanExp = function(x, weights){
   if(missing(weights)){
-    weights = matrix(
-      1 / ncol(importance.errors), 
-      nrow = nrow(importance.errors), 
-      ncol = ncol(importance.errors)
-    )
+    weights = rep(1/length(x), length(x))
   }
-  sapply(
-    1:nrow(importance.errors),
-    function(i){
-      smallest.error = min(importance.errors[i, ])
-      log(
-        sum(exp(smallest.error - importance.errors[i, ]) * weights[i, ])
-      ) - smallest.error
-    }
+  stopifnot(all.equal(1, sum(weights)))
+  
+  # Rescale so the largest log-likelihoods values are near zero, then undo the
+  # rescaling
+  biggest = max(x)
+  log(sum(exp(x - biggest) * weights)) + biggest
+}
+
+importanceSamplingEvaluation = function(object, newdata, y, batches, batch.size){
+  logliks = replicate(
+    batches,{
+      predictions = predict(
+        object, 
+        newdata, 
+        n.importance.samples = as.integer(batch.size)
+      )
+      
+      -apply(object$loss(y = y, yhat = predictions), 3, rowSums)
+    },
+    simplify = FALSE
   )
+  
+  apply(do.call(cbind, logliks), 1, logMeanExp)
 }
