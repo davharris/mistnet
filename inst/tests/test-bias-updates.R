@@ -1,45 +1,57 @@
-context("Updating biases")
+context("Bias updates")
 
 test_that("biases update correctly",{
   
   eps = 1E-5
   x = matrix(rnorm(1000), nrow = 50)
   y = dropoutMask(50, 17)
+  minibatch.size = 11L
+  n.importance.samples = 2L
   
-  net = network(
+  net = mistnet(
     x = x,
     y = y,
-    layers = list(
-      createLayer(
-        dim = c(ncol(x), ncol(y)),
-        learning.rate = eps,
-        momentum = .8,
-        prior = gaussian.prior$new(mean = 0, var = 1),
-        dataset.size = 12345,
-        nonlinearity.name = "sigmoid"
-      )
-    ),
-    n.layers = 1L,
-    minibatch.size = 11L,
+    nonlinearity.names = c("sigmoid"),
+    priors = list(gaussian.prior$new(mean = 0, var = 1)),
+    hidden.dims = NULL,
+    n.ranef = 3L,
+    minibatch.size = minibatch.size,
+    n.importance.samples = 5L,
     loss = crossEntropy,
-    lossGradient = crossEntropyGrad,
-    n.importance.samples = 1L
+    lossGrad = crossEntropyGrad,
+    ranefSample = gaussianRanefSample,
+    training.iterations = 0L
   )
   
   initial.biases = rnorm(ncol(y))
-  net$layers[[1]]$biases = initial.biases
-  # Currently, gradient isn't directly reported.  Have to infer it from how biases
-  # are updated.  Not the most maintainable decision I've ever made...
+  net$layers[[1]]$biases = matrix(initial.biases, nrow = 1)
+    
   net$fit(1)
   
-  # factor of 10 is baked into bias update.  See comment there.
-  grad = (initial.biases - net$layers[[1]]$biases) / 10
+  # Should actually do what the updater says
+  expect_equal(
+    net$layers[[1]]$biases, 
+    initial.biases + net$layers[[1]]$bias.updater$delta
+  )
   
+  # Delta should be calculated correctly.
+  # Divide by minibatch size to standardize the values regardless of # of examples
+  with(
+    net$layers[[1]],
+    expect_equal(
+      weighted.bias.grads / minibatch.size * bias.updater$learning.rate,
+      -c(bias.updater$delta)
+    )
+  )
   
+  #################
+  # Tests below this line haven't been updated
+  
+  # Reset coefficients to zero
   net$layers[[1]]$coefficients[ , ] = 0
   
   # With reset coefficients, let's see what the loss is.
-  net$feedForward()
+  net$feedForward(1L)
   updated.loss = sum(net$reportLoss())
   
   net$layers[[1]]$biases[] = initial.biases
