@@ -1,19 +1,19 @@
 mistnet = function(
   x,
   y,
-  nonlinearity.names,
   hidden.dims,
+  n.ranef,
+  nonlinearity.names,
+  loss.name,
   priors = replicate(
     length(nonlinearity.names), gaussian.prior$new(mean = 0, var = 1)
   ),
   updater.name = "sgd",
   updater.arguments = list(learning.rate = .001, momentum = .9),
-  n.ranef,
   ranefSample = gaussianRanefSample,
   n.importance.samples = 25,
   minibatch.size = 20,
-  training.iterations = 0,
-  loss.name
+  training.iterations = 0
 ){
   n.layers = length(nonlinearity.names)
   stopifnot(length(priors) == n.layers)
