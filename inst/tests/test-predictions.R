@@ -26,7 +26,7 @@ test_that("Prediction works",{
     lossGrad = crossEntropyGrad
   )
   net$fit(1) # Feed forward
-  net$layers[[3]]$biases[] = 0 # Undo bis updates
+  net$layers[[3]]$biases[] = 0 # Undo bias updates
   
   p = predict(net, rbind(x, x), n.importance.samples = n.importance.samples)
   
@@ -51,6 +51,6 @@ test_that("Prediction works",{
     if(name != "layers"){
       expect_identical(copy$field(name), copy2$field(name))
     }
-  }  
+  }
   
 })
