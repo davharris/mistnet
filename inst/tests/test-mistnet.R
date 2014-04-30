@@ -25,4 +25,7 @@ test_that("Correct behavior for fewer than one iteration",{
   
   expect_equal(net$completed.iterations, 0)
   expect_error(net$fit(-1), "valid number of iterations")
+  
+  net$fit(2) # shouldn't throw an error
+  
 })
