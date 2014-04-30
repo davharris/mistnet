@@ -1,6 +1,7 @@
-context("integration test: one layer")
+context("integration tests")
 
 test_that("one-layer network finds correct parameters",{
+  # Random effect doesn't do anything here
   
   set.seed(1)
   
@@ -30,13 +31,13 @@ test_that("one-layer network finds correct parameters",{
   )
   
   # Give the network a warm start
-  net$layers[[1]]$coefficients[-6, ] = true.coefs * .9
+  net$layers[[1]]$coefficients[-6, ] = true.coefs * .85
   
-  net$fit(100)
+  net$fit(150)
   
   estimated.coefs = net$layers[[1]]$coefficients[-6, ]
   
-  r.squared = 1 - var(c(true.coefs - estimated.coefs)) / var(c(true.coefs))
+  r.squared = 1 - sum((true.coefs - estimated.coefs)^2) / sum((true.coefs - mean(true.coefs))^2)
   
   expect_true(r.squared > .99)
 })
