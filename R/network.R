@@ -173,6 +173,35 @@ network = setRefClass(
         )
       }
       importance.weights <<- weighImportance(importance.errors)
+    },
+    copy = function(shallow = FALSE){
+      # Based on the default copy function provided for ReferenceClasses in 
+      # the methods package.
+      # A separate method is needed to ensure that the list of layers is copied
+      # fully.  With the default method, the copied list contains the same
+      # layer objects as the original.
+      
+      if(shallow){
+        stop("Network objects can only be copied with shallow = FALSE")
+      }
+      
+      original.layers = lapply(layers, function(x) x$copy())
+      
+      def = .refClassDef
+      value = new("network")
+      vEnv = as.environment(value)
+      selfEnv = as.environment(.self)
+      for (field in names(def@fieldClasses)) {
+        current = get(field, envir = selfEnv)
+        if(is(current, "envRefClass")){
+          current = current$copy(shallow = FALSE)
+        } 
+        assign(field, current, envir = vEnv)
+      }
+      
+      value$layers = original.layers
+      
+      value
     }
   )
 )
