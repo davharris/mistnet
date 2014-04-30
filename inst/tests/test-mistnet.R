@@ -3,6 +3,8 @@ context("Mistnet function")
 x = dropoutMask(17L, 37L)
 y = dropoutMask(17L, 19L)
 
+colnames(y) = letters[1:ncol(y)]
+
 test_that("Correct behavior for fewer than one iteration",{
   net = mistnet(
     x,
@@ -28,4 +30,8 @@ test_that("Correct behavior for fewer than one iteration",{
   
   net$fit(2) # shouldn't throw an error
   
+  
+  expect_equal(dimnames(net$layers[[3]]$outputs)[[2]], colnames(y))
+  
+  expect_equal(colnames(net$layers[[3]]$coefficients), colnames(y))
 })

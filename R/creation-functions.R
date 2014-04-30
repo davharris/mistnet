@@ -60,6 +60,10 @@ mistnet = function(
     completed.iterations = 0L
   ) 
   
+  colnames(net$layers[[net$n.layers]]$coefficients) = colnames(y)
+  dimnames(net$layers[[net$n.layers]]$outputs) = list(NULL, colnames(y), NULL)
+  
+  
   # Coefficients can't all start at zero! Perhaps sample coefficients from their
   # prior?
   # Final layer's biases shouldn't be zero either!
