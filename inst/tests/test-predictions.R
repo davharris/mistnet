@@ -26,8 +26,9 @@ test_that("Prediction works",{
     lossGrad = crossEntropyGrad
   )
   
-  p = predict(net, x, n.importance.samples = n.importance.samples)
+  p = predict(net, rbind(x, x), n.importance.samples = n.importance.samples)
   
-  expect_equal(dim(p), c(dim(y), n.importance.samples))
+  expect_equal(dim(p), c(2 * nrow(x), ncol(y), n.importance.samples))
+  
   expect_true(all(p == 0.5)) # With no coefficients, everything should be 0.5
 })
