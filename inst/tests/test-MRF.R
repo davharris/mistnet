@@ -82,7 +82,7 @@ test_that("findPredictedCrossprod works", {
     runif(nrow * ncol * n.importance.weights),
     dim = c(nrow, ncol, n.importance.weights)
   )
-  importance.weights = rdirichlet(nrow, rep(1, n.importance.weights))
+  importance.weights = gtools::rdirichlet(nrow, rep(1, n.importance.weights))
   
   x = findPredictedCrossprod(predicted, importance.weights)
   
@@ -108,7 +108,7 @@ test_that("lateral updates work", {
     runif(nrow * ncol * n.importance.weights),
     dim = c(nrow, ncol, n.importance.weights)
   )
-  importance.weights = rdirichlet(nrow, rep(1, n.importance.weights))
+  importance.weights = gtools::rdirichlet(nrow, rep(1, n.importance.weights))
   
   l = layer$new(
     activations = qlogis(predicted),

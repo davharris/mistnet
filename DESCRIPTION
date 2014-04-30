@@ -9,15 +9,13 @@ Description: mistnet is a package for building stochastic feed-forward
     neural networks.  These models describe a joint distribution over
     a set of variables, conditional on some observed predictors.
 License: GPL-2 | GPL-3
-Depends:
-    Rcpp,
-    RcppArmadillo,
-    testthat,
-    devtools,
-    gtools
 Imports:
     Rcpp (>= 0.11.1),
     RcppArmadillo (>= 0.4.100.2.1)
+Suggests:
+    testthat,
+    devtools,
+    gtools
 LinkingTo: Rcpp, RcppArmadillo
 Collate:
     'RcppExports.R'
