@@ -20,14 +20,20 @@ mistnet = function(
   stopifnot((length(hidden.dims) + 1L) == n.layers)
   
   stopifnot(hidden.dims == as.integer(hidden.dims))
+  hidden.dims = as.integer(hidden.dims)
+  
   stopifnot(n.ranef == as.integer(n.ranef))
+  n.ranef = as.integer(n.ranef)
+  
   stopifnot(minibatch.size == as.integer(minibatch.size))
+  minibatch.size = as.integer(minibatch.size)
+  
+  stopifnot(n.importance.samples == as.integer(n.importance.samples))
+  n.importance.samples = as.integer(n.importance.samples)
   # etc.  Probably worth writing a function for this...
   
   
-  network.dims = as.integer(
-    c(ncol(x) + n.ranef, hidden.dims, ncol(y))
-  )
+  network.dims = c(ncol(x) + n.ranef, hidden.dims, ncol(y))
   
   stopifnot(nrow(x) == nrow(y))
   dataset.size = nrow(x)
