@@ -32,6 +32,5 @@ test_that("Correct behavior for fewer than one iteration",{
   
   
   expect_equal(dimnames(net$layers[[3]]$outputs)[[2]], colnames(y))
-  
   expect_equal(colnames(net$layers[[3]]$coefficients), colnames(y))
 })
