@@ -7,10 +7,10 @@ mistnet = function(
   updater.name = "sgd",
   updater.arguments = list(learning.rate = .001, momentum = .9),
   n.ranef,
-  ranefSample,
-  n.importance.samples,
-  minibatch.size,
-  training.iterations,
+  ranefSample = gaussianRanefSample,
+  n.importance.samples = 25,
+  minibatch.size = 20,
+  training.iterations = 0,
   loss,
   lossGrad
 ){
