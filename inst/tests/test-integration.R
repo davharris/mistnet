@@ -15,8 +15,9 @@ test_that("one-layer network finds correct parameters",{
   
   true.coefs = matrix(rnorm(ncol(x)* n.spp), ncol = n.spp)
   
+  # No sampling noise: y is probabilities
   y = matrix(
-    rbinom(length(x %*% true.coefs), size = 1, prob = sigmoid(x %*% true.coefs)),
+    sigmoid(x %*% true.coefs),
     ncol = n.spp
   )
   
@@ -33,7 +34,7 @@ test_that("one-layer network finds correct parameters",{
   # Give the network a warm start
   net$layers[[1]]$coefficients[-6, ] = true.coefs * .85
   
-  net$fit(150)
+  net$fit(100)
   
   estimated.coefs = net$layers[[1]]$coefficients[-6, ]
   
