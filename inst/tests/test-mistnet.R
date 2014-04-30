@@ -11,11 +11,6 @@ test_that("Correct behavior for fewer than one iteration",{
     y,
     nonlinearity.names = c("sigmoid", "rectify", "sigmoid"),
     hidden.dims = c(5L, 7L),
-    priors = list(
-      gaussian.prior(mean = 0, var = 1),
-      gaussian.prior(mean = 0, var = 1),
-      gaussian.prior(mean = 0, var = 1)
-    ),
     n.ranef = 3L,
     ranefSample = gaussianRanefSample,
     n.importance.samples = 10L,
@@ -29,7 +24,6 @@ test_that("Correct behavior for fewer than one iteration",{
   expect_error(net$fit(-1), "valid number of iterations")
   
   net$fit(2) # shouldn't throw an error
-  
   
   expect_equal(dimnames(net$layers[[3]]$outputs)[[2]], colnames(y))
   expect_equal(colnames(net$layers[[3]]$coefficients), colnames(y))

@@ -3,7 +3,9 @@ mistnet = function(
   y,
   nonlinearity.names,
   hidden.dims,
-  priors,
+  priors = replicate(
+    length(nonlinearity.names), gaussian.prior$new(mean = 0, var = 1)
+  ),
   updater.name = "sgd",
   updater.arguments = list(learning.rate = .001, momentum = .9),
   n.ranef,
