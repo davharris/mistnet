@@ -18,8 +18,7 @@ test_that("net$copy works", {
     n.importance.samples = 10L,
     minibatch.size = 10L,
     training.iterations = 0L,
-    loss = crossEntropy,
-    lossGrad = crossEntropyGrad
+    loss.name = "crossEntropy"
   )
   
   net2 = net$copy()

@@ -17,8 +17,7 @@ test_that("biases update correctly",{
     n.ranef = 3L,
     minibatch.size = minibatch.size,
     n.importance.samples = 5L,
-    loss = crossEntropy,
-    lossGrad = crossEntropyGrad,
+    loss.name = "crossEntropy",
     ranefSample = gaussianRanefSample,
     training.iterations = 0L
   )

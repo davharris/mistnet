@@ -22,8 +22,7 @@ test_that("Prediction works",{
     n.importance.samples = 10L,
     minibatch.size = nrow(x),
     training.iterations = 0L,
-    loss = crossEntropy,
-    lossGrad = crossEntropyGrad
+    loss = "crossEntropy"
   )
   net$fit(1) # Feed forward
   net$layers[[3]]$biases[] = 0 # Undo bias updates

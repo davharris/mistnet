@@ -13,8 +13,7 @@ mistnet = function(
   n.importance.samples = 25,
   minibatch.size = 20,
   training.iterations = 0,
-  loss,
-  lossGrad
+  loss.name
 ){
   n.layers = length(nonlinearity.names)
   stopifnot(length(priors) == n.layers)
@@ -55,8 +54,8 @@ mistnet = function(
     dataset.size = dataset.size,
     minibatch.size = minibatch.size,
     n.importance.samples = n.importance.samples,
-    loss = loss,
-    lossGradient = lossGrad,
+    loss = get(loss.name, mode = "function"),
+    lossGradient = get(paste0(loss.name, "Grad"), mode = "function"),
     ranefSample = ranefSample,
     n.ranef = n.ranef,
     completed.iterations = 0L

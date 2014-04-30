@@ -20,8 +20,7 @@ test_that("3-layer backprop works", {
       gaussian.prior(mean = 0, var = .001),
       gaussian.prior(mean = 0, var = .001)
     ),
-    loss = crossEntropy,
-    lossGrad = crossEntropyGrad,
+    loss.name = "crossEntropy",
     minibatch.size = 13L,
     n.importance.samples = 1L,
     n.ranef = 7L,

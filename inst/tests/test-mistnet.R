@@ -16,8 +16,7 @@ test_that("Correct behavior for fewer than one iteration",{
     n.importance.samples = 10L,
     minibatch.size = 10L,
     training.iterations = 0L,
-    loss = crossEntropy,
-    lossGrad = crossEntropyGrad
+    loss.name = "crossEntropy"
   )
   
   expect_equal(net$completed.iterations, 0)
