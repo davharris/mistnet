@@ -1,3 +1,28 @@
+#' The mistnet function
+#' 
+#' This function creates a \code{network} object for fitting a mistnet model.
+#' 
+#' @param x a \code{numeric} \code{matrix} of predictor variables.  One row
+#'  per example, one column per predictive feature.
+#' @param y a \code{matrix} of responses to \code{x}.  One row per example, one
+#'  column per response variable.
+#' @param hidden.dims an \code{integer} \code{vector}. Each element specifies 
+#'  the number of hidden units in a hidden \code{layer} of the resulting
+#'  \code{network}. If your network should not have any hidden layers, 
+#'  \code{hidden.dims} should be \code{NULL}.
+#' @param n.ranef The number of latent random variables to include in the first
+#'  layer of the \code{network}.
+#' @param nonlinearity.names A character vector with the names of the 
+#'  \code{nonlinearity} objects to use (one per \code{layer})  Currently 
+#'  supported values include "sigmoid", "rectify", "exp", "linear", and "mf_mrf".
+#'  See \code{\link{nonlinearity}}.
+#' @param loss.name Currently supported values include "crossEntropy" (for 
+#'  bernoulli likelihood), "binomialLoss", "poissonLoss", "squaredLoss", 
+#'  and "mrfLoss".
+#' param priors
+#' 
+#' @seealso \code{\link{network}}
+
 mistnet = function(
   x,
   y,
