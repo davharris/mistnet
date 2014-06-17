@@ -227,7 +227,7 @@ test_that("MRF loss works" , {
   
   # If lateral is zero, MRF loss should equal cross Entropy
   expect_equal(
-    mrfLoss(y, sigmoid(inputs), 0 * lateral),
+    mrfLoss()$loss(y = y, yhat = sigmoid(inputs), lateral = 0 * lateral),
     rowSums(crossEntropy(y, sigmoid(inputs)))
   )
   
@@ -236,11 +236,11 @@ test_that("MRF loss works" , {
   losses = sapply(
     1:nrow,
     function(i){
-      mrfLoss(y[i, ], sigmoid(inputs[i, ]), lateral)
+      mrfLoss()$loss(y[i, ], sigmoid(inputs[i, ]), lateral)
     }
   )
   
-  expect_equal(losses, mrfLoss(y, sigmoid(inputs), lateral))
+  expect_equal(losses, mrfLoss()$loss(y, sigmoid(inputs), lateral))
   
   
   expected.frequencies = exp(-losses) / sum(exp(-losses))

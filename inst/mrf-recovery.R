@@ -1,8 +1,8 @@
 devtools::load_all()
 load("inst/fakedata.Rdata")
 
-n.importance.samples = 25L
-minibatch.size = 21L
+n.importance.samples = 35L
+minibatch.size = 11L
 n.ranef = 4L
 learning.rate = .1
 
@@ -51,7 +51,7 @@ net$layers[[1]]$nonlinearity = mf_mrf.nonlinearity(
   updater = new(
     "adagrad.updater",
     delta = matrix(0, nrow = ncol(fakedata), ncol = ncol(fakedata)),
-    learning.rate = learning.rate / 10
+    learning.rate = learning.rate
   ),
   l1.decay = 1 / scale / nrow(env)
 )
@@ -88,13 +88,19 @@ plot(
 )
 abline(0,1)
 abline(0,0)
-abline(v = c(-.05, .05))
+abline(v = c(-.005, .005))
 
 summary(lm(coefs[4, ] ~ 0 + t(net$layers[[1]]$coefficients[4:(3 + n.ranef), ])))
 summary(lm(coefs[5, ] ~ 0 + t(net$layers[[1]]$coefficients[4:(3 + n.ranef), ])))
 
 square = function(x){x^2}
-1-mean(square(net$layers[[1]]$nonlinearity$lateral - lateral))/mean(square(lateral))
+1-mean(square(net$layers[[1]]$nonlinearity$lateral - lateral))/mean(square(lateral - mean(lateral)))
 
-mean(abs(net$layers[[1]]$nonlinearity$lateral - lateral))
+mean(abs(net$layers[[1]]$nonlinearity$lateral))
 
+
+
+summary(
+  lm(
+    c(lateral) ~ c(net$layers[[1]]$nonlinearity$lateral))
+)

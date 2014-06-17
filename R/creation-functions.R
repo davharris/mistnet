@@ -29,7 +29,7 @@ mistnet = function(
   hidden.dims,
   n.ranef,
   nonlinearity.names,
-  loss.name,
+  loss,
   priors = replicate(
     length(nonlinearity.names), gaussian.prior$new(mean = 0, var = 1)
   ),
@@ -41,21 +41,15 @@ mistnet = function(
   training.iterations = 0
 ){
   n.layers = length(nonlinearity.names)
-  stopifnot(length(priors) == n.layers)
-  stopifnot((length(hidden.dims) + 1L) == n.layers)
+  assert_that(length(priors) == n.layers)
+  assert_that((length(hidden.dims) + 1L) == n.layers)
   
-  stopifnot(hidden.dims == as.integer(hidden.dims))
-  hidden.dims = as.integer(hidden.dims)
-  
-  stopifnot(n.ranef == as.integer(n.ranef))
-  n.ranef = as.integer(n.ranef)
-  
-  stopifnot(minibatch.size == as.integer(minibatch.size))
-  minibatch.size = as.integer(minibatch.size)
-  
-  stopifnot(n.importance.samples == as.integer(n.importance.samples))
-  n.importance.samples = as.integer(n.importance.samples)
-  # etc.  Probably worth writing a function for this...
+  if (!is.null(hidden.dims)){
+    hidden.dims = safe.as.integer(hidden.dims)
+  }
+  n.ranef = safe.as.integer(n.ranef)
+  minibatch.size = safe.as.integer(minibatch.size)
+  n.importance.samples = safe.as.integer(n.importance.samples)
   
   
   network.dims = c(ncol(x) + n.ranef, hidden.dims, ncol(y))
@@ -85,8 +79,8 @@ mistnet = function(
     dataset.size = dataset.size,
     minibatch.size = minibatch.size,
     n.importance.samples = n.importance.samples,
-    loss = get(loss.name, mode = "function"),
-    lossGradient = get(paste0(loss.name, "Grad"), mode = "function"),
+    loss = loss$loss,
+    lossGradient = loss$grad,
     ranefSample = ranefSample,
     n.ranef = n.ranef,
     completed.iterations = 0L

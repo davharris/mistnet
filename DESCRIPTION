@@ -13,7 +13,8 @@ Depends:
     RcppArmadillo (>= 0.4.100.2.1)
 Imports:
     Rcpp (>= 0.11.1),
-    RcppArmadillo (>= 0.4.100.2.1)
+    RcppArmadillo (>= 0.4.100.2.1),
+    assertthat
 Suggests:
     testthat,
     devtools,

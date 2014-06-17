@@ -1,3 +1,9 @@
+# Confirm that coercing to integer doesn't change the value
+safe.as.integer = function(x){
+  assert_that(are_equal(x, as.integer(x)))
+  as.integer(x)
+}
+
 `%plus%` = function(matrix, vector){
   rcpp_add_biases(matrix, vector)
 }

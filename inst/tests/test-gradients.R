@@ -70,10 +70,10 @@ test_that("crossEntropyGrad is accurate", {
 test_that("poissonLossGrad is accurate", {
   eps = 1E-5
   x = seq(.1, 10, by = .1)
-  y = poissonLoss(y = 1, yhat = x)
-  y.plus  = poissonLoss(y = 1, yhat = x + eps)
-  y.minus = poissonLoss(y = 1, yhat = x - eps)
-  grad = poissonLossGrad(y = 1, yhat = x)
+  y = poissonLoss()$loss(y = 1, yhat = x)
+  y.plus  = poissonLoss()$loss(y = 1, yhat = x + eps)
+  y.minus = poissonLoss()$loss(y = 1, yhat = x - eps)
+  grad = poissonLoss()$grad(y = 1, yhat = x)
   
   expect_equal(
     (y.plus - y.minus)/2 / eps,
@@ -85,10 +85,10 @@ test_that("poissonLossGrad is accurate", {
 test_that("squaredLossGrad is accurate", {
   eps = 1E-5
   x = seq(-10, 10, by = .1)
-  y = squaredLoss(y = 1, yhat = x)
-  y.plus  = squaredLoss(y = 1, yhat = x + eps)
-  y.minus = squaredLoss(y = 1, yhat = x - eps)
-  grad = squaredLossGrad(y = 1, yhat = x)
+  y = squaredLoss()$loss(y = 1, yhat = x)
+  y.plus  = squaredLoss()$loss(y = 1, yhat = x + eps)
+  y.minus = squaredLoss()$loss(y = 1, yhat = x - eps)
+  grad = squaredLoss()$grad(y = 1, yhat = x)
   
   expect_equal(
     (y.plus - y.minus)/2 / eps,
@@ -102,11 +102,11 @@ test_that("binomialLossGrad is accurate", {
   eps = 1E-5
   x = seq(0, 1, by = .1)
   n = 17L
-  y = binomialLoss(y = 1, yhat = x, n = n)
+  y = binomialLoss(n = n)$loss(y = 1, yhat = x)
   expect_warning(
     {
-      y.plus  = binomialLoss(y = 1, yhat = x + eps, n = n)
-      y.minus = binomialLoss(y = 1, yhat = x - eps, n = n)
+      y.plus  = binomialLoss(n = n)$loss(y = 1, yhat = x + eps)
+      y.minus = binomialLoss(n = n)$loss(y = 1, yhat = x - eps)
     },
     "NaN"
   )

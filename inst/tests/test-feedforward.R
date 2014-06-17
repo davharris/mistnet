@@ -58,7 +58,7 @@ test_that("Multi-layer feedforward works", {
       gaussian.prior(mean = 0, var = .001),
       gaussian.prior(mean = 0, var = .001)
     ),
-    loss.name = "crossEntropy",
+    loss = bernoulliLoss(),
     minibatch.size = 4L,
     n.importance.samples = 27L,
     n.ranef = 3L,

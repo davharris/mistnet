@@ -1,4 +1,4 @@
-context("integration tests")
+context("Integration tests")
 
 test_that("one-layer network finds correct parameters",{
   # Random effect doesn't do anything here
@@ -27,7 +27,7 @@ test_that("one-layer network finds correct parameters",{
     hidden.dims = NULL,
     n.ranef = 1,
     nonlinearity.names = "sigmoid",
-    loss.name = "crossEntropy",
+    loss = bernoulliLoss(),
     updater.arguments = list(learning.rate = .01, momentum = .9)
   )
   
@@ -42,3 +42,4 @@ test_that("one-layer network finds correct parameters",{
   
   expect_true(r.squared > .99)
 })
+

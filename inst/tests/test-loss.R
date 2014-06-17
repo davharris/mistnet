@@ -24,11 +24,11 @@ test_that("Poisson loss is correct",{
   yhat = matrix(rexp(N), ncol = 10)
   y = matrix(rpois(N, 5), ncol = 10)
   expect_equal(
-    poissonLoss(y = y, yhat = yhat),
+    poissonLoss()$loss(y = y, yhat = yhat),
     - dpois(x = y, lambda = yhat, log = TRUE)
   )
   
-  expect_equal(dim(poissonLoss(y = y, yhat = yhat)), dim(yhat))
+  expect_equal(dim(poissonLoss()$loss(y = y, yhat = yhat)), dim(yhat))
   
   # No other tests should be needed; dpois is already tested by R-core.
 })
@@ -39,11 +39,11 @@ test_that("Binomial loss is correct",{
   yhat = matrix(runif(N), ncol = 10)
   y = matrix(rbinom(N, 5, prob = runif(N)), ncol = 10)
   expect_equal(
-    binomialLoss(y = y, yhat = yhat, n = n),
+    binomialLoss(n = n)$loss(y = y, yhat = yhat),
     - dbinom(x = y, prob = yhat, size = n, log = TRUE)
   )
   
-  expect_equal(dim(binomialLoss(y = y, yhat = yhat, n = n)), dim(yhat))
+  expect_equal(dim(binomialLoss(n = n)$loss(y = y, yhat = yhat)), dim(yhat))
   
   # No other tests should be needed; dpois is already tested by R-core.
 })
@@ -53,10 +53,10 @@ test_that("Squared loss is correct",{
   yhat = matrix(rnorm(N), ncol = 10)
   y = matrix(rnorm(N), ncol = 10)
   expect_equal(
-    squaredLoss(y = y, yhat = yhat),
+    squaredLoss()$loss(y = y, yhat = yhat),
     (y - yhat)^2
   )
   
-  expect_equal(dim(squaredLoss(y = y, yhat = yhat)), dim(yhat))
+  expect_equal(dim(squaredLoss()$loss(y = y, yhat = yhat)), dim(yhat))
 })
 
