@@ -1,4 +1,4 @@
-#' The mistnet function
+#' Construct a mistnet model
 #' 
 #' This function creates a \code{network} object for fitting a mistnet model.
 #' 
@@ -31,7 +31,9 @@ mistnet = function(
   nonlinearity.names,
   loss,
   priors = replicate(
-    length(nonlinearity.names), gaussian.prior$new(mean = 0, var = 1)
+    length(nonlinearity.names), 
+    gaussianPrior(mean = 0, var = 1),
+    simplify = FALSE
   ),
   updater.name = "sgd",
   updater.arguments = list(learning.rate = .001, momentum = .9),
@@ -50,7 +52,6 @@ mistnet = function(
   n.ranef = safe.as.integer(n.ranef)
   minibatch.size = safe.as.integer(minibatch.size)
   n.importance.samples = safe.as.integer(n.importance.samples)
-  
   
   network.dims = c(ncol(x) + n.ranef, hidden.dims, ncol(y))
   
@@ -142,4 +143,8 @@ createLayer = function(
   out$resetState(minibatch.size, n.importance.samples)
   
   out
+}
+
+defineLayer = function(nonlinearity, size, prior){
+  list(nonlinearity = nonlinearity, size = size, prior = prior)
 }

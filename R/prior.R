@@ -1,69 +1,33 @@
-#' @exportClass prior
-prior = setRefClass(
-  Class = "prior",
-  fields = list(),
-  methods = list(
-    getLogGrad = function(x) stop("log gradient not defined for this prior")
-  )
-)
+setOldClass("prior")
 
-
-gaussian.prior = setRefClass(
-  Class = "gaussian.prior",
-  fields = list(
-    mean = "numeric",
-    var = "numeric"
-  ),
-  contains = "prior",
-  methods = list(
-    getLogGrad = function(x){
-      - (x - .self$mean) / .self$var
-    }
+gaussianPrior = function(mean, var){
+  structure(
+    list(
+      family = "gaussian",
+      getLogGrad = function(x){
+        - (x - mean) / var
+      },
+      sample = function(n){
+        rnorm(n, mean = mean, sd = sqrt(var))
+      }
+    ),
+    class = "prior"
   )
-)
+}
 
-laplace.prior = setRefClass(
-  Class = "laplace.prior",
-  fields = list(
-    location = "numeric",
-    scale = "numeric"
-  ),
-  contains = "prior",
-  methods = list(
-    getLogGrad = function(x){
-      # This will work if the learning rate is small. Otherwise, it could 
-      # overshoot. That's probably not a big deal, though...
-      - sign(x - .self$location) / .self$scale
-    }
-  )
-)
-
-# Why a Student-t distribution with 3 degrees of fredom?
-# Because it's the one with the most (non-infinite) degrees of freedom that 
-# Wikipedia has a simple formula for. I don't want to deal with derivatives
-# of gamma functions, so I'm not sure if I'll make a more general t prior.
-t3.prior = setRefClass(
-  Class = "t3.prior",
-  fields = list(
-    location = "numeric",
-    scale = "numeric"
-  ),
-  contains = "prior",
-  methods = list(
-    getLogGrad = function(x){
-      z = (x - location) / scale
-      - 4 * x / (x^2 + 3)
-    }
-  )
-)
-
-flat.prior = setRefClass(
-  Class = "flat.prior",
-  fields = list(),
-  contains = "prior",
-  methods = list(
-    getLogGrad = function(x){
-      0
-    }
-  )
-)
+laplacePrior = function(location, scale){
+ structure(
+   list(
+     family = "laplace",
+     getLogGrad = function(x){
+       # This will work if the learning rate is small. Otherwise, it could 
+       # overshoot past zero. That's probably not a big deal in practice?
+       - sign(x - location) / scale
+     },
+     sample = function(n){
+       rexp(n, rate  = 1 / scale) * sample(c(-1, 1), size = n, replace = TRUE)
+     }
+   ),
+   class = "prior"
+  ) 
+}

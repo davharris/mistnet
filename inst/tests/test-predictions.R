@@ -13,9 +13,9 @@ test_that("Prediction works",{
     nonlinearity.names = c("sigmoid", "rectify", "sigmoid"),
     hidden.dims = c(5L, 7L),
     priors = list(
-      gaussian.prior(mean = 0, var = 1),
-      gaussian.prior(mean = 0, var = 1),
-      gaussian.prior(mean = 0, var = 1)
+      gaussianPrior(mean = 0, var = 1),
+      gaussianPrior(mean = 0, var = 1),
+      gaussianPrior(mean = 0, var = 1)
     ),
     n.ranef = 3L,
     ranefSample = gaussianRanefSample,

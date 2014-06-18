@@ -2,12 +2,12 @@ context("Priors")
 
 eps = 1E-5
 
-test_that("gaussian.prior works", {
+test_that("gaussianPrior works", {
   mean = exp(1)
   var = pi
   test.points = 0:5
   
-  p = gaussian.prior$new(mean = mean, var = var)
+  p = gaussianPrior(mean = mean, var = var)
   
   # should have zero gradient at the mean
   expect_equal(p$getLogGrad(mean), 0)
@@ -22,7 +22,7 @@ test_that("gaussian.prior works", {
   
   
   # should have zero gradient when variance is infinite
-  p2 = gaussian.prior$new(mean = 1, var = Inf)
+  p2 = gaussianPrior(mean = 1, var = Inf)
   expect_equal(p2$getLogGrad(1E10), 0)
 })
 
@@ -31,7 +31,7 @@ test_that("Laplace prior works", {
   scale = 1/pi
   rate = 1/scale
   
-  p = laplace.prior$new(location = location, scale = scale)
+  p = laplacePrior(location = location, scale = scale)
   
   # slope shouldn't depend on distance from the median / location
   slopes = p$getLogGrad(c(location + eps, location + 2 * eps))

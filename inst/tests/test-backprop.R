@@ -16,9 +16,9 @@ test_that("3-layer backprop works", {
     nonlinearity.names = c("rectify", "rectify", "sigmoid"),
     hidden.dims = c(13L, 17L),
     priors = list(
-      gaussian.prior(mean = 0, var = .001),
-      gaussian.prior(mean = 0, var = .001),
-      gaussian.prior(mean = 0, var = .001)
+      gaussianPrior(mean = 0, var = .001),
+      gaussianPrior(mean = 0, var = .001),
+      gaussianPrior(mean = 0, var = .001)
     ),
     loss = bernoulliLoss(),
     minibatch.size = 13L,
