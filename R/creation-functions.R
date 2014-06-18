@@ -27,11 +27,11 @@ mistnet = function(
   x,
   y,
   layer.definitions,
-  n.ranef = 10,
   loss,
   updater.name = "sgd",
   updater.arguments = list(learning.rate = .001, momentum = .9),
   ranefSample = gaussianRanefSample,
+  n.ranef = 10,
   n.importance.samples = 25,
   minibatch.size = 20,
   training.iterations = 0
