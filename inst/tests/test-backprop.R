@@ -13,12 +13,22 @@ test_that("3-layer backprop works", {
   net = mistnet(
     x = x,
     y = y,
-    nonlinearity.names = c("rectify", "rectify", "sigmoid"),
-    hidden.dims = c(13L, 17L),
-    priors = list(
-      gaussianPrior(mean = 0, var = .001),
-      gaussianPrior(mean = 0, var = .001),
-      gaussianPrior(mean = 0, var = .001)
+    layer.definitions = list(
+      defineLayer(
+        nonlinearity = rectify.nonlinearity(), 
+        size = 23, 
+        prior = gaussianPrior(0, 001)
+      ),
+      defineLayer(
+        nonlinearity = rectify.nonlinearity(), 
+        size = 31, 
+        prior = gaussianPrior(0, 001)
+      ),
+      defineLayer(
+        nonlinearity = sigmoid.nonlinearity(), 
+        size = ncol(y), 
+        prior = gaussianPrior(0, 001)
+      )
     ),
     loss = bernoulliLoss(),
     minibatch.size = 13L,

@@ -24,9 +24,14 @@ test_that("one-layer network finds correct parameters",{
   net = mistnet(
     x = x,
     y = y,
-    hidden.dims = NULL,
+    layer.definitions = list(
+      defineLayer(
+        nonlinearity = sigmoid.nonlinearity(), 
+        size = ncol(y), 
+        prior = gaussianPrior(0, 001)
+      )
+    ),
     n.ranef = 1,
-    nonlinearity.names = "sigmoid",
     loss = bernoulliLoss(),
     updater.arguments = list(learning.rate = .01, momentum = .9)
   )

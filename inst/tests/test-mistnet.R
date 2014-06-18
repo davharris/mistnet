@@ -9,10 +9,11 @@ test_that("Correct behavior for fewer than one iteration",{
   net = mistnet(
     x,
     y,
-    nonlinearity.names = c("sigmoid", "rectify", "sigmoid"),
-    hidden.dims = c(5L, 7L),
-    n.ranef = 3L,
-    ranefSample = gaussianRanefSample,
+    layer.definitions = list(
+      defineLayer(rectify.nonlinearity(), 10, gaussianPrior(0, 1)),
+      defineLayer(rectify.nonlinearity(), 11, gaussianPrior(0, 1)),
+      defineLayer(sigmoid.nonlinearity(), ncol(y), gaussianPrior(0, 1))
+    ),
     n.importance.samples = 10L,
     minibatch.size = 10L,
     training.iterations = 0L,

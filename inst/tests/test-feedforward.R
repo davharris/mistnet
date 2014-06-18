@@ -4,10 +4,10 @@ test_that("Single-layer feedforward works", {
   l = createLayer(
     n.inputs = 4L,
     n.outputs = 7L,
-    prior = gaussianPrior(mean = 0, var = 1),
-    nonlinearity.name = "sigmoid",
     minibatch.size = 5L,
     n.importance.samples = 3L,
+    nonlinearity = sigmoid.nonlinearity(),
+    prior = gaussianPrior(0, 1),
     updater.name = "sgd",
     updater.arguments = NULL
   )
@@ -48,15 +48,26 @@ test_that("Single-layer feedforward works", {
 
 
 test_that("Multi-layer feedforward works", {
+  y = matrix(rnorm(100), nrow = 20, ncol = 5)
   net = mistnet(
     x = matrix(rnorm(100), nrow = 20, ncol = 5),
-    y = matrix(rnorm(100), nrow = 20, ncol = 5),
-    nonlinearity.names = c("rectify", "rectify", "sigmoid"),
-    hidden.dims = c(13L, 17L),
-    priors = list(
-      gaussianPrior(mean = 0, var = .001),
-      gaussianPrior(mean = 0, var = .001),
-      gaussianPrior(mean = 0, var = .001)
+    y = y,
+    layer.definitions = list(
+      defineLayer(
+        nonlinearity = rectify.nonlinearity(), 
+        size = 23, 
+        prior = gaussianPrior(0, 001)
+      ),
+      defineLayer(
+        nonlinearity = rectify.nonlinearity(), 
+        size = 31, 
+        prior = gaussianPrior(0, 001)
+      ),
+      defineLayer(
+        nonlinearity = sigmoid.nonlinearity(), 
+        size = ncol(y), 
+        prior = gaussianPrior(0, 001)
+      )
     ),
     loss = bernoulliLoss(),
     minibatch.size = 4L,

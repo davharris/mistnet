@@ -26,15 +26,9 @@
 mistnet = function(
   x,
   y,
-  hidden.dims,
-  n.ranef,
-  nonlinearity.names,
+  layer.definitions,
+  n.ranef = 10,
   loss,
-  priors = replicate(
-    length(nonlinearity.names), 
-    gaussianPrior(mean = 0, var = 1),
-    simplify = FALSE
-  ),
   updater.name = "sgd",
   updater.arguments = list(learning.rate = .001, momentum = .9),
   ranefSample = gaussianRanefSample,
@@ -42,20 +36,22 @@ mistnet = function(
   minibatch.size = 20,
   training.iterations = 0
 ){
-  n.layers = length(nonlinearity.names)
-  assert_that(length(priors) == n.layers)
-  assert_that((length(hidden.dims) + 1L) == n.layers)
-  
-  if (!is.null(hidden.dims)){
-    hidden.dims = safe.as.integer(hidden.dims)
-  }
   n.ranef = safe.as.integer(n.ranef)
   minibatch.size = safe.as.integer(minibatch.size)
   n.importance.samples = safe.as.integer(n.importance.samples)
+  n.layers = length(layer.definitions)
   
-  network.dims = c(ncol(x) + n.ranef, hidden.dims, ncol(y))
   
-  stopifnot(nrow(x) == nrow(y))
+  network.dims = c(
+    ncol(x) + n.ranef, 
+    sapply(layer.definitions, function(x) x$size)
+  )
+  
+  if(network.dims[length(network.dims)] != ncol(y)){
+    stop("The number of outputs in the last layer must equal the number of columns in y")
+  }
+  
+  assert_that(nrow(x) == nrow(y))
   dataset.size = nrow(x)
   
   net = network$new( 
@@ -67,8 +63,8 @@ mistnet = function(
         createLayer(
           n.in = network.dims[[i]],
           n.out = network.dims[[i + 1]],
-          prior = priors[[i]],
-          nonlinearity.name = nonlinearity.names[[i]],
+          prior = layer.definitions[[i]]$prior,
+          nonlinearity = layer.definitions[[i]]$nonlinearity,
           updater.name = updater.name,
           updater.arguments = updater.arguments,
           minibatch.size = minibatch.size,
@@ -105,7 +101,7 @@ createLayer = function(
   n.inputs,
   n.outputs,
   prior,
-  nonlinearity.name,
+  nonlinearity,
   updater.name,
   updater.arguments,
   minibatch.size,
@@ -135,9 +131,7 @@ createLayer = function(
         updater.arguments
       )
     ),
-    nonlinearity = new(
-      paste(nonlinearity.name, "nonlinearity", sep = ".")
-    ),
+    nonlinearity = nonlinearity,
     prior = prior
   )
   out$resetState(minibatch.size, n.importance.samples)
@@ -146,5 +140,12 @@ createLayer = function(
 }
 
 defineLayer = function(nonlinearity, size, prior){
-  list(nonlinearity = nonlinearity, size = size, prior = prior)
+  assert_that(inherits(nonlinearity, "nonlinearity"))
+  assert_that(inherits(prior, "prior"))
+  assert_that(length(size) == 1L)
+  list(
+    nonlinearity = nonlinearity, 
+    size = safe.as.integer(size), 
+    prior = prior
+  )
 }

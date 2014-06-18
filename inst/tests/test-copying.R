@@ -6,12 +6,22 @@ test_that("net$copy works", {
   net = mistnet(
     x,
     y,
-    nonlinearity.names = c("sigmoid", "rectify", "sigmoid"),
-    hidden.dims = c(5L, 7L),
-    priors = list(
-      gaussianPrior(mean = 0, var = 1),
-      gaussianPrior(mean = 0, var = 1),
-      gaussianPrior(mean = 0, var = 1)
+    layer.definitions = list(
+      defineLayer(
+        nonlinearity = rectify.nonlinearity(), 
+        size = 23, 
+        prior = gaussianPrior(0, 001)
+      ),
+      defineLayer(
+        nonlinearity = rectify.nonlinearity(), 
+        size = 31, 
+        prior = gaussianPrior(0, 001)
+      ),
+      defineLayer(
+        nonlinearity = sigmoid.nonlinearity(), 
+        size = ncol(y), 
+        prior = gaussianPrior(0, 001)
+      )
     ),
     n.ranef = 3L,
     ranefSample = gaussianRanefSample,
