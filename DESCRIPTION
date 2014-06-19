@@ -21,16 +21,17 @@ Suggests:
 LinkingTo: Rcpp, RcppArmadillo
 Collate:
     'RcppExports.R'
-    'creation-functions.R'
     'error_gradients.R'
     'findLogLik.R'
     'helpers.R'
+    'layer-creation.R'
     'updater.R'
     'prior.R'
     'nonlinearity.R'
     'layer.R'
     'loss.R'
     'mcmc.R'
+    'mistnet.R'
     'network.R'
     'predict.R'
     'ranefSample.R'

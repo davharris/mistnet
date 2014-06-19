@@ -6,21 +6,20 @@
 #'  per example, one column per predictive feature.
 #' @param y a \code{matrix} of responses to \code{x}.  One row per example, one
 #'  column per response variable.
-#' @param hidden.dims an \code{integer} \code{vector}. Each element specifies 
-#'  the number of hidden units in a hidden \code{layer} of the resulting
-#'  \code{network}. If your network should not have any hidden layers, 
-#'  \code{hidden.dims} should be \code{NULL}.
-#' @param n.ranef The number of latent random variables to include in the first
-#'  layer of the \code{network}.
-#' @param nonlinearity.names A character vector with the names of the 
-#'  \code{nonlinearity} objects to use (one per \code{layer})  Currently 
-#'  supported values include "sigmoid", "rectify", "exp", "linear", and "mf_mrf".
-#'  See \code{\link{nonlinearity}}.
-#' @param loss.name Currently supported values include "crossEntropy" (for 
-#'  bernoulli likelihood), "binomialLoss", "poissonLoss", "squaredLoss", 
-#'  and "mrfLoss".
-#' param priors
-#' 
+#' @param layer.definitions a \code{list} of specifications for each layer in
+#'  the network, as produced by \code{defineLayer}.
+#' @param loss a \code{loss} object, defining the function for optimization to 
+#' minimize, as well as its gradient
+#' @param updater an \code{updater} object, specifying how the model should move
+#'  across the likelihood surface (e.g. stochastic gradient descent or adagrad)
+#' @param sampler a \code{sampler} object, specifying the distribution of the
+#'  latent variables
+#' @param n.importance.samples an \code{integer}. More samples will take more time
+#'  to compute, but will provide a more precise estimate of the likelihood gradient.
+#' @param n.minibatch an \code{integer} specifying the number of rows to include
+#'  in each stochastic estimate of the likelihood gradient.
+#' @param training.iterations an \code{integer} number of minibatches to process
+#'  before terminating.
 #' @seealso \code{\link{network}}
 
 mistnet = function(
