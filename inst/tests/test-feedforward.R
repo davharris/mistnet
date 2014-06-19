@@ -8,8 +8,7 @@ test_that("Single-layer feedforward works", {
     n.importance.samples = 3L,
     nonlinearity = sigmoid.nonlinearity(),
     prior = gaussianPrior(0, 1),
-    updater.name = "sgd",
-    updater.arguments = NULL
+    updater = sgd.updater(momentum = .9, learning.rate = .001)
   )
   l.copy = l$copy()
   

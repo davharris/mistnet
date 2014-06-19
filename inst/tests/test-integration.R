@@ -33,7 +33,7 @@ test_that("one-layer network finds correct parameters",{
     ),
     n.ranef = 1,
     loss = bernoulliLoss(),
-    updater.arguments = list(learning.rate = .01, momentum = .9)
+    updater = sgd.updater(learning.rate = .01, momentum = .9)
   )
   
   # Give the network a warm start

@@ -28,8 +28,7 @@ mistnet = function(
   y,
   layer.definitions,
   loss,
-  updater.name = "sgd",
-  updater.arguments = list(learning.rate = .001, momentum = .9),
+  updater = sgd.updater(learning.rate = .001, momentum = .9),
   ranefSample = gaussianRanefSample,
   n.ranef = 10,
   n.importance.samples = 25,
@@ -65,8 +64,7 @@ mistnet = function(
           n.out = network.dims[[i + 1]],
           prior = layer.definitions[[i]]$prior,
           nonlinearity = layer.definitions[[i]]$nonlinearity,
-          updater.name = updater.name,
-          updater.arguments = updater.arguments,
+          updater = updater,
           minibatch.size = minibatch.size,
           n.importance.samples = n.importance.samples
         )
@@ -102,35 +100,22 @@ createLayer = function(
   n.outputs,
   prior,
   nonlinearity,
-  updater.name,
-  updater.arguments,
+  updater,
   minibatch.size,
   n.importance.samples
 ){
+  coef.updater = updater$copy()
+  coef.updater$delta = matrix(0, nrow = n.inputs, ncol = n.outputs)
+  
+  bias.updater = updater$copy()
+  bias.updater$delta = matrix(0, nrow = 1, ncol = n.outputs)
+  
   out = layer$new(
     coef.dim = c(n.inputs, n.outputs),
     coefficients = matrix(0, nrow = n.inputs, ncol = n.outputs),
     biases = matrix(rep(0, n.outputs), nrow = 1),
-    coef.updater = do.call(
-      new,
-      c(
-        list(
-          Class = paste(updater.name, "updater", sep = "."),
-          delta = matrix(0, nrow = n.inputs, ncol = n.outputs)
-        ),
-        updater.arguments
-      )
-    ),
-    bias.updater = do.call(
-      new,
-      c(
-        list(
-          Class = paste(updater.name, "updater", sep = "."),
-          delta = matrix(0, nrow = 1, ncol = n.outputs)
-        ),
-        updater.arguments
-      )
-    ),
+    coef.updater = coef.updater,
+    bias.updater = bias.updater,
     nonlinearity = nonlinearity,
     prior = prior
   )
