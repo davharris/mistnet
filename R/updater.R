@@ -1,3 +1,21 @@
+#' Updaters
+#' 
+#' @description Classes for determining the optimization step to make given a
+#'  gradient
+#' @details Updaters all have a \code{computeDelta} method, which determines the
+#'  changes in coefficient values to make based on the estimated graidient and
+#'  the current state of the updater.  These changes are stored in a field
+#'  called \code{delta}.
+#'  
+#'  By default, the \code{mistnet} function uses the same parameters for all
+#'  \code{updaters} in the network, but the user can tune them independently.
+#'
+#' @details __
+#'
+#' @field momentum the momentum term
+#' @field learning.rate the learning rate
+#' @field delta the delta matrix (see \code{updater})
+#' @export
 updater = setRefClass(
   Class = "updater",
   fields = list(
@@ -10,7 +28,16 @@ updater = setRefClass(
   )
 )
 
-# Stochastic gradient descent (with momentum)
+#' Stochastic gradient descent updater
+#' 
+#' @description An updater for descending a gradient with momentum
+#'
+#' @details __
+#'
+#' @field momentum the momentum term
+#' @field learning.rate the learning rate
+#' @field delta the delta matrix (see \code{updater})
+#' @export
 sgd.updater = setRefClass(
   Class = "sgd.updater",
   contains = "updater",
