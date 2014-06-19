@@ -3,6 +3,7 @@
 export(defineLayer)
 export(mistnet)
 exportClasses(layer)
+exportClasses(network)
 import(Rcpp)
 import(RcppArmadillo)
 useDynLib(mistnet)

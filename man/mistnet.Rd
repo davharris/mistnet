@@ -33,7 +33,8 @@ to compute, but will provide a more precise estimate of the likelihood gradient.
 in each stochastic estimate of the likelihood gradient.}
 
 \item{training.iterations}{an \code{integer} number of minibatches to process
-before terminating.}
+before terminating. Currently, it is best practice to leave this value at 0
+and manually initialize the model's coefficients before beginning training}
 }
 \description{
 This function creates a \code{network} object for fitting a mistnet model.

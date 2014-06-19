@@ -19,7 +19,8 @@
 #' @param n.minibatch an \code{integer} specifying the number of rows to include
 #'  in each stochastic estimate of the likelihood gradient.
 #' @param training.iterations an \code{integer} number of minibatches to process
-#'  before terminating.
+#'  before terminating. Currently, it is best practice to leave this value at 0
+#'  and manually initialize the model's coefficients before beginning training
 #' @seealso \code{\link{network}}
 #' @useDynLib mistnet
 #' @import Rcpp
@@ -39,9 +40,12 @@ mistnet = function(
 ){
   assert_that(is.matrix(x))
   assert_that(is.matrix(y))
+  assert_that(nrow(x) == nrow(y))
+  dataset.size = nrow(x)
   
   n.layers = length(layer.definitions)
     
+  # Input size followed by all the output sizes, in order
   network.dims = c(
     ncol(x) + with(environment(sampler), ncol), 
     sapply(layer.definitions, function(x) x$size)
@@ -50,9 +54,6 @@ mistnet = function(
   if(network.dims[length(network.dims)] != ncol(y)){
     stop("The number of outputs in the last layer must equal the number of columns in y")
   }
-  
-  assert_that(nrow(x) == nrow(y))
-  dataset.size = nrow(x)
   
   net = network$new( 
     x = x,

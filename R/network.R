@@ -1,3 +1,32 @@
+#' Network
+#'
+#' @description A reference class object for a mistnet \code{network} object.
+#'
+#' @details __
+#'
+#' @field x a numeric matrix of predictor variables.  One row
+#'  per example, one column per predictive feature.
+#' @field y a \code{matrix} of responses to \code{x}.  One row per example, one
+#'  column per response variable.
+#' @field layers a \code{list} of \code{layer} objects
+#' @field n.layers an integer corresponding to \code{length(layers)}
+#' @field dataset.size an integer corresponding to the number of rows in 
+#'  \code{x} and \code{y}
+#' @field n.minibacth an \code{integer} specifying the number of rows to include
+#'  in each stochastic estimate of the likelihood gradient.
+#' @field minibatch.ids an \code{integer} vector specifying which rows of the 
+#'  data set to include in the next estimate of the likelihood gradient
+#' @field n.importance.samples an \code{integer}
+#' @field importance.weights a numeric matrix containing the weights associated
+#'  with the most recent round of importance sampling.  (one row per example,
+#'  one column per Monte Carlo sample).
+#' @field loss the loss function being optimized (not a \code{loss} object!)
+#' @field lossGradient the gradient of the loss function being optimized
+#' @field sampler the function used to generate Monte Carlo samples for 
+#'  importance sampling
+#' @field completed.iterations a counter that increments after each iteration
+#'  of model fitting
+#' @export
 network = setRefClass(
   Class = "network",
   fields = list(
