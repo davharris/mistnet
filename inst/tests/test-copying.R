@@ -23,8 +23,6 @@ test_that("net$copy works", {
         prior = gaussianPrior(0, 001)
       )
     ),
-    n.ranef = 3L,
-    ranefSample = gaussianRanefSample,
     n.importance.samples = 10L,
     n.minibatch = 10L,
     training.iterations = 0L,

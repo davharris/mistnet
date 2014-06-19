@@ -27,8 +27,6 @@ test_that("Prediction works",{
         prior = gaussianPrior(0, 001)
       )
     ),
-    n.ranef = 3L,
-    ranefSample = gaussianRanefSample,
     n.importance.samples = 10L,
     n.minibatch = nrow(x),
     training.iterations = 0L,

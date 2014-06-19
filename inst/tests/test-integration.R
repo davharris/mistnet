@@ -7,7 +7,6 @@ test_that("one-layer network finds correct parameters",{
   
   n.importance.samples = 1L
   n.minibatch = 21L
-  n.ranef = 1L
   learning.rate = .1
   n.spp = 50
   
@@ -31,7 +30,7 @@ test_that("one-layer network finds correct parameters",{
         prior = gaussianPrior(0, 001)
       )
     ),
-    n.ranef = 1,
+    sampler = gaussianSampler(ncol = 1, sd = 1),
     loss = bernoulliLoss(),
     updater = sgd.updater(learning.rate = .01, momentum = .9)
   )

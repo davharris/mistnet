@@ -33,8 +33,6 @@ test_that("3-layer backprop works", {
     loss = bernoulliLoss(),
     n.minibatch = 13L,
     n.importance.samples = 1L,
-    n.ranef = 7L,
-    ranefSample = gaussianRanefSample,
     training.iterations = 0L
   )
   

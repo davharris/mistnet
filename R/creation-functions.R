@@ -29,20 +29,18 @@ mistnet = function(
   layer.definitions,
   loss,
   updater = sgd.updater(learning.rate = .001, momentum = .9),
-  ranefSample = gaussianRanefSample,
-  n.ranef = 10,
+  sampler = gaussianSampler(ncol = 10, sd = 1),
   n.importance.samples = 25,
   n.minibatch = 20,
   training.iterations = 0
 ){
-  n.ranef = safe.as.integer(n.ranef)
   n.minibatch = safe.as.integer(n.minibatch)
   n.importance.samples = safe.as.integer(n.importance.samples)
   n.layers = length(layer.definitions)
   
   
   network.dims = c(
-    ncol(x) + n.ranef, 
+    ncol(x) + with(environment(sampler), ncol), 
     sapply(layer.definitions, function(x) x$size)
   )
   
@@ -76,8 +74,7 @@ mistnet = function(
     n.importance.samples = n.importance.samples,
     loss = loss$loss,
     lossGradient = loss$grad,
-    ranefSample = ranefSample,
-    n.ranef = n.ranef,
+    sampler = sampler,
     completed.iterations = 0L
   ) 
   

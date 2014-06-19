@@ -12,8 +12,7 @@ network = setRefClass(
     importance.weights = "matrix",
     loss = "function",
     lossGradient = "function",
-    ranefSample = "function",
-    n.ranef = "integer",
+    sampler = "function",
     completed.iterations = "integer"
   ),
   methods = list(
@@ -45,7 +44,7 @@ network = setRefClass(
           feedForward(
             cbind(
               x[minibatch.ids, ], 
-              ranefSample(nrow = n.minibatch, ncol = n.ranef)
+              sampler(nrow = n.minibatch)
             ),
             i
           )
@@ -90,7 +89,7 @@ network = setRefClass(
         feedForward(
           cbind(
             x[minibatch.ids, ], 
-            ranefSample(nrow = n.minibatch, ncol = n.ranef)
+            sampler(nrow = n.minibatch)
           ),
           i
         )

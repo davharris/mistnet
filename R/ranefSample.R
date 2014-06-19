@@ -1,6 +1,9 @@
-gaussianRanefSample = function(nrow, ncol, sd = 1){
-  out = rnorm(nrow * ncol, sd = sd)
-  dim(out) = c(nrow, ncol)
-  
-  out
+gaussianSampler = function(ncol, sd = 1){
+  ncol = safe.as.integer(ncol)
+  function(nrow){
+    out = rnorm(nrow * ncol, sd = sd)
+    dim(out) = c(nrow, ncol)
+    
+    out
+  }
 }

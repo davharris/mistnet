@@ -71,12 +71,11 @@ test_that("Multi-layer feedforward works", {
     loss = bernoulliLoss(),
     n.minibatch = 4L,
     n.importance.samples = 27L,
-    n.ranef = 3L,
-    ranefSample = gaussianRanefSample,
+    sampler = gaussianSampler(ncol = 3L),
     training.iterations = 0L
   )
   
-  ranefs = net$ranefSample(nrow = net$n.minibatch, ncol = net$n.ranef)
+  ranefs = net$sampler(nrow = net$n.minibatch)
   net$selectMinibatch()
   net$feedForward(
     cbind(

@@ -14,14 +14,13 @@ predict.network = function(
   # everywhere that's fixed.
   inputs = cbind(
     newdata, 
-    zeros(nrow = nrow(newdata), ncol = cpy$n.ranef)
+    zeros(nrow = nrow(newdata), ncol = with(environment(cpy$sampler), ncol))
   )
   
   for(i in 1:cpy$n.importance.samples){
     # Update the unobserved columns, which occur after ncol(newdata)
-    inputs[, -(1:ncol(newdata))] = cpy$ranefSample(
-      nrow = nrow(newdata), 
-      ncol = cpy$n.ranef
+    inputs[, -(1:ncol(newdata))] = cpy$sampler(
+      nrow = nrow(newdata)
     )
     cpy$feedForward(
       inputs,
