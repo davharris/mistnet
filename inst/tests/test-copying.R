@@ -26,7 +26,7 @@ test_that("net$copy works", {
     n.ranef = 3L,
     ranefSample = gaussianRanefSample,
     n.importance.samples = 10L,
-    minibatch.size = 10L,
+    n.minibatch = 10L,
     training.iterations = 0L,
     loss = bernoulliLoss()
   )
@@ -60,10 +60,10 @@ test_that("net$copy works", {
   # Confirm that pass-by-value objects copy correctly
   
   # Modify minibatch.ids
-  net2$minibatch.ids = 1:net2$minibatch.size
+  net2$minibatch.ids = 1:net2$n.minibatch
   
   # net2 should change
-  expect_equal(net2$minibatch.ids, 1:net2$minibatch.size)
+  expect_equal(net2$minibatch.ids, 1:net2$n.minibatch)
   
   # the original net object shouldn't
   expect_equal(net$minibatch.ids, numeric(0))

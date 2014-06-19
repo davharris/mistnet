@@ -27,7 +27,7 @@ metropolisStep = function(object, y, proposal.scale = 1/4){
   
   # One multivariate proposal per row.
   latent = old.latent + proposal.scale * object$ranefSample(
-    nrow = object$minibatch.size, 
+    nrow = object$n.minibatch, 
     ncol = object$n.ranef
   )
   

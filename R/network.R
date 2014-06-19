@@ -6,7 +6,7 @@ network = setRefClass(
     layers = "list",
     n.layers = "integer",
     dataset.size = "integer",
-    minibatch.size = "integer",
+    n.minibatch = "integer",
     minibatch.ids = "integer",
     n.importance.samples = "integer",
     importance.weights = "matrix",
@@ -45,7 +45,7 @@ network = setRefClass(
           feedForward(
             cbind(
               x[minibatch.ids, ], 
-              ranefSample(nrow = minibatch.size, ncol = n.ranef)
+              ranefSample(nrow = n.minibatch, ncol = n.ranef)
             ),
             i
           )
@@ -68,15 +68,15 @@ network = setRefClass(
     
     selectMinibatch = function(row.nums){
       if(missing(row.nums)){
-        stopifnot(minibatch.size > 0)
-        start = (completed.iterations * minibatch.size) %% nrow(x)
-        minibatch.ids <<- 1L + (seq(start, start + minibatch.size - 1) %% nrow(x))
+        stopifnot(n.minibatch > 0)
+        start = (completed.iterations * n.minibatch) %% nrow(x)
+        minibatch.ids <<- 1L + (seq(start, start + n.minibatch - 1) %% nrow(x))
       }else{
-        if(length(row.nums) != minibatch.size){
-          minibatch.size <<- length(row.nums)
+        if(length(row.nums) != n.minibatch){
+          n.minibatch <<- length(row.nums)
           for(i in 1:n.layers){
             layers[[i]]$resetState(
-              minibatch.size = minibatch.size, 
+              n.minibatch = n.minibatch, 
               n.importance.samples
             )
           }
@@ -90,7 +90,7 @@ network = setRefClass(
         feedForward(
           cbind(
             x[minibatch.ids, ], 
-            ranefSample(nrow = minibatch.size, ncol = n.ranef)
+            ranefSample(nrow = n.minibatch, ncol = n.ranef)
           ),
           i
         )
@@ -103,7 +103,7 @@ network = setRefClass(
       for(i in 1:n.layers){
         layers[[i]]$updateCoefficients(
           dataset.size = dataset.size,
-          minibatch.size = minibatch.size
+          n.minibatch = n.minibatch
         )
         layers[[i]]$nonlinearity$update(
           observed = y[minibatch.ids, ],
@@ -163,7 +163,7 @@ network = setRefClass(
     },
     
     findImportanceWeights = function(){
-      importance.errors = zeros(minibatch.size, n.importance.samples)
+      importance.errors = zeros(n.minibatch, n.importance.samples)
       for(i in 1:n.importance.samples){
         importance.errors[ , i] = rowSums(
           loss(

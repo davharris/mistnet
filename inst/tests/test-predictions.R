@@ -30,7 +30,7 @@ test_that("Prediction works",{
     n.ranef = 3L,
     ranefSample = gaussianRanefSample,
     n.importance.samples = 10L,
-    minibatch.size = nrow(x),
+    n.minibatch = nrow(x),
     training.iterations = 0L,
     loss = bernoulliLoss()
   )

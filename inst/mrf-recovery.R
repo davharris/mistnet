@@ -2,7 +2,7 @@ devtools::load_all()
 load("inst/fakedata.Rdata")
 
 n.importance.samples = 35L
-minibatch.size = 11L
+n.minibatch = 11L
 n.ranef = 4L
 learning.rate = .1
 
@@ -14,7 +14,7 @@ net = network$new(
       n.inputs = 3L + n.ranef,
       n.outputs = ncol(fakedata),
       prior = gaussian.prior$new(mean = 0, var = 1),
-      minibatch.size = minibatch.size,
+      n.minibatch = n.minibatch,
       n.importance.samples = n.importance.samples,
       nonlinearity.name = "sigmoid",
       updater.name = "adagrad",
@@ -25,7 +25,7 @@ net = network$new(
   ),
   n.layers = 1L,
   dataset.size = nrow(env),
-  minibatch.size = minibatch.size,
+  n.minibatch = n.minibatch,
   n.importance.samples = n.importance.samples,
   loss = crossEntropy,
   lossGradient = crossEntropyGrad,
@@ -35,7 +35,7 @@ net = network$new(
 )
 
 # reset/initialize layer state
-net$layers[[1]]$resetState(minibatch.size, n.importance.samples)
+net$layers[[1]]$resetState(n.minibatch, n.importance.samples)
 
 # initialize biases
 net$layers[[1]]$biases = matrix(qlogis(colMeans(fakedata)), nrow = 1)

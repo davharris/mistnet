@@ -32,11 +32,11 @@ mistnet = function(
   ranefSample = gaussianRanefSample,
   n.ranef = 10,
   n.importance.samples = 25,
-  minibatch.size = 20,
+  n.minibatch = 20,
   training.iterations = 0
 ){
   n.ranef = safe.as.integer(n.ranef)
-  minibatch.size = safe.as.integer(minibatch.size)
+  n.minibatch = safe.as.integer(n.minibatch)
   n.importance.samples = safe.as.integer(n.importance.samples)
   n.layers = length(layer.definitions)
   
@@ -65,14 +65,14 @@ mistnet = function(
           prior = layer.definitions[[i]]$prior,
           nonlinearity = layer.definitions[[i]]$nonlinearity,
           updater = updater,
-          minibatch.size = minibatch.size,
+          n.minibatch = n.minibatch,
           n.importance.samples = n.importance.samples
         )
       }
     ),
     n.layers = n.layers,
     dataset.size = dataset.size,
-    minibatch.size = minibatch.size,
+    n.minibatch = n.minibatch,
     n.importance.samples = n.importance.samples,
     loss = loss$loss,
     lossGradient = loss$grad,
@@ -101,7 +101,7 @@ createLayer = function(
   prior,
   nonlinearity,
   updater,
-  minibatch.size,
+  n.minibatch,
   n.importance.samples
 ){
   coef.updater = updater$copy()
@@ -119,7 +119,7 @@ createLayer = function(
     nonlinearity = nonlinearity,
     prior = prior
   )
-  out$resetState(minibatch.size, n.importance.samples)
+  out$resetState(n.minibatch, n.importance.samples)
   
   out
 }

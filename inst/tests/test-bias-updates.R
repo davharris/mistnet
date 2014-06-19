@@ -5,7 +5,7 @@ test_that("biases update correctly",{
   eps = 1E-5
   x = matrix(rnorm(1000), nrow = 50)
   y = dropoutMask(50, 17)
-  minibatch.size = 11L
+  n.minibatch = 11L
   n.importance.samples = 2L
   
   net = mistnet(
@@ -15,7 +15,7 @@ test_that("biases update correctly",{
     priors = list(gaussian.prior$new(mean = 0, var = 1)),
     hidden.dims = NULL,
     n.ranef = 3L,
-    minibatch.size = minibatch.size,
+    n.minibatch = n.minibatch,
     n.importance.samples = 5L,
     loss.name = "crossEntropy",
     ranefSample = gaussianRanefSample,
@@ -34,11 +34,11 @@ test_that("biases update correctly",{
   )
   
   # Delta should be calculated correctly.
-  # Divide by minibatch size to standardize the values regardless of # of examples
+  # Divide by n.minibatch to standardize the values regardless of # of examples
   with(
     net$layers[[1]],
     expect_equal(
-      weighted.bias.grads / minibatch.size * bias.updater$learning.rate,
+      weighted.bias.grads / n.minibatch * bias.updater$learning.rate,
       -c(bias.updater$delta)
     )
   )

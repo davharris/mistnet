@@ -15,7 +15,7 @@ test_that("Correct behavior for fewer than one iteration",{
       defineLayer(sigmoid.nonlinearity(), ncol(y), gaussianPrior(0, 1))
     ),
     n.importance.samples = 10L,
-    minibatch.size = 10L,
+    n.minibatch = 10L,
     training.iterations = 0L,
     loss = bernoulliLoss()
   )

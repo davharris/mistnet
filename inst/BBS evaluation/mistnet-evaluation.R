@@ -14,7 +14,7 @@ for(attempt.num in 1:num.attempts){
   source("inst/BBS evaluation/setup.R")
   
   hyperparameters = list(
-    minibatch.size = minibatch.size,
+    n.minibatch = n.minibatch,
     n.ranef = n.ranef, 
     n.importance.samples = n.importance.samples,
     n.layer2 = n.layer2,

@@ -6,7 +6,7 @@ test_that("one-layer network finds correct parameters",{
   set.seed(1)
   
   n.importance.samples = 1L
-  minibatch.size = 21L
+  n.minibatch = 21L
   n.ranef = 1L
   learning.rate = .1
   n.spp = 50

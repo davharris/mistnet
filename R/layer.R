@@ -64,17 +64,17 @@ layer = setRefClass(
     
     updateCoefficients = function(
       dataset.size, 
-      minibatch.size
+      n.minibatch
     ){
       "Calculate coef.delta and add it to coefficients. Update biases"
       log.prior.grad = prior$getLogGrad(coefficients) / dataset.size
-      grad = weighted.llik.grads / minibatch.size + log.prior.grad
+      grad = weighted.llik.grads / n.minibatch + log.prior.grad
       
       coef.updater$computeDelta(grad)
       
       coefficients <<- coefficients + coef.updater$delta
       
-      bias.updater$computeDelta(weighted.bias.grads / minibatch.size)
+      bias.updater$computeDelta(weighted.bias.grads / n.minibatch)
       biases <<- biases + bias.updater$delta
     },
     
@@ -98,16 +98,16 @@ layer = setRefClass(
       }
     },
     
-    resetState = function(minibatch.size, n.importance.samples){
+    resetState = function(n.minibatch, n.importance.samples){
       "Reset inputs, activations, outputs, error.grads, and coef.delta to NA"
       inputs <<- array(
         NA, 
-        c(minibatch.size, coef.dim[[1]], n.importance.samples)
+        c(n.minibatch, coef.dim[[1]], n.importance.samples)
       )
       
       out.array = array(
         NA, 
-        c(minibatch.size, coef.dim[[2]], n.importance.samples)
+        c(n.minibatch, coef.dim[[2]], n.importance.samples)
       )
       activations <<- out.array
       outputs <<- out.array

@@ -4,7 +4,7 @@ test_that("Single-layer feedforward works", {
   l = createLayer(
     n.inputs = 4L,
     n.outputs = 7L,
-    minibatch.size = 5L,
+    n.minibatch = 5L,
     n.importance.samples = 3L,
     nonlinearity = sigmoid.nonlinearity(),
     prior = gaussianPrior(0, 1),
@@ -69,14 +69,14 @@ test_that("Multi-layer feedforward works", {
       )
     ),
     loss = bernoulliLoss(),
-    minibatch.size = 4L,
+    n.minibatch = 4L,
     n.importance.samples = 27L,
     n.ranef = 3L,
     ranefSample = gaussianRanefSample,
     training.iterations = 0L
   )
   
-  ranefs = net$ranefSample(nrow = net$minibatch.size, ncol = net$n.ranef)
+  ranefs = net$ranefSample(nrow = net$n.minibatch, ncol = net$n.ranef)
   net$selectMinibatch()
   net$feedForward(
     cbind(

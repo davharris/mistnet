@@ -1,6 +1,6 @@
 # Smaller minibatches allow for more gradient updates, bigger ones are more
 # precise.
-minibatch.size = sample(10:50, 1)
+n.minibatch = sample(10:50, 1)
 
 n.ranef = sample(5:25, 1)
 
@@ -19,5 +19,5 @@ n.layer1 = sample(25:50, 1)
 # Found this through trial and error.  Haven't messed with it much, since I 
 # don't want any exploding gradients and I already have two other ways to
 # trade off speed versus accuracy during gradient descent (# of samples and 
-# minibatch size).
+# n.minibatch).
 starting.rate = 0.05

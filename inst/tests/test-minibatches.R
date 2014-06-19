@@ -3,13 +3,13 @@ test_that("minibatches work", {
   
   net = network$new(
     completed.iterations = 0L,
-    minibatch.size = 29L,
+    n.minibatch = 29L,
     x = matrix(NA, nrow = 51, ncol = 33)
   )
   net$selectMinibatch()
   
   # First minibatch should bet the first bunch of numbers
-  expect_equal(net$minibatch.ids, 1:net$minibatch.size)
+  expect_equal(net$minibatch.ids, 1:net$n.minibatch)
   
   # Next minibatch should wrap around
   net$completed.iterations = 1L
@@ -22,27 +22,27 @@ test_that("minibatches work", {
   expect_equal(min(net$minibatch.ids), 1L)
   
   # Should have the correct size even after looping
-  expect_equal(length(net$minibatch.ids), net$minibatch.size)
+  expect_equal(length(net$minibatch.ids), net$n.minibatch)
   
   
   
   # Minibatch size must be positive
-  net$minibatch.size = -1L
+  net$n.minibatch = -1L
   expect_error(net$selectMinibatch())
   
-  net$minibatch.size = 0L
+  net$n.minibatch = 0L
   expect_error(net$selectMinibatch())
   
   
-  # If minibatch.size = nrow(x), all rows should be sampled once.
-  net$minibatch.size = nrow(net$x)
+  # If n.minibatch = nrow(x), all rows should be sampled once.
+  net$n.minibatch = nrow(net$x)
   net$selectMinibatch()
   expect_true(all(table(net$minibatch.ids) == 1))
   
   
   
-  # After looping around N times, everone row should occur once per minibatch.size
-  net$minibatch.size = 19L
+  # After looping around N times, everone row should occur once per n.minibatch
+  net$n.minibatch = 19L
   counts = integer(nrow(net$x))
   for(i in 1:nrow(net$x)){
     net$completed.iterations = net$completed.iterations + 1L
@@ -51,6 +51,6 @@ test_that("minibatches work", {
   }
   expect_equal(
     counts,
-    rep(net$minibatch.size, nrow(net$x))
+    rep(net$n.minibatch, nrow(net$x))
   )
 })
