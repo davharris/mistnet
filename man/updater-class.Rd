@@ -17,13 +17,4 @@ Updaters all have a \code{computeDelta} method, which determines the
  By default, the \code{mistnet} function uses the same parameters for all
  \code{updaters} in the network, but the user can tune them independently.
 }
-\section{Fields}{
-
-\describe{
-\item{\code{momentum}}{the momentum term}
-
-\item{\code{learning.rate}}{the learning rate}
-
-\item{\code{delta}}{the delta matrix (see \code{updater})}
-}}
 

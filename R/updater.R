@@ -9,12 +9,6 @@
 #'  
 #'  By default, the \code{mistnet} function uses the same parameters for all
 #'  \code{updaters} in the network, but the user can tune them independently.
-#'
-#' @details __
-#'
-#' @field momentum the momentum term
-#' @field learning.rate the learning rate
-#' @field delta the delta matrix (see \code{updater})
 #' @export
 updater = setRefClass(
   Class = "updater",
