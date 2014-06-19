@@ -110,7 +110,7 @@ test_that("binomialLossGrad is accurate", {
     },
     "NaN"
   )
-  grad = binomialLossGrad(y = 1, yhat = x, n = n)
+  grad = binomialLoss(n = n)$grad(y = 1, yhat = x, n = n)
   
   finite.elements = is.finite(y)
   

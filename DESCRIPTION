@@ -21,7 +21,6 @@ Suggests:
 LinkingTo: Rcpp, RcppArmadillo
 Collate:
     'RcppExports.R'
-    'error_gradients.R'
     'findLogLik.R'
     'helpers.R'
     'layer-creation.R'
