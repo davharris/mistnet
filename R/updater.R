@@ -53,8 +53,19 @@ sgd.updater = setRefClass(
   )
 )
 
-# Adagrad allows different coefficients to have different effective learning
-#   rates, depending on how much that parameter has moved so far.
+#' adagrad updater
+#' 
+#' @description An updater with adaptive step sizes. Adagrad allows different 
+#' coefficients to have different effective learning rates, depending on how 
+#' much that parameter has moved so far.
+#'
+#' @details __
+#'
+#' @field learning.rate the learning rate (set to one in the original paper)
+#' @field squared.grad a matrix summing the squared gradients over all previous
+#'  updates
+#' @field delta the delta matrix (see \code{updater})
+#' @export
 adagrad.updater = setRefClass(
   Class = "adagrad.updater",
   contains = "updater",
@@ -82,13 +93,32 @@ adagrad.updater = setRefClass(
 )
 
 
-# Adadelta modifies adagrad by decaying the squared gradients and multiplying
-#    by an extra term to keep the units consistent.  Supposed to be more robust
-#    to hyperparameter choice than adagrad or sgd.
-# Rho is a decay rate. Controls how long the updater remembers the squared
-#    magnitude of previous updates
 # Epsilon is a fudge factor that determines initial rates and keeps things from
 #    approaching zero.
+
+#' adadelta updater
+#' 
+#' @description An updater with adaptive step sizes, like adagrad. 
+#' Adadelta modifies adagrad (see \code{adagrad.updater}) by decaying the 
+#' squared gradients and multiplying by an extra term to keep the units 
+#' consistent.  Some evidence indicates that adadelta is more robust
+#  to hyperparameter choices than adagrad or sgd.
+#'
+#' @details See Zeiler 2012
+#' ADADELTA: AN ADAPTIVE LEARNING RATE METHOD
+#' http://www.matthewzeiler.com/pubs/googleTR2012/googleTR2012.pdf
+#'
+#' @field rho a rate (e.g. .95) that controls how long the updater "remembers" the 
+#'  squared magnitude of previous updates.  Larger rho (closer to 1) allows the
+#'  model to retain information from more steps in the past.
+#' @field epsilon a small constant (e.g. 1E-6) to prevent numerical instability
+#'  when dividing by small numbers
+#' @field squared.grad a matrix summing the squared gradients over all previous
+#'  updates, but decayed according to rho.
+#' @field delta the delta matrix (see \code{updater})
+#' @field squared.delta a matrix summing the squared deltas over all previous
+#'  updates, but decayed according to rho.
+#' @export
 adadelta.updater = setRefClass(
   Class = "adadelta.updater",
   contains = "updater",
@@ -101,6 +131,7 @@ adadelta.updater = setRefClass(
   ),
   methods = list(
     RMS = function(x.squared){
+      # Adding epsilon prevents division by tiny numbers
       sqrt(x.squared + epsilon)
     },
     computeDelta = function(gradient){
