@@ -20,7 +20,7 @@
 #' @include prior.R
 #' @include updater.R
 #' @include nonlinearity.R
-#' @exportClass
+#' @export
 layer = setRefClass(
   Class = "layer",
   fields = list(

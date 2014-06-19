@@ -21,6 +21,10 @@
 #' @param training.iterations an \code{integer} number of minibatches to process
 #'  before terminating.
 #' @seealso \code{\link{network}}
+#' @useDynLib mistnet
+#' @import Rcpp
+#' @import RcppArmadillo
+#' @export
 
 mistnet = function(
   x,
