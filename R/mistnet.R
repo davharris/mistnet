@@ -37,11 +37,11 @@ mistnet = function(
   n.minibatch = 20,
   training.iterations = 0
 ){
-  n.minibatch = safe.as.integer(n.minibatch)
-  n.importance.samples = safe.as.integer(n.importance.samples)
+  assert_that(is.matrix(x))
+  assert_that(is.matrix(y))
+  
   n.layers = length(layer.definitions)
-  
-  
+    
   network.dims = c(
     ncol(x) + with(environment(sampler), ncol), 
     sapply(layer.definitions, function(x) x$size)
@@ -61,20 +61,20 @@ mistnet = function(
       1:n.layers,
       function(i){
         createLayer(
-          n.in = network.dims[[i]],
-          n.out = network.dims[[i + 1]],
+          n.inputs = network.dims[[i]],
+          n.outputs = network.dims[[i + 1]],
           prior = layer.definitions[[i]]$prior,
           nonlinearity = layer.definitions[[i]]$nonlinearity,
           updater = updater,
-          n.minibatch = n.minibatch,
-          n.importance.samples = n.importance.samples
+          n.minibatch = safe.as.integer(n.minibatch),
+          n.importance.samples = safe.as.integer(n.importance.samples)
         )
       }
     ),
     n.layers = n.layers,
     dataset.size = dataset.size,
-    n.minibatch = n.minibatch,
-    n.importance.samples = n.importance.samples,
+    n.minibatch = safe.as.integer(n.minibatch),
+    n.importance.samples = safe.as.integer(n.importance.samples),
     loss = loss$loss,
     lossGradient = loss$grad,
     sampler = sampler,

@@ -1,4 +1,17 @@
-defineLayer = function(nonlinearity, size, prior){
+#' Define a layer's properties
+#' 
+#' This function produces a description of a \code{layer} in a \code{network}
+#' 
+#' @param nonlinearity a \code{nonlinearity} object describing the activation
+#'  function used in this layer
+#' @param size an integer describing the number of output neurons in this layer.
+#' @param a \code{prior} object for constraining the layer's coefficients.
+#' @param ... additional arguments to be passed to or from other methods 
+#'  (currently not used).
+#' 
+#' @seealso \code{\link{layer}}
+#' @export
+defineLayer = function(nonlinearity, size, prior, ...){
   assert_that(inherits(nonlinearity, "nonlinearity"))
   assert_that(inherits(prior, "prior"))
   assert_that(length(size) == 1L)
