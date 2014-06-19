@@ -1,0 +1,16 @@
+citHeader("To cite the mistnet package in publications, use:")
+
+citEntry(
+  entry = "Article", 
+  author = personList(as.person("David J. Harris")),
+  title = "Building realistic assemblages with a Joint Species Distribution Model", 
+  journal = "bioRxiv", 
+  year = 2014, 
+  url = "http://dx.doi.org/10.1101/003947", 
+  textVersion = paste(
+    "David J. Harris. Building realistic assemblages with a Joint Species Distribution Model.",
+    "bioRxiv 2014. http://dx.doi.org/10.1101/003947"
+  )
+)
+
+citFooter("As mistnet is continually evolving, you may want to cite its version number. Find it with 'help(package=mistnet)'.")
