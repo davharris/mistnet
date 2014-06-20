@@ -6,11 +6,11 @@
 #'
 #' @field coef.dim a length-two integer vector
 #' @field coefficients a matrix of real numbers
-#' @field biases a numeric vector
+#' @field biases a numeric vector containing the intercept for each neuron
 #' @field nonlinearity a \code{nonlinearity} object
 #' @field prior a \code{prior} object
-#' @field inputs a numeric array
-#' @field outputs a numeric array
+#' @field inputs a numeric array with the summed weights for each neuron
+#' @field outputs a numeric array with the transformed activations for each neuron
 #' @field error.grads a numeric array
 #' @field weighted.bias.grads a numeric vector
 #' @field weighted.llik.grads a numeric matrix

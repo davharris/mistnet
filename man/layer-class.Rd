@@ -17,17 +17,15 @@ __
 
 \item{\code{coefficients}}{a matrix of real numbers}
 
-\item{\code{biases}}{a numeric vector}
+\item{\code{biases}}{a numeric vector containing the intercept for each neuron}
 
 \item{\code{nonlinearity}}{a \code{nonlinearity} object}
 
 \item{\code{prior}}{a \code{prior} object}
 
-\item{\code{inputs}}{a numeric array}
+\item{\code{inputs}}{a numeric array with the summed weights for each neuron}
 
-\item{\code{activations}}{a numeric array}
-
-\item{\code{outputs}}{a numeric array}
+\item{\code{outputs}}{a numeric array with the transformed activations for each neuron}
 
 \item{\code{error.grads}}{a numeric array}
 
@@ -42,12 +40,13 @@ __
 \describe{
 \item{\code{backwardPass(incoming.error.grad, sample.num)}}{Calculate error.grads for one sample}
 
-\item{\code{combineSampleGradients(weights, n.importance.samples)}}{update weighted.llik.grads and weighted.bias.grads based on importance 
+\item{\code{combineSampleGradients(inputs, weights, n.importance.samples)}}{update weighted.llik.grads and weighted.bias.grads based on importance 
 weights and gradients from backpropagation}
 
-\item{\code{forwardPass(input, sample.num)}}{Update inputs, activations, and outputs for one sample}
+\item{\code{forwardPass(input, sample.num)}}{Update inputs, and outputs for one sample}
 
-\item{\code{resetState(n.minibatch, n.importance.samples)}}{Reset inputs, activations, outputs, error.grads, and coef.delta to NA}
+\item{\code{resetState(n.minibatch, n.importance.samples)}}{Reset inputs, outputs, error.grads, and coef.delta to NA;
+alter the minibatch size and number of importance samples if desired}
 
 \item{\code{updateCoefficients(dataset.size, n.minibatch)}}{Calculate coef.delta and add it to coefficients. Update biases}
 }}
