@@ -1,9 +1,7 @@
 # Activation functions ----------------------------------------------------
 
 sigmoid = function(x){
-  # Benchmarking suggests that this is 20% faster than plogis()  
-  storage.mode(x) = "numeric"
-  binomial()$linkinv(x)
+  plogis(q = x)
 }
 
 linear = function(x){
