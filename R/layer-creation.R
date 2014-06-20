@@ -5,7 +5,7 @@
 #' @param nonlinearity a \code{nonlinearity} object describing the activation
 #'  function used in this layer
 #' @param size an integer describing the number of output neurons in this layer.
-#' @param a \code{prior} object for constraining the layer's coefficients.
+#' @param prior \code{prior} object for constraining the layer's coefficients.
 #' @param ... additional arguments to be passed to or from other methods 
 #'  (currently not used).
 #' 

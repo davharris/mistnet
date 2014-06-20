@@ -11,7 +11,7 @@ function used in this layer}
 
 \item{size}{an integer describing the number of output neurons in this layer.}
 
-\item{a}{\code{prior} object for constraining the layer's coefficients.}
+\item{prior}{\code{prior} object for constraining the layer's coefficients.}
 
 \item{...}{additional arguments to be passed to or from other methods
  (currently not used).}
