@@ -7,18 +7,21 @@
 #' @field coef.dim a length-two integer vector
 #' @field coefficients a matrix of real numbers
 #' @field biases a numeric vector containing the intercept for each neuron
-#' @field nonlinearity a \code{nonlinearity} object
-#' @field prior a \code{prior} object
-#' @field inputs a numeric array with the summed weights for each neuron
-#' @field outputs a numeric array with the transformed activations for each neuron
+#' @field nonlinearity a \code{\link{nonlinearity}} object
+#' @field prior a \code{\link{prior}} object
+#' @field inputs a numeric array with the input activity to each
+#'  neuron in response to each example, for each Monte Carlo sample
+#' @field outputs a numeric array with the transformed activations for each 
+#'  neuron in response to each example, for each Monte Carlo sample
 #' @field error.grads a numeric array
 #' @field weighted.bias.grads a numeric vector
 #' @field weighted.llik.grads a numeric matrix
-#' @field coef.updater an \code{updater} object
+#' @field coef.updater an \code{\link{updater}} object
 #' 
 #' @include prior.R
 #' @include updater.R
 #' @include nonlinearity.R
+#' @seealso \code{\link{network}}
 #' @export
 layer = setRefClass(
   Class = "layer",

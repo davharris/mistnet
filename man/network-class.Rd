@@ -19,7 +19,7 @@ per example, one column per predictive feature.}
 \item{\code{y}}{a \code{matrix} of responses to \code{x}.  One row per example, one
 column per response variable.}
 
-\item{\code{layers}}{a \code{list} of \code{layer} objects}
+\item{\code{layers}}{a \code{list} of \code{\link{layer}} objects}
 
 \item{\code{n.layers}}{an integer corresponding to \code{length(layers)}}
 
@@ -38,7 +38,7 @@ data set to include in the next estimate of the likelihood gradient}
 with the most recent round of importance sampling.  (one row per example,
 one column per Monte Carlo sample).}
 
-\item{\code{loss}}{the loss function being optimized (not a \code{loss} object!)}
+\item{\code{loss}}{the loss function being optimized (not a \code{\link{loss}} object!)}
 
 \item{\code{lossGradient}}{the gradient of the loss function being optimized}
 
@@ -48,4 +48,7 @@ importance sampling}
 \item{\code{completed.iterations}}{a counter that increments after each iteration
 of model fitting}
 }}
+\seealso{
+\code{\link{mistnet}}, \code{\link{layer}}
+}
 

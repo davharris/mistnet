@@ -8,7 +8,7 @@
 #'  per example, one column per predictive feature.
 #' @field y a \code{matrix} of responses to \code{x}.  One row per example, one
 #'  column per response variable.
-#' @field layers a \code{list} of \code{layer} objects
+#' @field layers a \code{list} of \code{\link{layer}} objects
 #' @field n.layers an integer corresponding to \code{length(layers)}
 #' @field dataset.size an integer corresponding to the number of rows in 
 #'  \code{x} and \code{y}
@@ -20,13 +20,14 @@
 #' @field importance.weights a numeric matrix containing the weights associated
 #'  with the most recent round of importance sampling.  (one row per example,
 #'  one column per Monte Carlo sample).
-#' @field loss the loss function being optimized (not a \code{loss} object!)
+#' @field loss the loss function being optimized (not a \code{\link{loss}} object!)
 #' @field lossGradient the gradient of the loss function being optimized
 #' @field sampler the function used to generate Monte Carlo samples for 
 #'  importance sampling
 #' @field completed.iterations a counter that increments after each iteration
 #'  of model fitting
 #' @export
+#' @seealso \code{\link{mistnet}}, \code{\link{layer}}
 network = setRefClass(
   Class = "network",
   fields = list(

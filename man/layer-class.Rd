@@ -19,13 +19,15 @@ __
 
 \item{\code{biases}}{a numeric vector containing the intercept for each neuron}
 
-\item{\code{nonlinearity}}{a \code{nonlinearity} object}
+\item{\code{nonlinearity}}{a \code{\link{nonlinearity}} object}
 
-\item{\code{prior}}{a \code{prior} object}
+\item{\code{prior}}{a \code{\link{prior}} object}
 
-\item{\code{inputs}}{a numeric array with the summed weights for each neuron}
+\item{\code{inputs}}{a numeric array with the input activity to each
+neuron in response to each example, for each Monte Carlo sample}
 
-\item{\code{outputs}}{a numeric array with the transformed activations for each neuron}
+\item{\code{outputs}}{a numeric array with the transformed activations for each
+neuron in response to each example, for each Monte Carlo sample}
 
 \item{\code{error.grads}}{a numeric array}
 
@@ -33,7 +35,7 @@ __
 
 \item{\code{weighted.llik.grads}}{a numeric matrix}
 
-\item{\code{coef.updater}}{an \code{updater} object}
+\item{\code{coef.updater}}{an \code{\link{updater}} object}
 }}
 \section{Methods}{
 
@@ -50,4 +52,7 @@ alter the minibatch size and number of importance samples if desired}
 
 \item{\code{updateCoefficients(dataset.size, n.minibatch)}}{Calculate coef.delta and add it to coefficients. Update biases}
 }}
+\seealso{
+\code{\link{network}}
+}
 
