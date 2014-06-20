@@ -36,6 +36,7 @@ expGrad = function(x){
 
 # Nonlinearity classes ----------------------------------------------------
 
+#' @include updater.R
 #' @export nonlinearity
 #' @exportClass nonlinearity
 nonlinearity = setRefClass(
