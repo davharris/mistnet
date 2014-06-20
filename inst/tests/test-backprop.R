@@ -17,17 +17,17 @@ test_that("3-layer backprop works", {
       defineLayer(
         nonlinearity = rectify.nonlinearity(), 
         size = 23, 
-        prior = gaussianPrior(0, 001)
+        prior = gaussianPrior(0, 0.001)
       ),
       defineLayer(
         nonlinearity = rectify.nonlinearity(), 
         size = 31, 
-        prior = gaussianPrior(0, 001)
+        prior = gaussianPrior(0, 0.001)
       ),
       defineLayer(
         nonlinearity = sigmoid.nonlinearity(), 
         size = ncol(y), 
-        prior = gaussianPrior(0, 001)
+        prior = gaussianPrior(0, 0.001)
       )
     ),
     loss = bernoulliLoss(),
