@@ -19,7 +19,7 @@ test_that("Single-layer feedforward works", {
   
   
   expect_equal(
-    l$activations[ , , 2],
+    l$inputs[ , , 2],
     (input.matrix %*% l$coefficients) %plus% l$biases
   )
   expect_equal(

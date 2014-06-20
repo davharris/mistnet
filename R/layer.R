@@ -9,7 +9,7 @@
 #' @field biases a numeric vector
 #' @field nonlinearity a \code{nonlinearity} object
 #' @field prior a \code{prior} object
-#' @field activations a numeric array
+#' @field inputs a numeric array
 #' @field outputs a numeric array
 #' @field error.grads a numeric array
 #' @field weighted.bias.grads a numeric vector
@@ -28,7 +28,7 @@ layer = setRefClass(
     biases = "matrix",
     nonlinearity = "nonlinearity",
     prior = "prior",
-    activations = "array",
+    inputs = "array",
     outputs = "array",
     error.grads = "array",
     weighted.bias.grads = "numeric",
@@ -40,12 +40,12 @@ layer = setRefClass(
   methods = list(
     
     forwardPass = function(input, sample.num){
-      "Update activations, and outputs for one sample"
+      "Update inputs, and outputs for one sample"
       
       if(missing(sample.num)){stop("sample.num is missing in forwardPass")}
       
-      activations[ , , sample.num] <<- (input %*% coefficients) %plus% biases
-      outputs[ , , sample.num] <<- nonlinearity$f(activations[ , , sample.num])
+      inputs[ , , sample.num] <<- (input %*% coefficients) %plus% biases
+      outputs[ , , sample.num] <<- nonlinearity$f(inputs[ , , sample.num])
     },
     
     backwardPass = function(incoming.error.grad, sample.num){
@@ -54,7 +54,7 @@ layer = setRefClass(
       # Chain rule: multiply incoming error gradient by the nonlinearity's own 
       # gradient.
       nonlinear.grad = nonlinearity$grad(
-        activations[ , , sample.num]
+        inputs[ , , sample.num]
       )
       error.grads[ , , sample.num] <<- incoming.error.grad * nonlinear.grad
     },
@@ -96,14 +96,14 @@ layer = setRefClass(
     },
     
     resetState = function(n.minibatch, n.importance.samples){
-      "Reset activations, outputs, error.grads, and coef.delta to NA;
+      "Reset inputs, outputs, error.grads, and coef.delta to NA;
       alter the minibatch size and number of importance samples if desired"
       
       out.array = array(
         NA, 
         c(n.minibatch, coef.dim[[2]], n.importance.samples)
       )
-      activations <<- out.array
+      inputs <<- out.array
       outputs <<- out.array
       error.grads <<- out.array
     }

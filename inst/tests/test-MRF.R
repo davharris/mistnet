@@ -111,7 +111,7 @@ test_that("lateral updates work", {
   importance.weights = gtools::rdirichlet(nrow, rep(1, n.importance.weights))
   
   l = layer$new(
-    activations = qlogis(predicted),
+    inputs = qlogis(predicted),
     nonlinearity = mf_mrf.nonlinearity$new(
       lateral = matrix(0, nrow = ncol, ncol = ncol),
       maxit = 10L,
