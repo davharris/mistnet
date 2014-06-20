@@ -22,10 +22,53 @@
 #'  before terminating. Currently, it is best practice to leave this value at 0
 #'  and manually initialize the model's coefficients before beginning training
 #' @seealso \code{\link{network}}
+#' @examples
+#' # 107 rows of fake data
+#' x = matrix(rnorm(1819), ncol = 17, nrow = 107) 
+#' y = dropoutMask(107, 14)
+#' 
+#' # Create the network object
+#' net = mistnet(
+#'   x = x,
+#'   y = y,
+#'   layer.definitions = list(
+#'     defineLayer(
+#'       nonlinearity = rectify.nonlinearity(), 
+#'       size = 23, 
+#'       prior = gaussianPrior(0, 0.001)
+#'     ),
+#'     defineLayer(
+#'       nonlinearity = rectify.nonlinearity(), 
+#'       size = 31, 
+#'       prior = gaussianPrior(0, 0.001)
+#'     ),
+#'     defineLayer(
+#'       nonlinearity = sigmoid.nonlinearity(), 
+#'       size = ncol(y), 
+#'       prior = gaussianPrior(0, 0.001)
+#'     )
+#'   ),
+#'   loss = bernoulliLoss(),
+#'   updater = sgd.updater(learning.rate = .001, momentum = .9),
+#'   sampler = gaussianSampler(ncol = 10, sd = 1),
+#'   n.importance.samples = 25,
+#'   n.minibatch = 20,
+#'   training.iterations = 0
+#' )
+#' 
+#' # Currently, mistnet does not initialize the coefficients automatically.
+#' # This gets it started with nonzero values.
+#' for(layer in net$layers){
+#'   layer$coefficients[ , ] = rnorm(length(layer$coefficients), sd = .01)
+#' }
+#' 
+#' # Fit the model
+#' net$fit(iterations = 10)
 #' @useDynLib mistnet
 #' @import Rcpp
 #' @import RcppArmadillo
 #' @export
+
 
 mistnet = function(
   x,

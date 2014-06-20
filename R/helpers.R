@@ -8,8 +8,15 @@ safe.as.integer = function(x){
   rcpp_add_biases(matrix, vector)
 }
 
-# based on the "josh" function from 
-# https://gist.github.com/SChamberlain/3639688
+#' Produce a dropout mask
+#' 
+#' Produces a binary matrix, with each element independently sampled as 1 or 0
+#' with probabilty 0.5.
+#' Code is based on the "josh" function from 
+#' https://gist.github.com/sckott/3639688
+#' @param nrow the number of rows desired
+#' @param ncol the number of columns desired
+#' @export
 dropoutMask = function(nrow, ncol) {
   out = sample.int(n = 2L, size = nrow * ncol, replace = TRUE) - 1L
   dim(out) = c(nrow, ncol)

@@ -9,7 +9,8 @@
 #'  
 #'  By default, the \code{mistnet} function uses the same parameters for all
 #'  \code{updaters} in the network, but the user can tune them independently.
-#' @export
+#' @export updater
+#' @exportClass updater
 updater = setRefClass(
   Class = "updater",
   fields = list(
@@ -31,7 +32,8 @@ updater = setRefClass(
 #' @field momentum the momentum term
 #' @field learning.rate the learning rate
 #' @field delta the delta matrix (see \code{updater})
-#' @export
+#' @export sgd.updater
+#' @exportClass sgd.updater
 sgd.updater = setRefClass(
   Class = "sgd.updater",
   contains = "updater",
@@ -59,7 +61,8 @@ sgd.updater = setRefClass(
 #' @field squared.grad a matrix summing the squared gradients over all previous
 #'  updates
 #' @field delta the delta matrix (see \code{updater})
-#' @export
+#' @export adagrad.updater
+#' @exportClass adagrad.updater
 adagrad.updater = setRefClass(
   Class = "adagrad.updater",
   contains = "updater",
@@ -112,7 +115,8 @@ adagrad.updater = setRefClass(
 #' @field delta the delta matrix (see \code{updater})
 #' @field squared.delta a matrix summing the squared deltas over all previous
 #'  updates, but decayed according to rho.
-#' @export
+#' @export adadelta.updater
+#' @exportClass adadelta.updater
 adadelta.updater = setRefClass(
   Class = "adadelta.updater",
   contains = "updater",

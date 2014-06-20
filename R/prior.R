@@ -1,5 +1,6 @@
 setOldClass("prior")
 
+#' @export
 gaussianPrior = function(mean, var){
   structure(
     list(
@@ -15,6 +16,7 @@ gaussianPrior = function(mean, var){
   )
 }
 
+#' @export
 laplacePrior = function(location, scale){
  structure(
    list(

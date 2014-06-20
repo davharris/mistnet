@@ -26,7 +26,8 @@
 #'  importance sampling
 #' @field completed.iterations a counter that increments after each iteration
 #'  of model fitting
-#' @export
+#' @export network
+#' @exportClass network
 #' @seealso \code{\link{mistnet}}, \code{\link{layer}}
 network = setRefClass(
   Class = "network",

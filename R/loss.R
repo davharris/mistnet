@@ -1,3 +1,4 @@
+#' @export
 bernoulliLoss = function(){
   structure(
     list(
@@ -8,6 +9,7 @@ bernoulliLoss = function(){
   )
 }
 
+#' @export
 poissonLoss = function(){
   structure(
     list(
@@ -22,6 +24,7 @@ poissonLoss = function(){
   )
 }
 
+#' @export
 squaredLoss = function(){
   structure(
     list(
@@ -38,6 +41,7 @@ squaredLoss = function(){
 }
 
 # n is the size argument for dbinom
+#' @export
 binomialLoss = function(n){
   
   n = safe.as.integer(n)
@@ -56,6 +60,7 @@ binomialLoss = function(n){
   )
 }
 
+#' @export
 mrfLoss = function(){
   structure(
     list(

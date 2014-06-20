@@ -36,6 +36,8 @@ expGrad = function(x){
 
 # Nonlinearity classes ----------------------------------------------------
 
+#' @export nonlinearity
+#' @exportClass nonlinearity
 nonlinearity = setRefClass(
   Class = "nonlinearity",
   fields = list(),
@@ -52,6 +54,8 @@ nonlinearity = setRefClass(
   )
 )
 
+#' @exportClass linear.nonlinearity
+#' @export linear.nonlinearity
 linear.nonlinearity = setRefClass(
   Class = "linear.nonlinearity",
   fields = list(),
@@ -62,6 +66,8 @@ linear.nonlinearity = setRefClass(
   )
 )
 
+#' @exportClass sigmoid.nonlinearity
+#' @export sigmoid.nonlinearity
 sigmoid.nonlinearity = setRefClass(
   Class = "sigmoid.nonlinearity",
   fields = list(),
@@ -72,7 +78,8 @@ sigmoid.nonlinearity = setRefClass(
   )
 )
 
-
+#' @exportClass rectify.nonlinearity
+#' @export rectify.nonlinearity
 rectify.nonlinearity = setRefClass(
   Class = "rectify.nonlinearity",
   fields = list(),
@@ -84,7 +91,8 @@ rectify.nonlinearity = setRefClass(
 )
 
 
-
+#' @exportClass exp.nonlinearity
+#' @export exp.nonlinearity
 exp.nonlinearity = setRefClass(
   Class = "exp.nonlinearity",
   fields = list(),
@@ -102,8 +110,8 @@ exp.nonlinearity = setRefClass(
 
 
 
-
-
+#' @exportClass mf_mrf.nonlinearity
+#' @export mf_mrf.nonlinearity
 mf_mrf.nonlinearity = setRefClass(
   Class = "mf_mrf.nonlinearity",
   fields = list(
