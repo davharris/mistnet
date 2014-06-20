@@ -10,6 +10,8 @@
 #'  (currently not used).
 #' 
 #' @seealso \code{\link{layer}}
+#' @include prior
+#' @include nonlinearity
 #' @export
 defineLayer = function(nonlinearity, size, prior, ...){
   assert_that(inherits(nonlinearity, "nonlinearity"))

@@ -23,6 +23,8 @@ Collate:
     'RcppExports.R'
     'findLogLik.R'
     'helpers.R'
+    'prior'
+    'nonlinearity'
     'layer-creation.R'
     'updater.R'
     'prior.R'

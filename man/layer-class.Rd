@@ -17,17 +17,17 @@ __
 
 \item{\code{coefficients}}{a matrix of real numbers}
 
-\item{\code{biases}}{a numeric vector containing the intercept for each neuron}
+\item{\code{biases}}{a numeric vector containing the intercept for each node}
 
 \item{\code{nonlinearity}}{a \code{\link{nonlinearity}} object}
 
 \item{\code{prior}}{a \code{\link{prior}} object}
 
 \item{\code{inputs}}{a numeric array with the input activity to each
-neuron in response to each example, for each Monte Carlo sample}
+node in response to each example, for each Monte Carlo sample}
 
 \item{\code{outputs}}{a numeric array with the transformed activations for each
-neuron in response to each example, for each Monte Carlo sample}
+node in response to each example, for each Monte Carlo sample}
 
 \item{\code{error.grads}}{a numeric array}
 
@@ -45,9 +45,9 @@ neuron in response to each example, for each Monte Carlo sample}
 \item{\code{combineSampleGradients(inputs, weights, n.importance.samples)}}{update weighted.llik.grads and weighted.bias.grads based on importance 
 weights and gradients from backpropagation}
 
-\item{\code{forwardPass(input, sample.num)}}{Update inputs, and outputs for one sample}
+\item{\code{forwardPass(input, sample.num)}}{Update inputs and outputs for one sample}
 
-\item{\code{resetState(n.minibatch, n.importance.samples)}}{Reset inputs, outputs, error.grads, and coef.delta to NA;
+\item{\code{resetState(n.minibatch, n.importance.samples)}}{Reset inputs, outputs, and error.grads to NA;
 alter the minibatch size and number of importance samples if desired}
 
 \item{\code{updateCoefficients(dataset.size, n.minibatch)}}{Calculate coef.delta and add it to coefficients. Update biases}

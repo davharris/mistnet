@@ -6,13 +6,13 @@
 #'
 #' @field coef.dim a length-two integer vector
 #' @field coefficients a matrix of real numbers
-#' @field biases a numeric vector containing the intercept for each neuron
+#' @field biases a numeric vector containing the intercept for each node
 #' @field nonlinearity a \code{\link{nonlinearity}} object
 #' @field prior a \code{\link{prior}} object
 #' @field inputs a numeric array with the input activity to each
-#'  neuron in response to each example, for each Monte Carlo sample
+#'  node in response to each example, for each Monte Carlo sample
 #' @field outputs a numeric array with the transformed activations for each 
-#'  neuron in response to each example, for each Monte Carlo sample
+#'  node in response to each example, for each Monte Carlo sample
 #' @field error.grads a numeric array
 #' @field weighted.bias.grads a numeric vector
 #' @field weighted.llik.grads a numeric matrix
@@ -43,7 +43,7 @@ layer = setRefClass(
   methods = list(
     
     forwardPass = function(input, sample.num){
-      "Update inputs, and outputs for one sample"
+      "Update inputs and outputs for one sample"
       
       if(missing(sample.num)){stop("sample.num is missing in forwardPass")}
       
@@ -99,7 +99,7 @@ layer = setRefClass(
     },
     
     resetState = function(n.minibatch, n.importance.samples){
-      "Reset inputs, outputs, error.grads, and coef.delta to NA;
+      "Reset inputs, outputs, and error.grads to NA;
       alter the minibatch size and number of importance samples if desired"
       
       out.array = array(
