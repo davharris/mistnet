@@ -9,7 +9,6 @@
 #' @field biases a numeric vector
 #' @field nonlinearity a \code{nonlinearity} object
 #' @field prior a \code{prior} object
-#' @field inputs a numeric array
 #' @field activations a numeric array
 #' @field outputs a numeric array
 #' @field error.grads a numeric array
@@ -29,7 +28,6 @@ layer = setRefClass(
     biases = "matrix",
     nonlinearity = "nonlinearity",
     prior = "prior",
-    inputs = "array",
     activations = "array",
     outputs = "array",
     error.grads = "array",
@@ -42,11 +40,10 @@ layer = setRefClass(
   methods = list(
     
     forwardPass = function(input, sample.num){
-      "Update inputs, activations, and outputs for one sample"
+      "Update activations, and outputs for one sample"
       
       if(missing(sample.num)){stop("sample.num is missing in forwardPass")}
       
-      inputs[ , , sample.num] <<- input
       activations[ , , sample.num] <<- (input %*% coefficients) %plus% biases
       outputs[ , , sample.num] <<- nonlinearity$f(activations[ , , sample.num])
     },
@@ -78,7 +75,7 @@ layer = setRefClass(
       biases <<- biases + bias.updater$delta
     },
     
-    combineSampleGradients = function(weights, n.importance.samples){
+    combineSampleGradients = function(inputs, weights, n.importance.samples){
       "update weighted.llik.grads and weighted.bias.grads based on importance 
       weights and gradients from backpropagation"
       weighted.llik.grads <<- zeros(coef.dim[[1]], coef.dim[[2]])
@@ -99,11 +96,8 @@ layer = setRefClass(
     },
     
     resetState = function(n.minibatch, n.importance.samples){
-      "Reset inputs, activations, outputs, error.grads, and coef.delta to NA"
-      inputs <<- array(
-        NA, 
-        c(n.minibatch, coef.dim[[1]], n.importance.samples)
-      )
+      "Reset activations, outputs, error.grads, and coef.delta to NA;
+      alter the minibatch size and number of importance samples if desired"
       
       out.array = array(
         NA, 

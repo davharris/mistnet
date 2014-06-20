@@ -17,27 +17,19 @@ test_that("Single-layer feedforward works", {
   
   l$forwardPass(input.matrix, 2L)
   
-  expect_equal(
-    l$inputs[ , , 2],
-    input.matrix
-  )
-  expect_true(
-    all(is.na(l$inputs[ , , -2]))
-  )
-  
   
   expect_equal(
     l$activations[ , , 2],
-    (l$inputs[ , , 2] %*% l$coefficients) %plus% l$biases
+    (input.matrix %*% l$coefficients) %plus% l$biases
   )
   expect_equal(
     l$outputs[ , , 2],
-    l$nonlinearity$f((l$inputs[ , , 2] %*% l$coefficients) %plus% l$biases)
+    l$nonlinearity$f((input.matrix %*% l$coefficients) %plus% l$biases)
   )
   
-  # Nothing should change during feedforward except the three listed fields
+  # Nothing should change during feedforward except the listed fields
   for(name in layer$fields()){
-    name.shouldnt.change = name %in% c("inputs", "activations", "outputs")
+    name.shouldnt.change = name %in% c("activations", "outputs")
     if(name.shouldnt.change){
     }else{
       expect_equal(l[[name]], l.copy[[name]])
@@ -93,14 +85,8 @@ test_that("Multi-layer feedforward works", {
   )
   
   expect_equal(
-    net$layers[[1]]$outputs,
-    net$layers[[2]]$inputs
-  )
-  
-  expect_equal(
-    with(
-      net$layers[[2]],
-      nonlinearity$f((inputs[,,2] %*% coefficients) %plus% biases)
+    net$layers[[2]]$nonlinearity$f(
+      (net$layers[[1]]$outputs[,,2] %*% net$layers[[2]]$coefficients) %plus% net$layers[[2]]$biases
     ),
     net$layers[[2]]$outputs[,,2]
   )
@@ -109,7 +95,7 @@ test_that("Multi-layer feedforward works", {
   expect_equal(
     with(
       net$layers[[3]],
-      nonlinearity$f((inputs[,,2] %*% coefficients) %plus% biases)
+      nonlinearity$f((net$layers[[2]]$outputs[,,2] %*% coefficients) %plus% biases)
     ),
     net$layers[[3]]$outputs[,,2]
   )

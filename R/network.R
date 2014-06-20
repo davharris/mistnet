@@ -32,6 +32,7 @@ network = setRefClass(
   fields = list(
     x = "matrix",
     y = "matrix",
+    inputs = "array",
     layers = "list",
     n.layers = "integer",
     dataset.size = "integer",
@@ -70,13 +71,11 @@ network = setRefClass(
         selectMinibatch()
         
         for(i in 1:n.importance.samples){
-          feedForward(
-            cbind(
-              x[minibatch.ids, ], 
-              sampler(nrow = n.minibatch)
-            ),
-            i
+          inputs[,,i] <<- cbind(
+            x[minibatch.ids, ], 
+            sampler(nrow = n.minibatch)
           )
+          feedForward(inputs, i)
         }
         
         findImportanceWeights()
@@ -115,11 +114,12 @@ network = setRefClass(
     
     estimateGradient = function(){
       for(i in 1:n.importance.samples){
+        inputs[,,i] <<- cbind(
+          x[minibatch.ids, ], 
+          sampler(nrow = n.minibatch)
+        )
         feedForward(
-          cbind(
-            x[minibatch.ids, ], 
-            sampler(nrow = n.minibatch)
-          ),
+          inputs[,,i],
           i
         )
         backprop(i)
@@ -184,6 +184,7 @@ network = setRefClass(
       findImportanceWeights()
       for(i in 1:n.layers){
         layers[[i]]$combineSampleGradients(
+          inputs = if(i==1){inputs}else{layers[[i - 1]]$outputs},
           weights = importance.weights,     
           n.importance.samples = n.importance.samples
         )

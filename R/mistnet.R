@@ -81,6 +81,15 @@ mistnet = function(
     sampler = sampler,
     completed.iterations = 0L
   ) 
+  net$inputs = array(
+    0, 
+    c(
+      net$n.minibatch, 
+      ncol(net$x) + with(environment(net$sampler), ncol), 
+      net$n.importance.samples
+    )
+  )
+  
   
   colnames(net$layers[[net$n.layers]]$coefficients) = colnames(y)
   dimnames(net$layers[[net$n.layers]]$outputs) = list(NULL, colnames(y), NULL)
