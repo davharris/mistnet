@@ -1,5 +1,5 @@
 # Vector of stops to include
-stops = paste0("Stop", 1)
+stops = paste0("Stop", 1:50)
 
 # This file builds the training and test datasets for the analysis in the 
 # paper.  It relies on having files from the Breeding Bird Survey
