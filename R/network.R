@@ -67,34 +67,6 @@ network = setRefClass(
       }
     },
     
-    fitFinalNonlinearityOnly = function(iterations){
-      for(iter in 1:iterations){
-        
-        selectMinibatch()
-        
-        for(i in 1:n.importance.samples){
-          inputs[,,i] <<- cbind(
-            x[minibatch.ids, ], 
-            sampler(nrow = n.minibatch)
-          )
-          feedForward(inputs, i)
-        }
-        
-        findImportanceWeights()
-        
-        layers[[n.layers]]$nonlinearity$update(
-          observed = y[minibatch.ids, ],
-          predicted = layers[[n.layers]]$outputs, 
-          learning.rate = learning.rate / 10,
-          importance.weights = importance.weights,
-          momentum = momentum
-        )
-        
-        # Do I want to include this?
-        completed.iterations <<- completed.iterations + 1L
-      }
-    },
-    
     selectMinibatch = function(row.nums){
       if(missing(row.nums)){
         stopifnot(n.minibatch > 0)
