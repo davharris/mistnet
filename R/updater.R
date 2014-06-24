@@ -43,6 +43,17 @@ sgd.updater = setRefClass(
     delta = "matrix"
   ),
   methods = list(
+    initialize = function(delta, learning.rate, momentum){
+      if(!missing(delta)){
+        delta <<- delta
+      }
+      if(!missing(learning.rate)){
+        learning.rate <<- learning.rate
+      }
+      if(!missing(momentum)){
+        momentum <<- momentum
+      }
+    },
     computeDelta = function(gradient){
       delta <<- delta * momentum - gradient * learning.rate
     }
@@ -128,6 +139,19 @@ adadelta.updater = setRefClass(
     squared.delta = "matrix"
   ),
   methods = list(
+    initialize = function(delta, rho, epsilon){
+      if(!missing(delta)){
+        delta <<- delta
+        squared.delta <<- delta
+        squared.grad <<- delta
+      }
+      if(!missing(rho)){
+        rho <<- rho
+      }
+      if(!missing(epsilon)){
+        epsilon <<- epsilon
+      }
+    },
     RMS = function(x.squared){
       # Adding epsilon prevents division by tiny numbers
       sqrt(x.squared + epsilon)

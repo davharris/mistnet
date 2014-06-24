@@ -54,9 +54,7 @@ test_that("adadelta works",{
     "adadelta.updater", 
     delta = coefs, 
     rho = .95, 
-    epsilon = 1E-6, 
-    squared.grad = coefs, 
-    squared.delta = coefs
+    epsilon = 1E-6
   )
   
   for(i in 1:1000){

@@ -1,7 +1,8 @@
+#' @export
 predict.network = function(
   object, 
   newdata, 
-  n.importance.samples = 1000L, 
+  n.importance.samples, 
   return.model = FALSE
 ){
   

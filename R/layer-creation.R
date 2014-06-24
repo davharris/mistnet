@@ -34,10 +34,10 @@ createLayer = function(
   n.importance.samples
 ){
   coef.updater = updater$copy()
-  coef.updater$delta = matrix(0, nrow = n.inputs, ncol = n.outputs)
+  coef.updater$initialize(delta = matrix(0, nrow = n.inputs, ncol = n.outputs))
   
   bias.updater = updater$copy()
-  bias.updater$delta = matrix(0, nrow = 1, ncol = n.outputs)
+  bias.updater$initialize(delta = matrix(0, nrow = 1, ncol = n.outputs))
   
   out = layer$new(
     coef.dim = c(n.inputs, n.outputs),

@@ -93,10 +93,10 @@ test_that("Multi-layer feedforward works", {
   
   
   expect_equal(
-    with(
-      net$layers[[3]],
-      nonlinearity$f((net$layers[[2]]$outputs[,,2] %*% coefficients) %plus% biases)
+    net$layers[[3]]$nonlinearity$f(
+      (net$layers[[2]]$outputs[,,2] %*% net$layers[[3]]$coefficients) %plus% net$layers[[3]]$biases
     ),
     net$layers[[3]]$outputs[,,2]
   )
 })
+
