@@ -34,12 +34,12 @@
 #'   layer.definitions = list(
 #'     defineLayer(
 #'       nonlinearity = rectify.nonlinearity(), 
-#'       size = 23, 
+#'       size = 30, 
 #'       prior = gaussianPrior(0, 0.001)
 #'     ),
 #'     defineLayer(
 #'       nonlinearity = rectify.nonlinearity(), 
-#'       size = 31, 
+#'       size = 12, 
 #'       prior = gaussianPrior(0, 0.001)
 #'     ),
 #'     defineLayer(
@@ -49,7 +49,7 @@
 #'     )
 #'   ),
 #'   loss = bernoulliLoss(),
-#'   updater = sgd.updater(learning.rate = .001, momentum = .9),
+#'   updater = adagrad.updater(learning.rate = .01),
 #'   sampler = gaussianSampler(ncol = 10, sd = 1),
 #'   n.importance.samples = 25,
 #'   n.minibatch = 20,
@@ -75,7 +75,7 @@ mistnet = function(
   y,
   layer.definitions,
   loss,
-  updater = sgd.updater(learning.rate = .001, momentum = .9),
+  updater = adagrad.updater(learning.rate = .01),
   sampler = gaussianSampler(ncol = 10, sd = 1),
   n.importance.samples = 25,
   n.minibatch = 20,
