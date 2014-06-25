@@ -13,24 +13,23 @@ test_that("Prediction works",{
     layer.definitions = list(
       defineLayer(
         nonlinearity = rectify.nonlinearity(), 
-        size = 23, 
-        prior = gaussianPrior(0, 001)
+        size = 13, 
+        prior = gaussianPrior(0, 0.1)
       ),
       defineLayer(
         nonlinearity = rectify.nonlinearity(), 
-        size = 31, 
-        prior = gaussianPrior(0, 001)
+        size = 11, 
+        prior = gaussianPrior(0, 0.1)
       ),
       defineLayer(
         nonlinearity = sigmoid.nonlinearity(), 
         size = ncol(y), 
-        prior = gaussianPrior(0, 001)
+        prior = gaussianPrior(0, 0.1)
       )
     ),
-    n.importance.samples = 10L,
     n.minibatch = nrow(x),
-    training.iterations = 0L,
-    loss = bernoulliLoss()
+    loss = bernoulliLoss(),
+    updater = sgd.updater(learning.rate = 0, momentum = 0)
   )
   net$fit(1) # Feed forward
   net$layers[[3]]$biases[] = 0 # Undo bias updates
