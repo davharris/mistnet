@@ -35,24 +35,24 @@
 #'     defineLayer(
 #'       nonlinearity = rectify.nonlinearity(), 
 #'       size = 30, 
-#'       prior = gaussianPrior(0, 0.001)
+#'       prior = gaussianPrior(0, 0.01)
 #'     ),
 #'     defineLayer(
 #'       nonlinearity = rectify.nonlinearity(), 
 #'       size = 12, 
-#'       prior = gaussianPrior(0, 0.001)
+#'       prior = gaussianPrior(0, 0.01)
 #'     ),
 #'     defineLayer(
 #'       nonlinearity = sigmoid.nonlinearity(), 
 #'       size = ncol(y), 
-#'       prior = gaussianPrior(0, 0.001)
+#'       prior = gaussianPrior(0, 0.01)
 #'     )
 #'   ),
 #'   loss = bernoulliLoss(),
 #'   updater = adagrad.updater(learning.rate = .01),
 #'   sampler = gaussianSampler(ncol = 10, sd = 1),
-#'   n.importance.samples = 25,
-#'   n.minibatch = 20,
+#'   n.importance.samples = 30,
+#'   n.minibatch = 10,
 #'   training.iterations = 0
 #' )
 #' 
@@ -77,8 +77,8 @@ mistnet = function(
   loss,
   updater = adagrad.updater(learning.rate = .01),
   sampler = gaussianSampler(ncol = 10, sd = 1),
-  n.importance.samples = 25,
-  n.minibatch = 20,
+  n.importance.samples = 30,
+  n.minibatch = 10,
   training.iterations = 0
 ){
   assert_that(is.matrix(x))

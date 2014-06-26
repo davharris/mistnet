@@ -64,6 +64,12 @@ test_that("crossEntropyGrad is accurate", {
     (y.plus - y.minus)/2 / eps,
     grad
   )
+  
+  # Make sure it's symmetrical
+  expect_equal(
+    (y.plus - y.minus)/2 / eps,
+    -rev(crossEntropyGrad(y = 0, yhat = x))
+  )
 })
 
 
