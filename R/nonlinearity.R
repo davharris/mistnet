@@ -1,7 +1,10 @@
 # Activation functions ----------------------------------------------------
 
 sigmoid = function(x){
-  plogis(q = x)
+  # Sometimes slightly slower than plogis, but more precise.  Turns out this
+  # precision is really important
+  storage.mode(x) = "numeric"
+  make.link("logit")$linkinv(x)
 }
 
 linear = function(x){
@@ -15,8 +18,7 @@ linear = function(x){
 
 
 sigmoidGrad = function(x){
-  s = sigmoid(x)
-  s * (1 - s)
+  make.link("logit")$mu.eta(x)
 }
 
 rectifyGrad = function(x){
