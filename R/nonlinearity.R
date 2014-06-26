@@ -1,8 +1,8 @@
 # Activation functions ----------------------------------------------------
 
 sigmoid = function(x){
-  # Sometimes slightly slower than plogis, but more precise.  Turns out this
-  # precision is really important
+  # Sometimes slightly slower than plogis, but has a floor at 2.220446e-16 to
+  # prevent division-by-zero errors.
   storage.mode(x) = "numeric"
   make.link("logit")$linkinv(x)
 }
