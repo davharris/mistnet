@@ -122,7 +122,8 @@ mistnet = function(
     loss = loss$loss,
     lossGradient = loss$grad,
     sampler = sampler,
-    completed.iterations = 0L
+    completed.iterations = 0L,
+    debug = FALSE
   ) 
   net$inputs = array(
     0, 

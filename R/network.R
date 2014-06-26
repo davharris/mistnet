@@ -26,6 +26,9 @@
 #'  importance sampling
 #' @field completed.iterations a counter that increments after each iteration
 #'  of model fitting
+#' @field debug a logical flag indicating whether special debugging measures
+#'  should be enabled. Useful for diagnosing problems with the model, but 
+#'  potentially slow.
 #' @export network
 #' @exportClass network
 #' @seealso \code{\link{mistnet}}, \code{\link{layer}}
@@ -45,7 +48,8 @@ network = setRefClass(
     loss = "function",
     lossGradient = "function",
     sampler = "function",
-    completed.iterations = "integer"
+    completed.iterations = "integer",
+    debug = "logical"
   ),
   methods = list(
     
@@ -64,6 +68,13 @@ network = setRefClass(
         estimateGradient()
         updateCoefficients()
         completed.iterations <<- completed.iterations + 1L
+        
+        if(debug){
+          for(layer in layers){
+            assert_that(!any(is.na(layer$coefficients)))
+            assert_that(!any(is.na(layer$outputs)))
+          }
+        }
       }
     },
     
