@@ -44,17 +44,16 @@ test_that("Prediction works",{
   # variables)
   copy = predict(
     net, 
-    x, 
+    x * 2, 
     n.importance.samples = net$n.importance.samples, 
     return.model = TRUE
   )
   
-  copy2 = net$copy()
+  copy2 = net$copy(shallow = FALSE)
   
-  
-  # Everything but layers should be identical
+  # Everything but layers, inputs, x, and y should be identical
   for(name in names(network$fields())){
-    if(name != "layers"){
+    if(!(name %in% c("layers", "x", "y", "inputs"))){
       expect_identical(copy$field(name), copy2$field(name))
     }
   }

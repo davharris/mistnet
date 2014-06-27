@@ -77,4 +77,5 @@ system.time({
 
 lattice::levelplot(net$layers[[1]]$coefficients)
 plot(prcomp(net$layers[[1]]$coefficients[-(1:8), ]), npcs = 10)
-plot(prcomp(net$layers[[1]]$coefficients), npcs = 18)
+plot(prcomp(net$layers[[1]]$coefficients[1:8, ]), npcs = 10)
+hist(net$layers[[3]]$inputs)

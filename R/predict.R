@@ -5,26 +5,25 @@ predict.network = function(
   n.importance.samples, 
   return.model = FALSE
 ){
-  
   cpy = object$copy(shallow = FALSE)
-  cpy$n.importance.samples = n.importance.samples
-  
-  cpy$selectMinibatch(1:nrow(newdata))
-  
-  # Create an input matrix with the correct dimensions & correct values
-  # everywhere that's fixed.
-  inputs = cbind(
-    newdata, 
-    zeros(nrow = nrow(newdata), ncol = with(environment(cpy$sampler), ncol))
+  cpy$n.importance.samples = safe.as.integer(n.importance.samples)
+  cpy$x = newdata
+  cpy$y = matrix(NA, nrow = nrow(newdata), ncol = ncol(object$y))
+  cpy$inputs = array(
+    NA, 
+    dim = c(nrow(newdata), dim(object$inputs)[2], n.importance.samples)
   )
   
-  for(i in 1:cpy$n.importance.samples){
-    # Update the unobserved columns, which occur after ncol(newdata)
-    inputs[, -(1:ncol(newdata))] = cpy$sampler(
-      nrow = nrow(newdata)
+  cpy$n.minibatch = 0L
+  cpy$selectMinibatch(1:nrow(newdata))
+  
+  for(i in 1:n.importance.samples){
+    cpy$inputs[ , , i] = cbind(
+      cpy$x[cpy$minibatch.ids, ], 
+      cpy$sampler(nrow = cpy$n.minibatch)
     )
     cpy$feedForward(
-      inputs,
+      cpy$inputs[ , , i],
       i
     )
   }
