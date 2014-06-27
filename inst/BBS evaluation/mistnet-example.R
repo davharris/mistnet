@@ -2,6 +2,8 @@ load("birds.Rdata")
 env = scale(x[, 1:8])
 devtools::load_all()
 
+o = sample.int(sum(in.train))
+
 # Best model in submission 1 was something like 45, 15, 368
 layer.sizes = c(50, 15, ncol(route.presence.absence))
 
@@ -17,8 +19,8 @@ n.importance.samples = 30
 n.minibatch = 10
 
 net = mistnet(
-  x = env[in.train, ],
-  y = route.presence.absence[in.train, ],
+  x = env[in.train, ][o, ],
+  y = route.presence.absence[in.train, ][o, ],
   layer.definitions = list(
     defineLayer(
       nonlinearity = rectify.nonlinearity(),
@@ -47,18 +49,18 @@ net = mistnet(
 # Currently, mistnet does not initialize the coefficients automatically.
 # This gets it started with nonzero values.
 for(layer in net$layers){
-  layer$coefficients[ , ] = rt(length(layer$coefficients), df = 5) * .1
+  layer$coefficients[ , ] = rt(length(layer$coefficients), df = 5) * sqrt(mean(prior.var))
   
   # Biases can move more freely than coefficients
   layer$bias.updater$learning.rate = layer$bias.updater$learning.rate * 10
 }
 
 # Initialize the biases of the final layer
-net$layers[[3]]$biases[] = qlogis(colMeans(route.presence.absence[in.train, ]))
+net$layers[[net$n.layers]]$biases[] = qlogis(colMeans(route.presence.absence[in.train, ]))
 
 system.time({
-  for(i in 1:500){
-    net$fit(10)
+  for(i in 1:100){
+    net$fit(20)
     assert_that(!any(is.nan(net$layers[[3]]$outputs)))
     # Update prior mean of last layer.  Pull it in sligthly from the
     # observed mean, as if there were one observation at exactly 0.
@@ -75,3 +77,4 @@ system.time({
 
 lattice::levelplot(net$layers[[1]]$coefficients)
 plot(prcomp(net$layers[[1]]$coefficients[-(1:8), ]), npcs = 10)
+plot(prcomp(net$layers[[1]]$coefficients), npcs = 18)
