@@ -8,6 +8,7 @@ o = sample.int(sum(in.train))
 layer.sizes = c(50, 15, ncol(route.presence.absence))
 
 # Coefficients seemed to have variance of about .02 in a recent test run.
+# With first layer variance at 0.01, most neurons' weights disappear
 prior.var = c(.1, .01, .01)
 
 # Model still runs with learning.rate = 0.1, so maybe that's good?
@@ -69,7 +70,7 @@ system.time({
     ) * ncol(net$y) / (ncol(net$y) + 1)
     cat(".")
     
-    # revive dead first-layer neurons
+    # revive "dead" (always off) first-layer neurons by increasing their biases
     broken = apply(net$layers[[1]]$outputs, 2, mean) == 0
     net$layers[[1]]$biases[broken] = net$layers[[1]]$biases[broken] + .1
   }
