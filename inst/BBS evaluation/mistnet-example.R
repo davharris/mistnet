@@ -6,10 +6,10 @@ devtools::load_all()
 layer.sizes = c(50, 15, ncol(route.presence.absence))
 
 # Coefficients seemed to have variance of about .02 in a recent test run.
-prior.var = c(.01, .01, .01)
+prior.var = c(.1, .01, .01)
 
-# Model blows up with learning.rate == 0.1
-learning.rate = .01
+# Model still runs with learning.rate = 0.1, so maybe that's good?
+learning.rate = .1
 
 # Trial and error in submission 1 indicated that more importance samples was 
 # better.
@@ -57,8 +57,8 @@ for(layer in net$layers){
 net$layers[[3]]$biases[] = qlogis(colMeans(route.presence.absence[in.train, ]))
 
 system.time({
-  for(i in 1:200){
-    net$fit(100)
+  for(i in 1:500){
+    net$fit(10)
     assert_that(!any(is.nan(net$layers[[3]]$outputs)))
     # Update prior mean of last layer.  Pull it in sligthly from the
     # observed mean, as if there were one observation at exactly 0.
@@ -66,6 +66,10 @@ system.time({
       net$layers[[3]]$coefficients
     ) * ncol(net$y) / (ncol(net$y) + 1)
     cat(".")
+    
+    # revive dead first-layer neurons
+    broken = apply(net$layers[[1]]$outputs, 2, mean) == 0
+    net$layers[[1]]$biases[broken] = net$layers[[1]]$biases[broken] + .1
   }
 })
 
