@@ -63,16 +63,11 @@ system.time({
   for(i in 1:100){
     net$fit(20)
     assert_that(!any(is.nan(net$layers[[3]]$outputs)))
-    # Update prior mean of last layer.  Pull it in sligthly from the
-    # observed mean, as if there were one observation at exactly 0.
-    environment(net$layers[[3]]$prior$getLogGrad)$mean = rowMeans(
-      net$layers[[3]]$coefficients
-    ) * ncol(net$y) / (ncol(net$y) + 1)
     cat(".")
     
     # revive "dead" (always off) first-layer neurons by increasing their biases
-    broken = apply(net$layers[[1]]$outputs, 2, mean) == 0
-    net$layers[[1]]$biases[broken] = net$layers[[1]]$biases[broken] + .1
+    dead = apply(net$layers[[1]]$outputs, 2, mean) == 0
+    net$layers[[1]]$biases[dead] = net$layers[[1]]$biases[dead] + .1
   }
 })
 
