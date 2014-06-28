@@ -3,9 +3,9 @@
 \alias{mistnet}
 \title{Construct a mistnet model}
 \usage{
-mistnet(x, y, layer.definitions, loss, updater = sgd.updater(learning.rate =
-  0.001, momentum = 0.9), sampler = gaussianSampler(ncol = 10, sd = 1),
-  n.importance.samples = 25, n.minibatch = 20, training.iterations = 0)
+mistnet(x, y, layer.definitions, loss, updater = adagrad.updater(learning.rate
+  = 0.01), sampler = gaussianSampler(ncol = 10, sd = 1),
+  n.importance.samples = 30, n.minibatch = 10, training.iterations = 0)
 }
 \arguments{
 \item{x}{a \code{numeric} \code{matrix} of predictor variables.  One row
@@ -51,25 +51,25 @@ net = mistnet(
   layer.definitions = list(
     defineLayer(
       nonlinearity = rectify.nonlinearity(),
-      size = 23,
-      prior = gaussianPrior(0, 0.001)
+      size = 30,
+      prior = gaussianPrior(0, 0.01)
     ),
     defineLayer(
       nonlinearity = rectify.nonlinearity(),
-      size = 31,
-      prior = gaussianPrior(0, 0.001)
+      size = 12,
+      prior = gaussianPrior(0, 0.01)
     ),
     defineLayer(
       nonlinearity = sigmoid.nonlinearity(),
       size = ncol(y),
-      prior = gaussianPrior(0, 0.001)
+      prior = gaussianPrior(0, 0.01)
     )
   ),
   loss = bernoulliLoss(),
-  updater = sgd.updater(learning.rate = .001, momentum = .9),
+  updater = adagrad.updater(learning.rate = .01),
   sampler = gaussianSampler(ncol = 10, sd = 1),
-  n.importance.samples = 25,
-  n.minibatch = 20,
+  n.importance.samples = 30,
+  n.minibatch = 10,
   training.iterations = 0
 )
 

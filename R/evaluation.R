@@ -13,6 +13,9 @@ logMeanExp = function(x, weights){
   log(sum(exp(x - biggest) * weights)) + biggest
 }
 
+# Evaluate a network object's predictions on newdata against observed y.
+# Rather than storing a huge number of samples in memory, we can do this in
+# batches of a specified size.
 importanceSamplingEvaluation = function(object, newdata, y, batches, batch.size){
   logliks = replicate(
     batches,{

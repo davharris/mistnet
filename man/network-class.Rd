@@ -47,6 +47,10 @@ importance sampling}
 
 \item{\code{completed.iterations}}{a counter that increments after each iteration
 of model fitting}
+
+\item{\code{debug}}{a logical flag indicating whether special debugging measures
+should be enabled. Useful for diagnosing problems with the model, but
+potentially slow.}
 }}
 \seealso{
 \code{\link{mistnet}}, \code{\link{layer}}

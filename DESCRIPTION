@@ -19,11 +19,12 @@ Imports:
 Suggests:
     testthat,
     devtools,
-    gtools
+    gtools,
+    BayesFactor
 LinkingTo: Rcpp, RcppArmadillo
 Collate:
     'RcppExports.R'
-    'findLogLik.R'
+    'evaluation.R'
     'helpers.R'
     'prior.R'
     'updater.R'
