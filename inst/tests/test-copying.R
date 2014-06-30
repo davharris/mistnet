@@ -10,17 +10,17 @@ test_that("net$copy works", {
       defineLayer(
         nonlinearity = rectify.nonlinearity(), 
         size = 23, 
-        prior = gaussianPrior(0, 001)
+        prior = gaussian.prior(mean = 0, var = .001)
       ),
       defineLayer(
         nonlinearity = rectify.nonlinearity(), 
         size = 31, 
-        prior = gaussianPrior(0, 001)
+        prior = gaussian.prior(mean = 0, var = .001)
       ),
       defineLayer(
         nonlinearity = sigmoid.nonlinearity(), 
         size = ncol(y), 
-        prior = gaussianPrior(0, 001)
+        prior = gaussian.prior(mean = 0, var = .001)
       )
     ),
     n.importance.samples = 10L,

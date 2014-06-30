@@ -2,12 +2,12 @@ context("Priors")
 
 eps = 1E-5
 
-test_that("gaussianPrior works", {
+test_that("gaussian.prior works", {
   mean = exp(1)
   var = pi
   test.points = 0:5
   
-  p = gaussianPrior(mean = mean, var = var)
+  p = gaussian.prior(mean = mean, var = var)
   
   # should have zero gradient at the mean
   expect_equal(p$getLogGrad(mean), 0)
@@ -22,7 +22,7 @@ test_that("gaussianPrior works", {
   
   
   # should have zero gradient when variance is infinite
-  p2 = gaussianPrior(mean = 1, var = Inf)
+  p2 = gaussian.prior(mean = 1, var = Inf)
   expect_equal(p2$getLogGrad(1E10), 0)
 })
 

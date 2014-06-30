@@ -22,13 +22,21 @@ importanceSamplingEvaluation = function(object, newdata, y, batches, batch.size)
       predictions = predict(
         object, 
         newdata, 
-        n.importance.samples = as.integer(batch.size)
+        n.importance.samples = safe.as.integer(batch.size)
       )
       
-      -apply(object$loss(y = y, yhat = predictions), 3, rowSums)
+      apply(
+        predictions, 
+        3, 
+        function(x){
+          -rowSums(object$loss(y = y, yhat = x))
+        }
+      )
     },
     simplify = FALSE
   )
   
   apply(do.call(cbind, logliks), 1, logMeanExp)
 }
+
+

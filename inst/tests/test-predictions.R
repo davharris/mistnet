@@ -14,17 +14,17 @@ test_that("Prediction works",{
       defineLayer(
         nonlinearity = rectify.nonlinearity(), 
         size = 13, 
-        prior = gaussianPrior(0, 0.1)
+        prior = gaussian.prior(mean = 0, var = 0.1)
       ),
       defineLayer(
         nonlinearity = rectify.nonlinearity(), 
         size = 11, 
-        prior = gaussianPrior(0, 0.1)
+        prior = gaussian.prior(mean = 0, var = 0.1)
       ),
       defineLayer(
         nonlinearity = sigmoid.nonlinearity(), 
         size = ncol(y), 
-        prior = gaussianPrior(0, 0.1)
+        prior = gaussian.prior(mean = 0, var = 0.1)
       )
     ),
     n.minibatch = nrow(x),

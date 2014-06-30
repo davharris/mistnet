@@ -7,7 +7,7 @@ test_that("Single-layer feedforward works", {
     n.minibatch = 5L,
     n.importance.samples = 3L,
     nonlinearity = sigmoid.nonlinearity(),
-    prior = gaussianPrior(0, 1),
+    prior = gaussian.prior(mean = 0, var = 1),
     updater = sgd.updater(momentum = .9, learning.rate = .001)
   )
   l.copy = l$copy()
@@ -47,17 +47,17 @@ test_that("Multi-layer feedforward works", {
       defineLayer(
         nonlinearity = rectify.nonlinearity(), 
         size = 23, 
-        prior = gaussianPrior(0, 001)
+        prior = gaussian.prior(mean = 0, var =  0.001)
       ),
       defineLayer(
         nonlinearity = rectify.nonlinearity(), 
         size = 31, 
-        prior = gaussianPrior(0, 001)
+        prior = gaussian.prior(mean = 0, var =  0.001)
       ),
       defineLayer(
         nonlinearity = sigmoid.nonlinearity(), 
         size = ncol(y), 
-        prior = gaussianPrior(0, 001)
+        prior = gaussian.prior(mean = 0, var =  0.001)
       )
     ),
     loss = bernoulliLoss(),

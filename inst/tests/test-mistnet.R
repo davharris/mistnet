@@ -10,9 +10,9 @@ test_that("Correct behavior for fewer than one iteration",{
     x,
     y,
     layer.definitions = list(
-      defineLayer(rectify.nonlinearity(), 10, gaussianPrior(0, 1)),
-      defineLayer(rectify.nonlinearity(), 11, gaussianPrior(0, 1)),
-      defineLayer(sigmoid.nonlinearity(), ncol(y), gaussianPrior(0, 1))
+      defineLayer(rectify.nonlinearity(), 10, gaussian.prior(mean = 0, var = 1)),
+      defineLayer(rectify.nonlinearity(), 11, gaussian.prior(mean = 0, var = 1)),
+      defineLayer(sigmoid.nonlinearity(), ncol(y), gaussian.prior(mean = 0, var = 1))
     ),
     n.importance.samples = 10L,
     n.minibatch = 10L,
