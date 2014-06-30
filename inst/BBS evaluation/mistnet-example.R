@@ -4,12 +4,8 @@ devtools::load_all()
 
 o = sample.int(sum(in.train))
 
-# Best model in submission 1 was something like 45, 15, 368
-layer.sizes = c(50, 15, ncol(route.presence.absence))
-
-# Coefficients seemed to have variance of about .02 in a recent test run.
-# With first layer variance at 0.01, most neurons' weights disappear
-prior.var = c(.1, .01, .01)
+# Best model in first submission's cross-validation was something like 45, 15
+layer.sizes = c(30, 12, ncol(route.presence.absence))
 
 # Model still runs with learning.rate = 0.1, so maybe that's good?
 learning.rate = .1
@@ -17,7 +13,9 @@ learning.rate = .1
 # Trial and error in submission 1 indicated that more importance samples was 
 # better.
 n.importance.samples = 30
-n.minibatch = 10
+n.minibatch = 30
+
+n.ranef = 5
 
 net = mistnet(
   x = env[in.train, ][o, ],
@@ -26,22 +24,22 @@ net = mistnet(
     defineLayer(
       nonlinearity = rectify.nonlinearity(),
       size = layer.sizes[1],
-      prior = gaussianPrior(0, prior.var[1])
+      prior = gaussian.prior(mean = 0, var = 1)
     ),
     defineLayer(
       nonlinearity = linear.nonlinearity(),
       size = layer.sizes[2],
-      prior = gaussianPrior(0, prior.var[2])
+      prior = gaussian.prior(mean = 0, var = 1)
     ),
     defineLayer(
       nonlinearity = sigmoid.nonlinearity(),
       size = layer.sizes[3],
-      prior = gaussianPrior(0, prior.var[3])
+      prior = gaussian.prior(mean = 0, var = 1)
     )
   ),
   loss = bernoulliRegLoss(a = 1 + 1E-6),
   updater = adagrad.updater(learning.rate = learning.rate),
-  sampler = gaussianSampler(ncol = 10, sd = 1),
+  sampler = gaussianSampler(ncol = n.ranef, sd = 1),
   n.importance.samples = n.importance.samples,
   n.minibatch = n.minibatch,
   training.iterations = 0
@@ -50,28 +48,37 @@ net = mistnet(
 # Currently, mistnet does not initialize the coefficients automatically.
 # This gets it started with nonzero values.
 for(layer in net$layers){
-  layer$coefficients[ , ] = rt(length(layer$coefficients), df = 5) * sqrt(mean(prior.var))
+  layer$coefficients[ , ] = rnorm(length(layer$coefficients), sd = .1)
   
   # Biases can move more freely than coefficients
   layer$bias.updater$learning.rate = layer$bias.updater$learning.rate * 10
 }
 
+
+start.params = net$layers[[1]]$coefficients
+
+net$layers[[1]]$biases[] = 1 # First layer biases equal 1
+
 # Initialize the biases of the final layer
 net$layers[[net$n.layers]]$biases[] = qlogis(colMeans(route.presence.absence[in.train, ]))
 
-system.time({
-  for(i in 1:100){
-    net$fit(20)
-    assert_that(!any(is.nan(net$layers[[3]]$outputs)))
-    cat(".")
-    
-    # revive "dead" (always off) first-layer neurons by increasing their biases
-    dead = apply(net$layers[[1]]$outputs, 2, mean) == 0
-    net$layers[[1]]$biases[dead] = net$layers[[1]]$biases[dead] + .1
+start.time = Sys.time()
+while(difftime(Sys.time(), start.time, units = "secs") < 500){
+  net$fit(20)
+  cat(".")
+  # Update prior variance
+  for(layer in net$layers){
+    layer$prior$update(
+      layer$coefficients, 
+      update.mean = FALSE, 
+      update.var = TRUE,
+      min.var = .001
+    )
   }
-})
+}
 
 lattice::levelplot(net$layers[[1]]$coefficients)
 plot(prcomp(net$layers[[1]]$coefficients[-(1:8), ]), npcs = 10)
 plot(prcomp(net$layers[[1]]$coefficients[1:8, ]), npcs = 10)
 hist(net$layers[[3]]$inputs)
+plot(net$layers[[1]]$coefficients[1:8, ] ~start.params[1:8, ], asp = 1);abline(0,1)

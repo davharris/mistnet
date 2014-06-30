@@ -4,17 +4,19 @@ prior = setRefClass(
   fields = list(),
   methods = list(
     getLogGrad = function(x) stop({"log gradient not defined for this prior"}),
-    sample = function(n){stop("sampler not defined for this prior")}
+    sample = function(n){stop("sampler not defined for this prior")},
+    update = function(){stop("update not defined for this prior")}
   )
 )
 
-
+# Annoyingly, var's class will be different if it's a scalar or a matrix...
+#  Set to "any" as a stopgap.
 #' @export
 gaussian.prior = setRefClass(
   Class = "gaussian.prior",
   fields = list(
     mean = "numeric",
-    var = "numeric"
+    var = "ANY"
   ),
   contains = "prior",
   methods = list(
@@ -23,6 +25,15 @@ gaussian.prior = setRefClass(
     },
     sample = function(n){
       rnorm(n, mean = mean, sd = sqrt(var))
+    },
+    update = function(coefficients, update.mean, update.var, min.var){
+      if(update.mean){
+        mean <<- rowMeans(coefficients)
+      }
+      if(update.var){
+        var.vector = pmax(apply(coefficients, 1, var), min.var)
+        var <<- replicate(ncol(coefficients), var.vector)
+      }
     }
   )
 )
