@@ -3,7 +3,8 @@ predict.network = function(
   object, 
   newdata, 
   n.importance.samples, 
-  return.model = FALSE
+  return.model = FALSE,
+  ...
 ){
   cpy = object$copy(shallow = FALSE)
   cpy$n.importance.samples = safe.as.integer(n.importance.samples)
