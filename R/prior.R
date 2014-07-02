@@ -43,8 +43,8 @@ gaussian.prior = setRefClass(
 )
 
 #' @exportClass laplace.prior
-laplacePrior = setRefClass(
-  Class = "laplacePrior",
+laplace.prior = setRefClass(
+  Class = "laplace.prior",
   fields = list(
     location = "numeric",
     scale = "numeric"
