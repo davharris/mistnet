@@ -12,11 +12,6 @@ test_that("logMeanExp works", {
     log(sum(exp(loglik) * w))
   )
   
-  expect_error(
-    logMeanExp(loglik, w * 2), 
-    "all.equal\\(1, sum\\(weights\\)\\) is not TRUE"
-  )
-  
   # Make sure it works when we'd get overflow
   loglik = rep(1000, 1000)
   
