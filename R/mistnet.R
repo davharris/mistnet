@@ -24,7 +24,7 @@
 #' @seealso \code{\link{network}}
 #' @include prior.R
 #' @include nonlinearity.R
-#' @importFrom assertthat assert_that
+#' @import assertthat
 #' @examples
 #' # 107 rows of fake data
 #' x = matrix(rnorm(1819), ncol = 17, nrow = 107) 
