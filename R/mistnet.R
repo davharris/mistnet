@@ -37,17 +37,17 @@
 #'     defineLayer(
 #'       nonlinearity = rectify.nonlinearity(), 
 #'       size = 30, 
-#'       prior = gaussian.prior(0, 0.01)
+#'       prior = gaussian.prior(mean = 0, var = 0.01)
 #'     ),
 #'     defineLayer(
 #'       nonlinearity = rectify.nonlinearity(), 
 #'       size = 12, 
-#'       prior = gaussian.prior(0, 0.01)
+#'       prior = gaussian.prior(mean = 0, var = 0.01)
 #'     ),
 #'     defineLayer(
 #'       nonlinearity = sigmoid.nonlinearity(), 
 #'       size = ncol(y), 
-#'       prior = gaussian.prior(0, 0.01)
+#'       prior = gaussian.prior(mean = 0, var = 0.01)
 #'     )
 #'   ),
 #'   loss = bernoulliLoss(),
