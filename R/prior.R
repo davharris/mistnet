@@ -11,7 +11,7 @@ prior = setRefClass(
 
 # Annoyingly, var's class will be different if it's a scalar or a matrix...
 #  Set to "any" as a stopgap.
-#' @exportClass gaussian.prior
+#' @export
 gaussian.prior = setRefClass(
   Class = "gaussian.prior",
   fields = list(
@@ -42,7 +42,7 @@ gaussian.prior = setRefClass(
   )
 )
 
-#' @exportClass laplace.prior
+#' @export
 laplace.prior = setRefClass(
   Class = "laplace.prior",
   fields = list(
