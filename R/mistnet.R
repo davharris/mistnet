@@ -22,6 +22,8 @@
 #'  before terminating. Currently, it is best practice to leave this value at 0
 #'  and manually initialize the model's coefficients before beginning training
 #' @seealso \code{\link{network}}
+#' @include prior.R
+#' @include nonlinearity.R
 #' @examples
 #' # 107 rows of fake data
 #' x = matrix(rnorm(1819), ncol = 17, nrow = 107) 
