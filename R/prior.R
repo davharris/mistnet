@@ -31,7 +31,11 @@ gaussian.prior = setRefClass(
         mean <<- rowMeans(coefficients)
       }
       if(update.var){
-        var.vector = pmax(apply(coefficients, 1, var), min.var)
+        var.vector = apply(coefficients, 1, var)
+        var.vector = pmax(
+          (var.vector + mean(var.vector)) / 2,
+          min.var
+        )
         var <<- replicate(ncol(coefficients), var.vector)
       }
     }
