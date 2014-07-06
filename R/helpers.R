@@ -17,14 +17,14 @@ safe.as.integer = function(x){
 #' @param nrow the number of rows desired
 #' @param ncol the number of columns desired
 #' @export
-dropoutMask = function(nrow, ncol) {
-  out = sample.int(n = 2L, size = nrow * ncol, replace = TRUE) - 1L
-  dim(out) = c(nrow, ncol)
+dropoutMask = function(n.row, n.col) {
+  out = sample.int(n = 2L, size = n.row * n.col, replace = TRUE) - 1L
+  dim(out) = c(n.row, n.col)
   out
 }
 
-zeros = function(nrow, ncol){
-  matrix(0, nrow = nrow, ncol = ncol)
+zeros = function(n.row, n.col){
+  matrix(0, nrow = n.row, ncol = n.col)
 }
 
 weighImportance = function(importance.errors){

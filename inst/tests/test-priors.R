@@ -31,7 +31,7 @@ test_that("Laplace prior works", {
   scale = 1/pi
   rate = 1/scale
   
-  p = laplacePrior(location = location, scale = scale)
+  p = laplace.prior(location = location, scale = scale)
   
   # slope shouldn't depend on distance from the median / location
   slopes = p$getLogGrad(c(location + eps, location + 2 * eps))
