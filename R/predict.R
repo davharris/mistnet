@@ -15,13 +15,13 @@ predict.network = function(
     dim = c(nrow(newdata), dim(object$inputs)[2], n.importance.samples)
   )
   
-  cpy$n.minibatch = 0L
+  cpy$row.selector$n.minibatch = 0L
   cpy$selectMinibatch(1:nrow(newdata))
   
   for(i in 1:n.importance.samples){
     cpy$inputs[ , , i] = cbind(
-      cpy$x[cpy$minibatch.ids, ], 
-      cpy$sampler(nrow = cpy$n.minibatch)
+      cpy$x[cpy$row.selector$minibatch.ids, ], 
+      cpy$sampler(nrow = cpy$row.selector$n.minibatch)
     )
     cpy$feedForward(
       cpy$inputs[ , , i],

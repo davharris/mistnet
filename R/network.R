@@ -14,8 +14,6 @@
 #'  \code{x} and \code{y}
 #' @field n.minibacth an \code{integer} specifying the number of rows to include
 #'  in each stochastic estimate of the likelihood gradient.
-#' @field minibatch.ids an \code{integer} vector specifying which rows of the 
-#'  data set to include in the next estimate of the likelihood gradient
 #' @field n.importance.samples an \code{integer}
 #' @field importance.weights a numeric matrix containing the weights associated
 #'  with the most recent round of importance sampling.  (one row per observation,
@@ -32,7 +30,7 @@
 #' @export network
 #' @exportClass network
 #' @seealso \code{\link{mistnet}}, \code{\link{layer}}
-#' @include minibatch.selector.R
+#' @include row.selector.R
 network = setRefClass(
   Class = "network",
   fields = list(
@@ -42,9 +40,7 @@ network = setRefClass(
     layers = "list",
     n.layers = "integer",
     dataset.size = "integer",
-    minibatch.selector = "minibatch.selector",
-    n.minibatch = "integer",
-    minibatch.ids = "integer",
+    row.selector = "row.selector",
     n.importance.samples = "integer",
     importance.weights = "matrix",
     loss = "function",
@@ -82,28 +78,25 @@ network = setRefClass(
     
     selectMinibatch = function(row.nums){
       if(missing(row.nums)){
-        stopifnot(n.minibatch > 0)
-        start = (completed.iterations * n.minibatch) %% nrow(x)
-        minibatch.ids <<- 1L + (seq(start, start + n.minibatch - 1) %% nrow(x))
+        row.selector$select()
       }else{
-        if(length(row.nums) != n.minibatch){
-          n.minibatch <<- length(row.nums)
-          for(i in 1:n.layers){
-            layers[[i]]$resetState(
-              n.minibatch = n.minibatch, 
-              n.importance.samples
-            )
-          }
+        n = length(row.nums)
+        row.selector$n.minibatch <<- n
+        for(i in 1:n.layers){
+          layers[[i]]$resetState(
+            n.minibatch = row.selector$n.minibatch, 
+            n.importance.samples
+          )
         }
-        minibatch.ids <<- row.nums
+        row.selector$minibatch.ids <<- row.nums
       }
     },
     
     estimateGradient = function(){
       for(i in 1:n.importance.samples){
         inputs[,,i] <<- cbind(
-          x[minibatch.ids, ], 
-          sampler(nrow = n.minibatch)
+          x[row.selector$minibatch.ids, ], 
+          sampler(nrow = row.selector$n.minibatch)
         )
         feedForward(
           inputs[,,i],
@@ -118,7 +111,7 @@ network = setRefClass(
       for(i in 1:n.layers){
         layers[[i]]$updateCoefficients(
           dataset.size = dataset.size,
-          n.minibatch = n.minibatch
+          n.minibatch = row.selector$n.minibatch
         )
         layers[[i]]$nonlinearity$update(
           observed = y[minibatch.ids, ],
@@ -146,7 +139,7 @@ network = setRefClass(
       # Final layer gets its error from the loss gradient
       layers[[n.layers]]$backwardPass(
         lossGradient(
-          y = y[minibatch.ids, ], 
+          y = y[row.selector$minibatch.ids, ], 
           yhat = layers[[n.layers]]$outputs[ , , sample.num]
         ),
         sample.num
@@ -179,11 +172,11 @@ network = setRefClass(
     },
     
     findImportanceWeights = function(){
-      importance.errors = zeros(n.minibatch, n.importance.samples)
+      importance.errors = zeros(row.selector$n.minibatch, n.importance.samples)
       for(i in 1:n.importance.samples){
         importance.errors[ , i] = rowSums(
           loss(
-            y = y[minibatch.ids, ], 
+            y = y[row.selector$minibatch.ids, ], 
             yhat = layers[[n.layers]]$outputs[ , , i]
           )
         )

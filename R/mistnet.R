@@ -82,7 +82,8 @@ mistnet = function(
   sampler = gaussianSampler(ncol = 10, sd = 1),
   n.importance.samples = 30,
   n.minibatch = 10,
-  training.iterations = 0
+  training.iterations = 0,
+  shuffle = TRUE
 ){  
   assert_that(is.matrix(x))
   assert_that(is.matrix(y))
@@ -90,10 +91,10 @@ mistnet = function(
   dataset.size = nrow(x)
   
   assert_that(n.minibatch > 0)
-  assert_that(n.minibatch < dataset.size)
+  assert_that(n.minibatch <= dataset.size)
   
   n.layers = length(layer.definitions)
-    
+  
   # Input size followed by all the output sizes, in order
   network.dims = c(
     ncol(x) + with(environment(sampler), ncol), 
@@ -123,7 +124,19 @@ mistnet = function(
     ),
     n.layers = n.layers,
     dataset.size = dataset.size,
-    n.minibatch = safe.as.integer(n.minibatch),
+    row.selector = row.selector(
+      rows = if(shuffle){
+        sample.int(dataset.size)
+      }else{
+        seq_len(dataset.size)
+      }, 
+      shuffle = shuffle,
+      dataset.size = safe.as.integer(dataset.size),
+      n.minibatch = safe.as.integer(n.minibatch),
+      completed.epochs = 0L,
+      minibatch.ids = rep(0L, n.minibatch),
+      pointer = 1L
+    ),
     n.importance.samples = safe.as.integer(n.importance.samples),
     loss = loss$loss,
     lossGradient = loss$grad,
@@ -134,7 +147,7 @@ mistnet = function(
   net$inputs = array(
     0, 
     c(
-      net$n.minibatch, 
+      net$row.selector$n.minibatch, 
       ncol(net$x) + with(environment(net$sampler), ncol), 
       net$n.importance.samples
     )

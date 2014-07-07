@@ -29,9 +29,6 @@ column per response variable.}
 \item{\code{n.minibacth}}{an \code{integer} specifying the number of rows to include
 in each stochastic estimate of the likelihood gradient.}
 
-\item{\code{minibatch.ids}}{an \code{integer} vector specifying which rows of the
-data set to include in the next estimate of the likelihood gradient}
-
 \item{\code{n.importance.samples}}{an \code{integer}}
 
 \item{\code{importance.weights}}{a numeric matrix containing the weights associated

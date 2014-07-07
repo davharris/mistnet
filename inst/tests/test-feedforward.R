@@ -1,10 +1,12 @@
 context("Feedforward")
 
 test_that("Single-layer feedforward works", {
+  n.minibatch = 5L
+  
   l = createLayer(
     n.inputs = 4L,
     n.outputs = 7L,
-    n.minibatch = 5L,
+    n.minibatch = n.minibatch,
     n.importance.samples = 3L,
     nonlinearity = sigmoid.nonlinearity(),
     prior = gaussian.prior(mean = 0, var = 1),
@@ -39,6 +41,8 @@ test_that("Single-layer feedforward works", {
 
 
 test_that("Multi-layer feedforward works", {
+  n.minibatch = 5L
+  
   y = matrix(rnorm(100), nrow = 20, ncol = 5)
   net = mistnet(
     x = matrix(rnorm(100), nrow = 20, ncol = 5),
@@ -61,17 +65,16 @@ test_that("Multi-layer feedforward works", {
       )
     ),
     loss = bernoulliLoss(),
-    n.minibatch = 4L,
     n.importance.samples = 27L,
     sampler = gaussianSampler(ncol = 3L),
     training.iterations = 0L
   )
   
-  ranefs = net$sampler(nrow = net$n.minibatch)
+  ranefs = net$sampler(nrow = net$row.selector$n.minibatch)
   net$selectMinibatch()
   net$feedForward(
     cbind(
-      net$x[net$minibatch.ids, ], 
+      net$x[net$row.selector$minibatch.ids, ], 
       ranefs
     ),
     2
@@ -79,7 +82,7 @@ test_that("Multi-layer feedforward works", {
   
   expect_equal(
     net$layers[[1]]$nonlinearity$f(
-      (cbind(ranefs, net$x[net$minibatch.ids, ]) %*% net$layers[[1]]$coefficients) %plus% net$layers[[1]]$biases
+      (cbind(ranefs, net$x[net$row.selector$minibatch.ids, ]) %*% net$layers[[1]]$coefficients) %plus% net$layers[[1]]$biases
     ),
     net$layers[[1]]$outputs[,,2]
   )

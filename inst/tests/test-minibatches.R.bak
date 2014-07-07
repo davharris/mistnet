@@ -28,26 +28,26 @@ test_that("minibatches work", {
     net$fit(1)
     # All elements should be selected equally often, +/- 1
     expect_true(max(tally) <= (min(tally) + 1))
-    for(j in net$row.selector$minibatch.ids){
+    for(j in net$minibatch.selector$minibatch.ids){
       tally[j] = tally[j] + 1
     }
   }
   
   # Should go through the correct number of epochs
   expect_equal(
-    (i * net$row.selector$n.minibatch) %/% nrow(x),
+    (i * net$minibatch.selector$n.minibatch) %/% nrow(x),
     min(tally)
   )
   
   # Number of epochs should be counted correctly
   expect_equal(
-    net$row.selector$completed.epochs,
+    net$minibatch.selector$completed.epochs,
     min(tally)
   )
   
   expect_false(
     all(
-      net$row.selector$minibatch.ids == seq_len(net$row.selector$n.minibatch)
+      net$minibatch.selector$minibatch.ids == seq_len(net$minibatch.selector$n.minibatch)
     )
   )
   
