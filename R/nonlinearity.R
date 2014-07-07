@@ -53,6 +53,9 @@ nonlinearity = setRefClass(
     },
     update = function(...){
       # Do nothing
+    },
+    initializeFinalBiases = function(y){
+      rep(0, ncol(y))
     }
   )
 )
@@ -65,7 +68,10 @@ linear.nonlinearity = setRefClass(
   contains = "nonlinearity",
   methods = list(
     f = linear,
-    grad = linearGrad
+    grad = linearGrad,
+    initializeFinalBiases = function(y){
+      colMeans(y)
+    }
   )
 )
 
@@ -77,7 +83,12 @@ sigmoid.nonlinearity = setRefClass(
   contains = "nonlinearity",
   methods = list(
     f = sigmoid,
-    grad = sigmoidGrad
+    grad = sigmoidGrad,
+    initializeFinalBiases = function(y){
+      out = qlogis(colMeans(y))
+      assert_that(all(is.finite(out)))
+      out
+    }
   )
 )
 
@@ -89,7 +100,10 @@ rectify.nonlinearity = setRefClass(
   contains = "nonlinearity",
   methods = list(
     f = rectify,
-    grad = rectifyGrad
+    grad = rectifyGrad,
+    initializeFinalBiases = function(y){
+      rep(0, ncol(y))
+    }
   )
 )
 
@@ -107,7 +121,12 @@ exp.nonlinearity = setRefClass(
       # penalty for this wrapper.
       exp(x)
     },
-    grad = expGrad
+    grad = expGrad,
+    initializeFinalBiases = function(y){
+      out = log(colMeans(y))
+      assert_that(all(is.finite(out)))
+      out
+    }
   )
 )
 
@@ -125,7 +144,7 @@ mf_mrf.nonlinearity = setRefClass(
     l1.decay = "numeric",
     updater = "updater"
   ),
-  contains = "nonlinearity",
+  contains = "sigmoid.nonlinearity",
   methods = list(
     f = function(x){
       mrf_meanfield(
@@ -136,7 +155,6 @@ mf_mrf.nonlinearity = setRefClass(
         tol = tol
       )
     },
-    grad = sigmoidGrad,
     update = function(
       observed, 
       predicted, 

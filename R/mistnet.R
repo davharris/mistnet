@@ -160,7 +160,11 @@ mistnet = function(
   
   # Coefficients can't all start at zero! Perhaps sample coefficients from their
   # prior?
-  # Final layer's biases shouldn't be zero either!
+  
+  message("initializing biases for the final layer automatically")
+  final.biases = net$layers[[net$n.layers]]$nonlinearity$initializeFinalBiases(y)
+  net$layers[[net$n.layers]]$biases[] = final.biases
+  
   
   net$fit(training.iterations)
   

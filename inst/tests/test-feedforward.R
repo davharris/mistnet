@@ -43,7 +43,7 @@ test_that("Single-layer feedforward works", {
 test_that("Multi-layer feedforward works", {
   n.minibatch = 5L
   
-  y = matrix(rnorm(100), nrow = 20, ncol = 5)
+  y = matrix(plogis(rnorm(100)), nrow = 20, ncol = 5)
   net = mistnet(
     x = matrix(rnorm(100), nrow = 20, ncol = 5),
     y = y,

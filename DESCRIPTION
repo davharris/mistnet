@@ -24,7 +24,6 @@ Collate:
     'layer-creation.R'
     'layer.R'
     'loss.R'
-    'minibatch.selector.R'
     'mistnet.R'
     'row.selector.R'
     'network.R'
