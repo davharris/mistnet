@@ -54,6 +54,15 @@ for(layer in net$layers){
   layer$bias.updater$learning.rate = layer$bias.updater$learning.rate * 10
 }
 
+# Set a bunch of the first-layer coefficients using the MARS initialization
+init = initializeMars(
+  x = env[in.train, ],
+  y = route.presence.absence[in.train, ]
+)
+net$layers[[1]]$biases[1:init$n] = init$biases
+net$layers[[1]]$coefficients[1:ncol(env), 1:init$n] = init$coefficients
+
+
 
 start.params = net$layers[[1]]$coefficients
 
