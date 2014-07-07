@@ -19,6 +19,7 @@ Collate:
     'RcppExports.R'
     'evaluation.R'
     'helpers.R'
+    'initializeMars.R'
     'prior.R'
     'updater.R'
     'nonlinearity.R'
