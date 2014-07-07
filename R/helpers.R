@@ -14,15 +14,25 @@ safe.as.integer = function(x){
 #' with probabilty 0.5.
 #' Code is based on the "josh" function from 
 #' https://gist.github.com/sckott/3639688
-#' @param nrow the number of rows desired
-#' @param ncol the number of columns desired
+#' @param n.row the number of rows desired
+#' @param n.col the number of columns desired
 #' @export
-dropoutMask = function(n.row, n.col) {
-  out = sample.int(n = 2L, size = n.row * n.col, replace = TRUE) - 1L
+dropoutMask = function(n.row, n.col, prob = 0.5) {
+  out = - 1L +  sample.int(n = 2L, 
+                           size = n.row * n.col, 
+                           replace = TRUE, 
+                           prob = c(1-prob, prob)
+  )
   dim(out) = c(n.row, n.col)
   out
 }
 
+
+#' Produce a matrix of zeros
+#' 
+#' @param n.row the number of rows desired
+#' @param n.col the number of columns desired
+#' @export
 zeros = function(n.row, n.col){
   matrix(0, nrow = n.row, ncol = n.col)
 }

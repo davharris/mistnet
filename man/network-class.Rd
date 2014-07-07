@@ -14,9 +14,9 @@ __
 
 \describe{
 \item{\code{x}}{a numeric matrix of predictor variables.  One row
-per example, one column per predictive feature.}
+per observation, one column per predictive feature.}
 
-\item{\code{y}}{a \code{matrix} of responses to \code{x}.  One row per example, one
+\item{\code{y}}{a \code{matrix} of responses to \code{x}.  One row per observation, one
 column per response variable.}
 
 \item{\code{layers}}{a \code{list} of \code{\link{layer}} objects}
@@ -35,7 +35,7 @@ data set to include in the next estimate of the likelihood gradient}
 \item{\code{n.importance.samples}}{an \code{integer}}
 
 \item{\code{importance.weights}}{a numeric matrix containing the weights associated
-with the most recent round of importance sampling.  (one row per example,
+with the most recent round of importance sampling.  (one row per observation,
 one column per Monte Carlo sample).}
 
 \item{\code{loss}}{the loss function being optimized (not a \code{\link{loss}} object!)}

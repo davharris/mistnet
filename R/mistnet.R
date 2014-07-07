@@ -83,11 +83,14 @@ mistnet = function(
   n.importance.samples = 30,
   n.minibatch = 10,
   training.iterations = 0
-){
+){  
   assert_that(is.matrix(x))
   assert_that(is.matrix(y))
   assert_that(nrow(x) == nrow(y))
   dataset.size = nrow(x)
+  
+  assert_that(n.minibatch > 0)
+  assert_that(n.minibatch < dataset.size)
   
   n.layers = length(layer.definitions)
     

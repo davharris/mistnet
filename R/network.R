@@ -5,8 +5,8 @@
 #' @details __
 #'
 #' @field x a numeric matrix of predictor variables.  One row
-#'  per example, one column per predictive feature.
-#' @field y a \code{matrix} of responses to \code{x}.  One row per example, one
+#'  per observation, one column per predictive feature.
+#' @field y a \code{matrix} of responses to \code{x}.  One row per observation, one
 #'  column per response variable.
 #' @field layers a \code{list} of \code{\link{layer}} objects
 #' @field n.layers an integer corresponding to \code{length(layers)}
@@ -18,7 +18,7 @@
 #'  data set to include in the next estimate of the likelihood gradient
 #' @field n.importance.samples an \code{integer}
 #' @field importance.weights a numeric matrix containing the weights associated
-#'  with the most recent round of importance sampling.  (one row per example,
+#'  with the most recent round of importance sampling.  (one row per observation,
 #'  one column per Monte Carlo sample).
 #' @field loss the loss function being optimized (not a \code{\link{loss}} object!)
 #' @field lossGradient the gradient of the loss function being optimized
@@ -32,6 +32,7 @@
 #' @export network
 #' @exportClass network
 #' @seealso \code{\link{mistnet}}, \code{\link{layer}}
+#' @include minibatch.selector.R
 network = setRefClass(
   Class = "network",
   fields = list(
@@ -41,6 +42,7 @@ network = setRefClass(
     layers = "list",
     n.layers = "integer",
     dataset.size = "integer",
+    minibatch.selector = "minibatch.selector",
     n.minibatch = "integer",
     minibatch.ids = "integer",
     n.importance.samples = "integer",

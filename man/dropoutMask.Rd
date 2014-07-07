@@ -3,12 +3,12 @@
 \alias{dropoutMask}
 \title{Produce a dropout mask}
 \usage{
-dropoutMask(nrow, ncol)
+dropoutMask(n.row, n.col, prob = 0.5)
 }
 \arguments{
-\item{nrow}{the number of rows desired}
+\item{n.row}{the number of rows desired}
 
-\item{ncol}{the number of columns desired}
+\item{n.col}{the number of columns desired}
 }
 \description{
 Produces a binary matrix, with each element independently sampled as 1 or 0
