@@ -162,4 +162,4 @@ net = fit(
   which.max(logliks[,2])
 )
 
-save(net, fil = "mistnet.model")
+save(net, file = "mistnet.model")
