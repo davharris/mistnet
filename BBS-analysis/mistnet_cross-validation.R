@@ -20,6 +20,9 @@ rlunif = function(n, min, max){
   floor(exp(runif(n, log(min), log(max + 1))))
 }
 
+
+# Choose hyperparams ------------------------------------------------------
+
 hyperparams = data.frame(
   n.minibatch = rlunif(n.iterations, 10, 100),
   sampler.size = rlunif(n.iterations, 5, 20),
@@ -29,6 +32,9 @@ hyperparams = data.frame(
   learning.rate = 0.1,
   fit.seconds = 900
 )
+
+
+# Fitting code ------------------------------------------------------------
 
 fit = function(x, y, hyperparams, i){
   net = mistnet(
@@ -95,10 +101,9 @@ fit = function(x, y, hyperparams, i){
 }
 
 
+# Cross-validation --------------------------------------------------------
 
 out = list()
-
-cv.seconds = 2
 
 for(i in 1:n.iterations){
   cat(paste0("Starting iteration ", i, "\n"))
@@ -132,6 +137,9 @@ for(i in 1:n.iterations){
     
   } # End fold
 } # End iteration
+
+
+# Save CV results ---------------------------------------------------------
 
 mistnet.results = merge(
   x = as.data.frame(do.call(rbind, out)),
