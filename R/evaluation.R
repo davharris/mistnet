@@ -17,7 +17,14 @@ logMeanExp = function(x, weights){
 # Evaluate a network object's predictions on newdata against observed y.
 # Rather than storing a huge number of samples in memory, we can do this in
 # batches of a specified size.
-importanceSamplingEvaluation = function(object, newdata, y, batches, batch.size){
+importanceSamplingEvaluation = function(
+  object, 
+  newdata, 
+  y, 
+  batches, 
+  batch.size,
+  verbose = FALSE
+){
   logliks = replicate(
     batches,{
       predictions = predict(
@@ -26,13 +33,17 @@ importanceSamplingEvaluation = function(object, newdata, y, batches, batch.size)
         n.importance.samples = safe.as.integer(batch.size)
       )
       
-      apply(
+      loglik = apply(
         predictions, 
         3, 
         function(x){
           -rowSums(object$loss(y = y, yhat = x))
         }
       )
+      
+      cat(".")
+      
+      loglik
     },
     simplify = FALSE
   )

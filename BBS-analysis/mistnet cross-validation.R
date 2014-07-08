@@ -1,49 +1,123 @@
-source("inst/BBS evaluation/auxiliary-mistnet-methods.R")
+# devtools::install_github("davharris/mistnet")
+
+library(mistnet)
+set.seed(1)
+
+load("birds.Rdata")
+load("fold.ids.Rdata")
 
 env = as.data.frame(x[ , grep("^bio", colnames(x))])
 
 # Number of seconds to fit the model during CV before stopping to evaluate fit
-cv.seconds = 1000
+cv.seconds = 900 # 15 minutes
 
 # How many samples to generate when evaluating CV fit
-n.prediction.samples = 500L
+n.prediction.samples = 250L
 
 # Number of times to do fit & evaluate loop. Total training time is thus up to
-# cv.seconds * n.iterations
-n.iterations = 1L
+# cv.seconds * n.iterations * n.folds, plus prediction time.
+n.iterations = 15L
+
+# Random log-uniform samples between min and max
+rlunif = function(n, min, max){
+  floor(exp(runif(n, log(min), log(max + 1))))
+}
+
+n.minibatch = rlunif(n.iterations, 10, 100)
+sampler.size = rlunif(n.iterations, 5, 20)
+n.importance.samples = rlunif(n.iterations, 20, 50)
+n.layer1 = rlunif(n.iterations, 20, 50)
+n.layer2 = rlunif(n.iterations, 5, 20)
+learning.rate = 0.1
 
 
-output.df = data.frame(
-  fold.id = integer(),
-  seconds = numeric(),
-  loglik = numeric()
-)
 
-cat("Fold number: ")
+out = list()
 
-i = 0
-for(fold.id in 1:max(fold.ids)){
-  in.fold = fold.ids != fold.id
-  net = buildNet(
-    x = scale(env)[in.train, ][in.fold, ],
-    y = route.presence.absence[in.train, ][in.fold, ]
-  )
-  
-  for(iteration in 1:n.iterations){
+cv.seconds = 2
+
+for(i in 1:n.iterations){
+  cat(paste0("Starting iteration ", i, "\n"))
+  for(fold.id in 1:max(fold.ids)){
     start.time = Sys.time()
+    cat(paste0(" Starting fold ", fold.id, "\n  "))
+    in.fold = fold.ids != fold.id
+    net = mistnet(
+      x = scale(env)[in.train, ][in.fold, ],
+      y = route.presence.absence[in.train, ][in.fold, ],
+      layer.definitions = list(
+        defineLayer(
+          nonlinearity = rectify.nonlinearity(),
+          size = n.layer1[i],
+          prior = gaussian.prior(mean = 0, var = 1)
+        ),
+        defineLayer(
+          nonlinearity = linear.nonlinearity(),
+          size = n.layer2[i],
+          prior = gaussian.prior(mean = 0, var = 1)
+        ),
+        defineLayer(
+          nonlinearity = sigmoid.nonlinearity(),
+          size = ncol(route.presence.absence),
+          prior = gaussian.prior(mean = 0, var = 1)
+        )
+      ),
+      loss = bernoulliRegLoss(a = 1 + 1E-6),
+      updater = adagrad.updater(learning.rate = learning.rate),
+      sampler = gaussianSampler(ncol = sampler.size[i], sd = 1),
+      n.importance.samples = n.importance.samples[i],
+      n.minibatch = n.minibatch[i],
+      training.iterations = 0
+    )
+    # Currently, mistnet does not initialize the coefficients automatically.
+    # This gets it started with nonzero values.
+    for(layer in net$layers){
+      layer$coefficients[ , ] = rnorm(length(layer$coefficients), sd = .1)
+    }
+    net$layers[[1]]$biases[] = 1 # First layer biases equal 1
     while(
-      as.double(Sys.time() - start.time, units = "secs") < cv.seconds
+      difftime(Sys.time(), start.time, units = "secs") < cv.seconds
     ){
       if(is.nan(net$layers[[3]]$outputs[[1]])){
         stop("NaNs detected :-(")
       }
-      net$update_all(10L)
-    }
+      net$fit(1)
+      cat(".")
+      # Update prior variance
+      for(layer in net$layers){
+        layer$prior$update(
+          layer$coefficients, 
+          update.mean = FALSE, 
+          update.var = TRUE,
+          min.var = .001
+        )
+      }
+      # Update mean for final layer
+      net$layers[[3]]$prior$update(
+        layer$coefficients, 
+        update.mean = TRUE, 
+        update.var = FALSE,
+        min.var = .001
+      )
+    } # End while
     
-    i = i + 1
-    output.df[i, ] = c(fold.id, iteration * cv.seconds, cv.evaluate())
-  }
-  cat(fold.id)
-}
-
-rm(net)
+    cat("\n evaluating")
+    
+    loglik = importanceSamplingEvaluation(
+      net, 
+      newdata = scale(env)[in.train, ][!in.fold, ],
+      y = route.presence.absence[in.train, ][!in.fold, ],
+      batches = 10L,
+      batch.size = n.prediction.samples / 10L,
+      verbose = TRUE
+    )
+    cat("\n")
+    out[[length(out) + 1]] = c(
+      iteration = i, 
+      fold = fold.id, 
+      seconds = cv.seconds,
+      loglik = mean(loglik)
+    )
+        
+  } # End fold
+} # End iteration
