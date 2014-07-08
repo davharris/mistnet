@@ -30,7 +30,7 @@ hyperparams = data.frame(
   n.layer1 = rlunif(n.iterations, 20, 50),
   n.layer2 = rlunif(n.iterations, 5, 20),
   learning.rate = 0.1,
-  fit.seconds = 12 * 60
+  fit.seconds = 18 * 60
 )
 
 
@@ -62,21 +62,15 @@ fit = function(x, y, hyperparams, i){
     sampler = gaussian.sampler(ncol = hyperparams$sampler.size[i], sd = 1),
     n.importance.samples = hyperparams$n.importance.samples[i],
     n.minibatch = hyperparams$n.minibatch[i],
-    training.iterations = 0
+    training.iterations = 0,
+    initialize.biases = TRUE,
+    initialize.coefficients = TRUE
   )
-  # Currently, mistnet does not initialize the coefficients automatically.
-  # This gets it started with nonzero values.
-  for(layer in net$layers){
-    layer$coefficients[ , ] = rnorm(length(layer$coefficients), sd = .1)
-  }
   net$layers[[1]]$biases[] = 1 # First layer biases equal 1
   start.time = Sys.time()
   while(
     difftime(Sys.time(), start.time, units = "secs") < hyperparams$fit.seconds[i]
   ){
-    if(is.nan(net$layers[[3]]$outputs[[1]])){
-      stop("NaNs detected :-(")
-    }
     net$fit(10)
     cat(".")
     # Update prior variance
