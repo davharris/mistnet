@@ -41,7 +41,7 @@ importanceSamplingEvaluation = function(
         }
       )
       
-      cat(".")
+      if(verbose){cat(".")}
       
       loglik
     },
