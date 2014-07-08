@@ -84,16 +84,16 @@ fit = function(x, y, hyperparams, i){
       layer$prior$update(
         layer$coefficients, 
         update.mean = FALSE, 
-        update.var = TRUE,
-        min.var = .001
+        update.sd = TRUE,
+        min.sd = .01
       )
     }
     # Update mean for final layer
     net$layers[[3]]$prior$update(
       layer$coefficients, 
       update.mean = TRUE, 
-      update.var = FALSE,
-      min.var = .001
+      update.sd = FALSE,
+      min.sd = .01
     )
   } # End while
   
