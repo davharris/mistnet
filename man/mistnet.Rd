@@ -6,8 +6,7 @@
 mistnet(x, y, layer.definitions, loss, updater = adagrad.updater(learning.rate
   = 0.01), sampler = gaussian.sampler(ncol = 10L, sd = 1),
   n.importance.samples = 30, n.minibatch = 10, training.iterations = 0,
-  shuffle = TRUE, initialize.biases = FALSE,
-  initialize.coefficients = FALSE)
+  shuffle = TRUE, initialize.biases = FALSE, initialize.weights = FALSE)
 }
 \arguments{
 \item{x}{a \code{numeric} \code{matrix} of predictor variables.  One row
@@ -36,7 +35,7 @@ in each stochastic estimate of the likelihood gradient.}
 
 \item{training.iterations}{an \code{integer} number of minibatches to process
 before terminating. Currently, it is best practice to leave this value at 0
-and manually initialize the model's coefficients before beginning training}
+and manually initialize the model's weights before beginning training}
 }
 \description{
 This function creates a \code{network} object for fitting a mistnet model.
@@ -75,10 +74,10 @@ net = mistnet(
   training.iterations = 0
 )
 
-# Currently, mistnet does not initialize the coefficients automatically.
+# Currently, mistnet does not initialize the weights automatically.
 # This gets it started with nonzero values.
 for(layer in net$layers){
-  layer$coefficients[ , ] = rnorm(length(layer$coefficients), sd = .01)
+  layer$weights[ , ] = rnorm(length(layer$weights), sd = .01)
 }
 
 # Fit the model

@@ -15,7 +15,7 @@ __
 \describe{
 \item{\code{coef.dim}}{a length-two integer vector}
 
-\item{\code{coefficients}}{a matrix of real numbers}
+\item{\code{weights}}{a matrix of real numbers}
 
 \item{\code{biases}}{a numeric vector containing the intercept for each node}
 
@@ -50,7 +50,7 @@ weights and gradients from backpropagation}
 \item{\code{resetState(n.minibatch, n.importance.samples)}}{Reset inputs, outputs, and error.grads to NA;
 alter the minibatch size and number of importance samples if desired}
 
-\item{\code{updateCoefficients(dataset.size, n.minibatch)}}{Calculate coef.delta and add it to coefficients. Update biases}
+\item{\code{updateCoefficients(dataset.size, n.minibatch)}}{Calculate coef.delta and add it to weights. Update biases}
 }}
 \seealso{
 \code{\link{network}}
