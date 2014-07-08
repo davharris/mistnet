@@ -44,17 +44,17 @@ fit = function(x, y, hyperparams, i){
       defineLayer(
         nonlinearity = rectify.nonlinearity(),
         size = hyperparams$n.layer1[i],
-        prior = gaussian.prior(mean = 0, var = 1)
+        prior = gaussian.prior(mean = 0, sd = .1)
       ),
       defineLayer(
         nonlinearity = linear.nonlinearity(),
         size = hyperparams$n.layer2[i],
-        prior = gaussian.prior(mean = 0, var = 1)
+        prior = gaussian.prior(mean = 0, sd = .1)
       ),
       defineLayer(
         nonlinearity = sigmoid.nonlinearity(),
         size = ncol(y),
-        prior = gaussian.prior(mean = 0, var = 1)
+        prior = gaussian.prior(mean = 0, sd = .1)
       )
     ),
     loss = bernoulliRegLoss(a = 1 + 1E-6),
