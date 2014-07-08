@@ -8,9 +8,6 @@ load("fold.ids.Rdata")
 
 env = as.data.frame(x[ , grep("^bio", colnames(x))])
 
-# Number of seconds to fit the model during CV before stopping to evaluate fit
-cv.seconds = 900 # 15 minutes
-
 # How many samples to generate when evaluating CV fit
 n.prediction.samples = 250L
 
@@ -23,12 +20,78 @@ rlunif = function(n, min, max){
   floor(exp(runif(n, log(min), log(max + 1))))
 }
 
-n.minibatch = rlunif(n.iterations, 10, 100)
-sampler.size = rlunif(n.iterations, 5, 20)
-n.importance.samples = rlunif(n.iterations, 20, 50)
-n.layer1 = rlunif(n.iterations, 20, 50)
-n.layer2 = rlunif(n.iterations, 5, 20)
-learning.rate = 0.1
+hyperparams = data.frame(
+  n.minibatch = rlunif(n.iterations, 10, 100),
+  sampler.size = rlunif(n.iterations, 5, 20),
+  n.importance.samples = rlunif(n.iterations, 20, 50),
+  n.layer1 = rlunif(n.iterations, 20, 50),
+  n.layer2 = rlunif(n.iterations, 5, 20),
+  learning.rate = 0.1,
+  fit.seconds = 900
+)
+
+fit = function(x, y, hyperparams){
+  net = mistnet(
+    x = x,
+    y = y,
+    layer.definitions = list(
+      defineLayer(
+        nonlinearity = rectify.nonlinearity(),
+        size = hyperparams$n.layer1[i],
+        prior = gaussian.prior(mean = 0, var = 1)
+      ),
+      defineLayer(
+        nonlinearity = linear.nonlinearity(),
+        size = hyperparams$n.layer2[i],
+        prior = gaussian.prior(mean = 0, var = 1)
+      ),
+      defineLayer(
+        nonlinearity = sigmoid.nonlinearity(),
+        size = ncol(y),
+        prior = gaussian.prior(mean = 0, var = 1)
+      )
+    ),
+    loss = bernoulliRegLoss(a = 1 + 1E-6),
+    updater = adagrad.updater(learning.rate = hyperparams$learning.rate),
+    sampler = gaussianSampler(ncol = hyperparams$sampler.size[i], sd = 1),
+    n.importance.samples = hyperparams$n.importance.samples[i],
+    n.minibatch = hyperparams$n.minibatch[i],
+    training.iterations = 0
+  )
+  # Currently, mistnet does not initialize the coefficients automatically.
+  # This gets it started with nonzero values.
+  for(layer in net$layers){
+    layer$coefficients[ , ] = rnorm(length(layer$coefficients), sd = .1)
+  }
+  net$layers[[1]]$biases[] = 1 # First layer biases equal 1
+  while(
+    difftime(Sys.time(), start.time, units = "secs") < hyperparams$fit.seconds
+  ){
+    if(is.nan(net$layers[[3]]$outputs[[1]])){
+      stop("NaNs detected :-(")
+    }
+    net$fit(100)
+    cat(".")
+    # Update prior variance
+    for(layer in net$layers){
+      layer$prior$update(
+        layer$coefficients, 
+        update.mean = FALSE, 
+        update.var = TRUE,
+        min.var = .001
+      )
+    }
+    # Update mean for final layer
+    net$layers[[3]]$prior$update(
+      layer$coefficients, 
+      update.mean = TRUE, 
+      update.var = FALSE,
+      min.var = .001
+    )
+  } # End while
+  
+  net
+}
 
 
 
@@ -42,64 +105,11 @@ for(i in 1:n.iterations){
     start.time = Sys.time()
     cat(paste0(" Starting fold ", fold.id, "\n  "))
     in.fold = fold.ids != fold.id
-    net = mistnet(
-      x = scale(env)[in.train, ][in.fold, ],
+    net = fit(
+      scale(env)[in.train, ][in.fold, ], 
       y = route.presence.absence[in.train, ][in.fold, ],
-      layer.definitions = list(
-        defineLayer(
-          nonlinearity = rectify.nonlinearity(),
-          size = n.layer1[i],
-          prior = gaussian.prior(mean = 0, var = 1)
-        ),
-        defineLayer(
-          nonlinearity = linear.nonlinearity(),
-          size = n.layer2[i],
-          prior = gaussian.prior(mean = 0, var = 1)
-        ),
-        defineLayer(
-          nonlinearity = sigmoid.nonlinearity(),
-          size = ncol(route.presence.absence),
-          prior = gaussian.prior(mean = 0, var = 1)
-        )
-      ),
-      loss = bernoulliRegLoss(a = 1 + 1E-6),
-      updater = adagrad.updater(learning.rate = learning.rate),
-      sampler = gaussianSampler(ncol = sampler.size[i], sd = 1),
-      n.importance.samples = n.importance.samples[i],
-      n.minibatch = n.minibatch[i],
-      training.iterations = 0
+      hyperparams = hyperparams
     )
-    # Currently, mistnet does not initialize the coefficients automatically.
-    # This gets it started with nonzero values.
-    for(layer in net$layers){
-      layer$coefficients[ , ] = rnorm(length(layer$coefficients), sd = .1)
-    }
-    net$layers[[1]]$biases[] = 1 # First layer biases equal 1
-    while(
-      difftime(Sys.time(), start.time, units = "secs") < cv.seconds
-    ){
-      if(is.nan(net$layers[[3]]$outputs[[1]])){
-        stop("NaNs detected :-(")
-      }
-      net$fit(1)
-      cat(".")
-      # Update prior variance
-      for(layer in net$layers){
-        layer$prior$update(
-          layer$coefficients, 
-          update.mean = FALSE, 
-          update.var = TRUE,
-          min.var = .001
-        )
-      }
-      # Update mean for final layer
-      net$layers[[3]]$prior$update(
-        layer$coefficients, 
-        update.mean = TRUE, 
-        update.var = FALSE,
-        min.var = .001
-      )
-    } # End while
     
     cat("\n evaluating")
     
@@ -118,6 +128,6 @@ for(i in 1:n.iterations){
       seconds = cv.seconds,
       loglik = mean(loglik)
     )
-        
+    
   } # End fold
 } # End iteration
