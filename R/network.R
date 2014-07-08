@@ -64,7 +64,7 @@ network = setRefClass(
       # Do I have an opinion about non-integer iteration counts?
       for(i in 1:iterations){
         selectMinibatch()
-        estimateGradient()
+        estimateGrad()
         updateCoefficients()
         completed.iterations <<- completed.iterations + 1L
         
@@ -93,7 +93,7 @@ network = setRefClass(
       }
     },
     
-    estimateGradient = function(){
+    estimateGrad = function(){
       for(i in 1:n.importance.samples){
         inputs[,,i] <<- cbind(
           x[row.selector$minibatch.ids, ], 
@@ -105,7 +105,7 @@ network = setRefClass(
         )
         backprop(i)
       }
-      averageSampleGradients()
+      averageSampleGrads()
     },
     
     updateCoefficients = function(){
@@ -161,10 +161,10 @@ network = setRefClass(
       }
     },
     
-    averageSampleGradients = function(){
+    averageSampleGrads = function(){
       findImportanceWeights()
       for(i in 1:n.layers){
-        layers[[i]]$combineSampleGradients(
+        layers[[i]]$combineSampleGrads(
           inputs = if(i==1){inputs}else{layers[[i - 1]]$outputs},
           weights = importance.weights,     
           n.importance.samples = n.importance.samples

@@ -42,7 +42,7 @@ node in response to each example, for each Monte Carlo sample}
 \describe{
 \item{\code{backwardPass(incoming.error.grad, sample.num)}}{Calculate error.grads for one sample}
 
-\item{\code{combineSampleGradients(inputs, weights, n.importance.samples)}}{update weighted.llik.grads and weighted.bias.grads based on importance 
+\item{\code{combineSampleGrads(inputs, weights, n.importance.samples)}}{update weighted.llik.grads and weighted.bias.grads based on importance 
 weights and gradients from backpropagation}
 
 \item{\code{forwardPass(input, sample.num)}}{Update inputs and outputs for one sample}

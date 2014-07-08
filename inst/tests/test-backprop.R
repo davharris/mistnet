@@ -50,12 +50,12 @@ test_that("3-layer backprop works", {
   net$selectMinibatch()
   set.seed(1)
   # feedforward, backprop, average sample gradients. Don't update.
-  net$estimateGradient() 
+  net$estimateGrad() 
   grad = net$layers[[1]]$weighted.llik.grads[1,1]
   
   net$layers[[1]]$coefficients[1, 1] = net$layers[[1]]$coefficients[1, 1] + eps
   set.seed(1)
-  net$estimateGradient()
+  net$estimateGrad()
   plus.loss = mean(
     rowSums(
       net$loss(
@@ -68,7 +68,7 @@ test_that("3-layer backprop works", {
   # 2*eps: once to undo the plus above, once to actually decrement
   net$layers[[1]]$coefficients[1, 1] = net$layers[[1]]$coefficients[1, 1] - 2 * eps
   set.seed(1)
-  net$estimateGradient()
+  net$estimateGrad()
   minus.loss = mean(
     rowSums(
       net$loss(

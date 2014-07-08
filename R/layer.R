@@ -78,7 +78,7 @@ layer = setRefClass(
       biases <<- biases + bias.updater$delta
     },
     
-    combineSampleGradients = function(inputs, weights, n.importance.samples){
+    combineSampleGrads = function(inputs, weights, n.importance.samples){
       "update weighted.llik.grads and weighted.bias.grads based on importance 
       weights and gradients from backpropagation"
       weighted.llik.grads <<- zeros(coef.dim[[1]], coef.dim[[2]])
