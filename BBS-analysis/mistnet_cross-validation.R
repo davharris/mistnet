@@ -131,7 +131,7 @@ for(i in 1:n.iterations){
     out[[length(out) + 1]] = c(
       iteration = i, 
       fold = fold.id, 
-      seconds = cv.seconds,
+      seconds = hyperparams$fit.seconds[i],
       loglik = mean(loglik)
     )
     
