@@ -30,7 +30,7 @@ hyperparams = data.frame(
   fit.seconds = 900
 )
 
-fit = function(x, y, hyperparams){
+fit = function(x, y, hyperparams, i){
   net = mistnet(
     x = x,
     y = y,
@@ -52,7 +52,7 @@ fit = function(x, y, hyperparams){
       )
     ),
     loss = bernoulliRegLoss(a = 1 + 1E-6),
-    updater = adagrad.updater(learning.rate = hyperparams$learning.rate),
+    updater = adagrad.updater(learning.rate = hyperparams$learning.rate[i]),
     sampler = gaussianSampler(ncol = hyperparams$sampler.size[i], sd = 1),
     n.importance.samples = hyperparams$n.importance.samples[i],
     n.minibatch = hyperparams$n.minibatch[i],
@@ -64,13 +64,14 @@ fit = function(x, y, hyperparams){
     layer$coefficients[ , ] = rnorm(length(layer$coefficients), sd = .1)
   }
   net$layers[[1]]$biases[] = 1 # First layer biases equal 1
+  start.time = Sys.time()
   while(
-    difftime(Sys.time(), start.time, units = "secs") < hyperparams$fit.seconds
+    difftime(Sys.time(), start.time, units = "secs") < hyperparams$fit.seconds[i]
   ){
     if(is.nan(net$layers[[3]]$outputs[[1]])){
       stop("NaNs detected :-(")
     }
-    net$fit(100)
+    net$fit(1)
     cat(".")
     # Update prior variance
     for(layer in net$layers){
@@ -102,13 +103,13 @@ cv.seconds = 2
 for(i in 1:n.iterations){
   cat(paste0("Starting iteration ", i, "\n"))
   for(fold.id in 1:max(fold.ids)){
-    start.time = Sys.time()
     cat(paste0(" Starting fold ", fold.id, "\n  "))
     in.fold = fold.ids != fold.id
     net = fit(
       scale(env)[in.train, ][in.fold, ], 
       y = route.presence.absence[in.train, ][in.fold, ],
-      hyperparams = hyperparams
+      hyperparams = hyperparams,
+      i = i
     )
     
     cat("\n evaluating")
@@ -131,3 +132,7 @@ for(i in 1:n.iterations){
     
   } # End fold
 } # End iteration
+
+mistnet.results = do.call(rbind, out)
+
+save(mistnet.results, file = "mistnet-results.Rdata")
