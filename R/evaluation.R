@@ -17,6 +17,7 @@ logMeanExp = function(x, weights){
 # Evaluate a network object's predictions on newdata against observed y.
 # Rather than storing a huge number of samples in memory, we can do this in
 # batches of a specified size.
+#' @export
 importanceSamplingEvaluation = function(
   object, 
   newdata, 

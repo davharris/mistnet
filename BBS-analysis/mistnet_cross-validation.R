@@ -9,11 +9,11 @@ load("fold.ids.Rdata")
 env = as.data.frame(x[ , grep("^bio", colnames(x))])
 
 # How many samples to generate when evaluating CV fit
-n.prediction.samples = 250L
+n.prediction.samples = 20L
 
 # Number of times to do fit & evaluate loop. Total training time is thus up to
 # cv.seconds * n.iterations * n.folds, plus prediction time.
-n.iterations = 12L
+n.iterations = 3L
 
 # Random log-uniform samples between min and max
 rlunif = function(n, min, max){
@@ -30,7 +30,7 @@ hyperparams = data.frame(
   n.layer1 = rlunif(n.iterations, 20, 50),
   n.layer2 = rlunif(n.iterations, 5, 20),
   learning.rate = 0.1,
-  fit.seconds = 12 * 60
+  fit.seconds = 2
 )
 
 
