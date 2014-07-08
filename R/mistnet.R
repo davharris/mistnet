@@ -83,7 +83,9 @@ mistnet = function(
   n.importance.samples = 30,
   n.minibatch = 10,
   training.iterations = 0,
-  shuffle = TRUE
+  shuffle = TRUE,
+  initialize.biases = FALSE,
+  initialize.coefficients = FALSE
 ){  
   assert_that(is.matrix(x))
   assert_that(is.matrix(y))
@@ -158,13 +160,15 @@ mistnet = function(
   colnames(net$layers[[net$n.layers]]$coefficients) = colnames(y)
   dimnames(net$layers[[net$n.layers]]$outputs) = list(NULL, colnames(y), NULL)
   
-  
-  # Coefficients can't all start at zero! Perhaps sample coefficients from their
-  # prior?
-  
-  message("initializing biases for the final layer automatically")
-  final.biases = net$layers[[net$n.layers]]$nonlinearity$initializeFinalBiases(y)
-  net$layers[[net$n.layers]]$biases[] = final.biases
+  if(initialize.biases){
+    final.biases = net$layers[[net$n.layers]]$nonlinearity$initializeFinalBiases(y)
+    net$layers[[net$n.layers]]$biases[] = final.biases
+  }
+  if(initialize.coefficients){
+    for(layer in net$layers){
+      layer$coefficients[] = layer$prior$sample(length(layer$coefficients))
+    }
+  }
   
   
   net$fit(training.iterations)

@@ -33,7 +33,9 @@ test_that("3-layer backprop works", {
     loss = bernoulliLoss(),
     n.minibatch = 13L,
     n.importance.samples = 1L,
-    training.iterations = 0L
+    training.iterations = 0L,
+    initialize.coefficients = FALSE,
+    initialize.biases = FALSE
   )
   
   net$fit(1)

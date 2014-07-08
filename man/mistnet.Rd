@@ -6,7 +6,8 @@
 mistnet(x, y, layer.definitions, loss, updater = adagrad.updater(learning.rate
   = 0.01), sampler = gaussian.sampler(ncol = 10L, sd = 1),
   n.importance.samples = 30, n.minibatch = 10, training.iterations = 0,
-  shuffle = TRUE)
+  shuffle = TRUE, initialize.biases = FALSE,
+  initialize.coefficients = FALSE)
 }
 \arguments{
 \item{x}{a \code{numeric} \code{matrix} of predictor variables.  One row
