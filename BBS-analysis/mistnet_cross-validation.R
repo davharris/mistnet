@@ -13,7 +13,7 @@ n.prediction.samples = 250L
 
 # Number of times to do fit & evaluate loop. Total training time is thus up to
 # cv.seconds * n.iterations * n.folds, plus prediction time.
-n.iterations = 15L
+n.iterations = 12L
 
 # Random log-uniform samples between min and max
 rlunif = function(n, min, max){
@@ -30,7 +30,7 @@ hyperparams = data.frame(
   n.layer1 = rlunif(n.iterations, 20, 50),
   n.layer2 = rlunif(n.iterations, 5, 20),
   learning.rate = 0.1,
-  fit.seconds = 900
+  fit.seconds = 12 * 60
 )
 
 
@@ -149,3 +149,17 @@ mistnet.results = merge(
 save(mistnet.results, file = "mistnet-results.Rdata")
 
 
+# fit final model ---------------------------------------------------------
+
+library(dplyr)
+
+logliks = (mistnet.results %>% group_by(iteration) %>% summarize(mean(loglik)))
+
+net = fit(
+  x = scale(env)[in.train, ], 
+  y = route.presence.absence[in.train, ], 
+  hyperparams, 
+  which.max(logliks[,2])
+)
+
+save(net, fil = "mistnet.model")
