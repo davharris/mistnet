@@ -91,7 +91,8 @@ adagrad.updater = setRefClass(
     initialize = function(delta, learning.rate, ...){
       if(!missing(delta)){
         delta <<- delta
-        squared.grad <<- delta * 0
+        # Don't initialize squared.grad at 0 to prevent divide by zero errors
+        squared.grad <<- delta * sqrt(.Machine$double.eps)
       }
       if(!missing(learning.rate)){
         learning.rate <<- learning.rate
