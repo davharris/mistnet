@@ -133,6 +133,11 @@ for(i in 1:n.iterations){
   } # End fold
 } # End iteration
 
-mistnet.results = do.call(rbind, out)
+mistnet.results = merge(
+  x = as.data.frame(do.call(rbind, out)),
+  y = cbind(iteration = 1:nrow(hyperparams), hyperparams)
+)
 
 save(mistnet.results, file = "mistnet-results.Rdata")
+
+
