@@ -17,27 +17,27 @@ gaussian.prior = setRefClass(
   Class = "gaussian.prior",
   fields = list(
     mean = "numeric",
-    var = "ANY"
+    sd = "ANY"
   ),
   contains = "prior",
   methods = list(
     getLogGrad = function(x){
-      - (x - .self$mean) / .self$var
+      - (x - .self$mean) / .self$sd^2
     },
     sample = function(n){
-      rnorm(n, mean = mean, sd = sqrt(var))
+      rnorm(n, mean = mean, sd = sd)
     },
-    update = function(coefficients, update.mean, update.var, min.var){
+    update = function(coefficients, update.mean, update.sd, min.sd){
       if(update.mean){
         mean <<- rowMeans(coefficients)
       }
-      if(update.var){
+      if(update.sd){
         var.vector = apply(coefficients, 1, var)
         var.vector = pmax(
           (var.vector + mean(var.vector)) / 2,
-          min.var
+          min.sd^2
         )
-        var <<- replicate(ncol(coefficients), var.vector)
+        sd <<- replicate(ncol(coefficients), sqrt(var.vector))
       }
     }
   )

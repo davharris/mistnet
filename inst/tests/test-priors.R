@@ -4,16 +4,16 @@ eps = 1E-5
 
 test_that("gaussian.prior works", {
   mean = exp(1)
-  var = pi
+  sd = sqrt(pi)
   test.points = 0:5
   
-  p = gaussian.prior(mean = mean, var = var)
+  p = gaussian.prior(mean = mean, sd = sd)
   
   # should have zero gradient at the mean
   expect_equal(p$getLogGrad(mean), 0)
   
-  deltas = dnorm(test.points + eps, mean = mean, sd = sqrt(var), log = TRUE) - 
-    dnorm(test.points - eps, mean = mean, sd = sqrt(var), log = TRUE)
+  deltas = dnorm(test.points + eps, mean = mean, sd = sd, log = TRUE) - 
+    dnorm(test.points - eps, mean = mean, sd = sd, log = TRUE)
   
   expect_equal(
     deltas/2 / eps,
@@ -22,7 +22,7 @@ test_that("gaussian.prior works", {
   
   
   # should have zero gradient when variance is infinite
-  p2 = gaussian.prior(mean = 1, var = Inf)
+  p2 = gaussian.prior(mean = 1, sd = Inf)
   expect_equal(p2$getLogGrad(1E10), 0)
 })
 

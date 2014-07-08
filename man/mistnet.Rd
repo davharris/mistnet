@@ -53,17 +53,17 @@ net = mistnet(
     defineLayer(
       nonlinearity = rectify.nonlinearity(),
       size = 30,
-      prior = gaussian.prior(mean = 0, var = 0.01)
+      prior = gaussian.prior(mean = 0, sd = 0.1)
     ),
     defineLayer(
       nonlinearity = rectify.nonlinearity(),
       size = 12,
-      prior = gaussian.prior(mean = 0, var = 0.01)
+      prior = gaussian.prior(mean = 0, sd = 0.1)
     ),
     defineLayer(
       nonlinearity = sigmoid.nonlinearity(),
       size = ncol(y),
-      prior = gaussian.prior(mean = 0, var = 0.01)
+      prior = gaussian.prior(mean = 0, sd = 0.1)
     )
   ),
   loss = bernoulliLoss(),

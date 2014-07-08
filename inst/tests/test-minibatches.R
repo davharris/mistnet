@@ -12,7 +12,7 @@ test_that("minibatches work", {
       defineLayer(
         nonlinearity = sigmoid.nonlinearity(), 
         size = ncol(y), 
-        prior = gaussian.prior(mean = 0, var = 1)
+        prior = gaussian.prior(mean = 0, sd = 1)
       )
     ),
     loss = bernoulliLoss(),

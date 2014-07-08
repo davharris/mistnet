@@ -26,7 +26,7 @@ test_that("one-layer network finds correct parameters",{
       defineLayer(
         nonlinearity = sigmoid.nonlinearity(), 
         size = ncol(y), 
-        prior = gaussian.prior(mean = 0, var = .1)
+        prior = gaussian.prior(mean = 0, sd = sqrt(.1))
       )
     ),
     sampler = gaussian.sampler(ncol = 1L, sd = 1),
@@ -52,9 +52,9 @@ test_that("one-layer network finds correct parameters",{
   
   expect_true(r.squared > .99)
   
-  
+
   # With a strong prior, the coefficients should shrink toward zero
-  net$layers[[1]]$prior$var = .0001
+  net$layers[[1]]$prior$sd = .01
   net$fit(1)
   expect_true(
     mean(abs(estimated.coefs) > abs(net$layers[[1]]$coefficients[-6, ])) > .99
