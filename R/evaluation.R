@@ -5,7 +5,7 @@ logMeanExp = function(x, weights){
   if(missing(weights)){
     weights = rep(1/length(x), length(x))
   }
-  assert_that(all(weights > 0))
+  assert_that(all(weights >= 0))
   weights = weights / sum(weights)
   
   # Rescale so the largest log-likelihoods values are near zero, then undo the

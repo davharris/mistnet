@@ -94,6 +94,7 @@ mistnet = function(
   assert_that(n.minibatch <= dataset.size)
   
   n.layers = length(layer.definitions)
+  assert_that(n.layers > 0)
   
   # Input size followed by all the output sizes, in order
   network.dims = c(
