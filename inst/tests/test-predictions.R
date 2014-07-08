@@ -53,7 +53,7 @@ test_that("Prediction works",{
   
   # Everything but inputs, x, y, and reference classes should be identical
   for(name in names(network$fields())){
-    if(!(name %in% c("x", "y", "inputs", "layers", "row.selector"))){
+    if(!(name %in% c("x", "y", "inputs", "layers", "row.selector", "sampler"))){
       expect_identical(copy$field(name), copy2$field(name))
     }
   }

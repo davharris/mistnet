@@ -17,7 +17,7 @@ n.iterations = 12L
 
 # Random log-uniform samples between min and max
 rlunif = function(n, min, max){
-  floor(exp(runif(n, log(min), log(max + 1))))
+  as.integer(floor(exp(runif(n, log(min), log(max + 1)))))
 }
 
 
@@ -59,7 +59,7 @@ fit = function(x, y, hyperparams, i){
     ),
     loss = bernoulliRegLoss(a = 1 + 1E-6),
     updater = adagrad.updater(learning.rate = hyperparams$learning.rate[i]),
-    sampler = gaussianSampler(ncol = hyperparams$sampler.size[i], sd = 1),
+    sampler = gaussian.sampler(ncol = hyperparams$sampler.size[i], sd = 1),
     n.importance.samples = hyperparams$n.importance.samples[i],
     n.minibatch = hyperparams$n.minibatch[i],
     training.iterations = 0
@@ -162,4 +162,4 @@ net = fit(
   which.max(logliks[,2])
 )
 
-save(net, file = "mistnet.model")
+save(net, file = "mistnet.model.Rdata")

@@ -4,7 +4,7 @@
 \title{Construct a mistnet model}
 \usage{
 mistnet(x, y, layer.definitions, loss, updater = adagrad.updater(learning.rate
-  = 0.01), sampler = gaussianSampler(ncol = 10, sd = 1),
+  = 0.01), sampler = gaussian.sampler(ncol = 10L, sd = 1),
   n.importance.samples = 30, n.minibatch = 10, training.iterations = 0,
   shuffle = TRUE)
 }
@@ -68,7 +68,7 @@ net = mistnet(
   ),
   loss = bernoulliLoss(),
   updater = adagrad.updater(learning.rate = .01),
-  sampler = gaussianSampler(ncol = 10, sd = 1),
+  sampler = gaussian.sampler(ncol = 10L, sd = 1),
   n.importance.samples = 30,
   n.minibatch = 10,
   training.iterations = 0

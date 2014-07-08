@@ -21,7 +21,7 @@ predict.network = function(
   for(i in 1:n.importance.samples){
     cpy$inputs[ , , i] = cbind(
       cpy$x[cpy$row.selector$minibatch.ids, ], 
-      cpy$sampler(nrow = cpy$row.selector$n.minibatch)
+      cpy$sampler$sample(nrow = cpy$row.selector$n.minibatch)
     )
     cpy$feedForward(
       cpy$inputs[ , , i],

@@ -39,7 +39,7 @@ net = mistnet(
   ),
   loss = bernoulliRegLoss(a = 1 + 1E-6),
   updater = adagrad.updater(learning.rate = learning.rate),
-  sampler = gaussianSampler(ncol = n.ranef, sd = 1),
+  sampler = gaussian.sampler(ncol = n.ranef, sd = 1),
   n.importance.samples = n.importance.samples,
   n.minibatch = n.minibatch,
   training.iterations = 0

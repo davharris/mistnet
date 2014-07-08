@@ -31,6 +31,7 @@
 #' @exportClass network
 #' @seealso \code{\link{mistnet}}, \code{\link{layer}}
 #' @include row.selector.R
+#' @include sampler.R
 network = setRefClass(
   Class = "network",
   fields = list(
@@ -45,7 +46,7 @@ network = setRefClass(
     importance.weights = "matrix",
     loss = "function",
     lossGradient = "function",
-    sampler = "function",
+    sampler = "sampler",
     completed.iterations = "integer",
     debug = "logical"
   ),
@@ -96,7 +97,7 @@ network = setRefClass(
       for(i in 1:n.importance.samples){
         inputs[,,i] <<- cbind(
           x[row.selector$minibatch.ids, ], 
-          sampler(nrow = row.selector$n.minibatch)
+          sampler$sample(nrow = row.selector$n.minibatch)
         )
         feedForward(
           inputs[,,i],

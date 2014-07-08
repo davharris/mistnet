@@ -27,7 +27,7 @@ Collate:
     'layer.R'
     'loss.R'
     'mistnet.R'
+    'sampler.R'
     'row.selector.R'
     'network.R'
     'predict.R'
-    'ranefSample.R'

@@ -53,7 +53,7 @@
 #'   ),
 #'   loss = bernoulliLoss(),
 #'   updater = adagrad.updater(learning.rate = .01),
-#'   sampler = gaussianSampler(ncol = 10, sd = 1),
+#'   sampler = gaussian.sampler(ncol = 10L, sd = 1),
 #'   n.importance.samples = 30,
 #'   n.minibatch = 10,
 #'   training.iterations = 0
@@ -79,7 +79,7 @@ mistnet = function(
   layer.definitions,
   loss,
   updater = adagrad.updater(learning.rate = .01),
-  sampler = gaussianSampler(ncol = 10, sd = 1),
+  sampler = gaussian.sampler(ncol = 10L, sd = 1),
   n.importance.samples = 30,
   n.minibatch = 10,
   training.iterations = 0,
@@ -97,7 +97,7 @@ mistnet = function(
   
   # Input size followed by all the output sizes, in order
   network.dims = c(
-    ncol(x) + with(environment(sampler), ncol), 
+    ncol(x) + sampler$ncol, 
     sapply(layer.definitions, function(x) x$size)
   )
   
@@ -148,7 +148,7 @@ mistnet = function(
     0, 
     c(
       net$row.selector$n.minibatch, 
-      ncol(net$x) + with(environment(net$sampler), ncol), 
+      ncol(net$x) + net$sampler$ncol, 
       net$n.importance.samples
     )
   )
