@@ -28,17 +28,17 @@ gaussian.prior = setRefClass(
     sample = function(n){
       rnorm(n, mean = mean, sd = sd)
     },
-    update = function(coefficients, update.mean, update.sd, min.sd){
+    update = function(weights, update.mean, update.sd, min.sd){
       if(update.mean){
-        mean <<- rowMeans(coefficients)
+        mean <<- rowMeans(weights)
       }
       if(update.sd){
-        var.vector = apply(coefficients, 1, var)
+        var.vector = apply(weights, 1, var)
         var.vector = pmax(
           (var.vector + mean(var.vector)) / 2,
           min.sd^2
         )
-        sd <<- replicate(ncol(coefficients), sqrt(var.vector))
+        sd <<- replicate(ncol(weights), sqrt(var.vector))
       }
     }
   )

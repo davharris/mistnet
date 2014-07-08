@@ -12,7 +12,7 @@ marsInitializer = function(x, y){
   
   list(
     biases = initial.biases, 
-    coefficients = initial.weights, 
+    weights = initial.weights, 
     n = length(initial.biases)
   )
 }

@@ -64,7 +64,7 @@ fit = function(x, y, hyperparams, i){
     n.minibatch = hyperparams$n.minibatch[i],
     training.iterations = 0,
     initialize.biases = TRUE,
-    initialize.coefficients = TRUE
+    initialize.weights = TRUE
   )
   net$layers[[1]]$biases[] = 1 # First layer biases equal 1
   start.time = Sys.time()
@@ -76,7 +76,7 @@ fit = function(x, y, hyperparams, i){
     # Update prior variance
     for(layer in net$layers){
       layer$prior$update(
-        layer$coefficients, 
+        layer$weights, 
         update.mean = FALSE, 
         update.sd = TRUE,
         min.sd = .01
@@ -84,7 +84,7 @@ fit = function(x, y, hyperparams, i){
     }
     # Update mean for final layer
     net$layers[[3]]$prior$update(
-      layer$coefficients, 
+      layer$weights, 
       update.mean = TRUE, 
       update.sd = FALSE,
       min.sd = .01

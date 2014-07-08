@@ -35,10 +35,10 @@ test_that("one-layer network finds correct parameters",{
   )
   
   # Give the network a warm start
-  net$layers[[1]]$coefficients[-6, ] = true.coefs + rnorm(length(true.coefs), sd = .25)
+  net$layers[[1]]$weights[-6, ] = true.coefs + rnorm(length(true.coefs), sd = .25)
   
   
-  estimated.coefs = net$layers[[1]]$coefficients[-6, ]
+  estimated.coefs = net$layers[[1]]$weights[-6, ]
   r.squared = 1 - sum((true.coefs - estimated.coefs)^2) / sum((true.coefs - mean(true.coefs))^2)
   
   # Model should fail before fitting
@@ -46,18 +46,18 @@ test_that("one-layer network finds correct parameters",{
   
   net$fit(100)
   
-  estimated.coefs = net$layers[[1]]$coefficients[-6, ]
+  estimated.coefs = net$layers[[1]]$weights[-6, ]
   
   r.squared = 1 - sum((true.coefs - estimated.coefs)^2) / sum((true.coefs - mean(true.coefs))^2)
   
   expect_true(r.squared > .99)
   
 
-  # With a strong prior, the coefficients should shrink toward zero
+  # With a strong prior, the weights should shrink toward zero
   net$layers[[1]]$prior$sd = .01
   net$fit(1)
   expect_true(
-    mean(abs(estimated.coefs) > abs(net$layers[[1]]$coefficients[-6, ])) > .99
+    mean(abs(estimated.coefs) > abs(net$layers[[1]]$weights[-6, ])) > .99
   )
 })
 

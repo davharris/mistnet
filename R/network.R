@@ -70,7 +70,7 @@ network = setRefClass(
         
         if(debug){
           for(layer in layers){
-            assert_that(!any(is.na(layer$coefficients)))
+            assert_that(!any(is.na(layer$weights)))
             assert_that(!any(is.na(layer$outputs)))
           }
         }
@@ -146,14 +146,14 @@ network = setRefClass(
         sample.num
       )
       
-      # Earlier layers' error gradients are filtered through the coefficients of
+      # Earlier layers' error gradients are filtered through the weights of
       # the layer above.
       if(n.layers > 1){
         for(i in (n.layers - 1):1){
           incoming.error.grad = layers[[i]]$backwardPass(
             tcrossprod(
               layers[[i + 1]]$error.grads[ , , sample.num], 
-              layers[[i + 1]]$coefficients
+              layers[[i + 1]]$weights
             ),
             sample.num = sample.num
           )

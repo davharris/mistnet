@@ -160,7 +160,7 @@ test_that("lateral updates work", {
     2 * momentum * (1 - diag(ncol))
   )
   
-  # With no learning and initialization with no lateral coefficients, lateral
+  # With no learning and initialization with no lateral weights, lateral
   # should come straight from delta.
   expect_equal(
     l$nonlinearity$lateral,

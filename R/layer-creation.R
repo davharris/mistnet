@@ -5,7 +5,7 @@
 #' @param nonlinearity a \code{nonlinearity} object describing the activation
 #'  function used in this layer
 #' @param size an integer describing the number of output neurons in this layer.
-#' @param prior \code{prior} object for constraining the layer's coefficients.
+#' @param prior \code{prior} object for constraining the layer's weights.
 #' @param ... additional arguments to be passed to or from other methods 
 #'  (currently not used).
 #' 
@@ -41,7 +41,7 @@ createLayer = function(
   
   out = layer$new(
     coef.dim = c(n.inputs, n.outputs),
-    coefficients = matrix(0, nrow = n.inputs, ncol = n.outputs),
+    weights = matrix(0, nrow = n.inputs, ncol = n.outputs),
     biases = matrix(rep(0, n.outputs), nrow = 1),
     coef.updater = coef.updater,
     bias.updater = bias.updater,

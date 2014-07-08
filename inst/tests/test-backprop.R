@@ -34,20 +34,20 @@ test_that("3-layer backprop works", {
     n.minibatch = 13L,
     n.importance.samples = 1L,
     training.iterations = 0L,
-    initialize.coefficients = FALSE,
+    initialize.weights = FALSE,
     initialize.biases = FALSE
   )
   
   net$fit(1)
-  # If all the coefficients in layer 2 are 0, then the
+  # If all the weights in layer 2 are 0, then the
   # weights in layer 1 can't possibly matter
   expect_true(all(net$layers[[1]]$weighted.llik.grads == 0))
   
   
   
-  net$layers[[1]]$coefficients[ , ] = rnorm(length(net$layers[[1]]$coefficients[ , ])) / 1000
-  net$layers[[2]]$coefficients[ , ] = rnorm(length(net$layers[[2]]$coefficients[ , ]))
-  net$layers[[3]]$coefficients[ , ] = rnorm(length(net$layers[[3]]$coefficients[ , ]))
+  net$layers[[1]]$weights[ , ] = rnorm(length(net$layers[[1]]$weights[ , ])) / 1000
+  net$layers[[2]]$weights[ , ] = rnorm(length(net$layers[[2]]$weights[ , ]))
+  net$layers[[3]]$weights[ , ] = rnorm(length(net$layers[[3]]$weights[ , ]))
   
   net$selectMinibatch()
   set.seed(1)
@@ -55,7 +55,7 @@ test_that("3-layer backprop works", {
   net$estimateGrad() 
   grad = net$layers[[1]]$weighted.llik.grads[1,1]
   
-  net$layers[[1]]$coefficients[1, 1] = net$layers[[1]]$coefficients[1, 1] + eps
+  net$layers[[1]]$weights[1, 1] = net$layers[[1]]$weights[1, 1] + eps
   set.seed(1)
   net$estimateGrad()
   plus.loss = mean(
@@ -68,7 +68,7 @@ test_that("3-layer backprop works", {
   )
   
   # 2*eps: once to undo the plus above, once to actually decrement
-  net$layers[[1]]$coefficients[1, 1] = net$layers[[1]]$coefficients[1, 1] - 2 * eps
+  net$layers[[1]]$weights[1, 1] = net$layers[[1]]$weights[1, 1] - 2 * eps
   set.seed(1)
   net$estimateGrad()
   minus.loss = mean(

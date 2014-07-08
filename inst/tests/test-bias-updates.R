@@ -46,10 +46,10 @@ test_that("biases update correctly",{
   #################
   # Tests below this line haven't been updated
   
-  # Reset coefficients to zero
-  net$layers[[1]]$coefficients[ , ] = 0
+  # Reset weights to zero
+  net$layers[[1]]$weights[ , ] = 0
   
-  # With reset coefficients, let's see what the loss is.
+  # With reset weights, let's see what the loss is.
   net$feedForward(1L)
   updated.loss = sum(net$reportLoss())
   

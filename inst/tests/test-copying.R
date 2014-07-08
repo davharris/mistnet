@@ -35,13 +35,13 @@ test_that("net$copy works", {
   #    object and need to be copied separately)
   
   # Modify a layer in net2
-  net2$layers[[2]]$coefficients[1] = 1
+  net2$layers[[2]]$weights[1] = 1
   
   # net2 should change
-  expect_equal(net2$layers[[2]]$coefficients[1], 1)
+  expect_equal(net2$layers[[2]]$weights[1], 1)
   
   # the original net object shouldn't
-  expect_equal(net$layers[[2]]$coefficients[1], 0)
+  expect_equal(net$layers[[2]]$weights[1], 0)
   
   
   # Confirm that normal reference classes copy correctly (i.e. shallow==FALSE)

@@ -22,11 +22,11 @@ test_that("Single-layer feedforward works", {
   
   expect_equal(
     l$inputs[ , , 2],
-    (input.matrix %*% l$coefficients) %plus% l$biases
+    (input.matrix %*% l$weights) %plus% l$biases
   )
   expect_equal(
     l$outputs[ , , 2],
-    l$nonlinearity$f((input.matrix %*% l$coefficients) %plus% l$biases)
+    l$nonlinearity$f((input.matrix %*% l$weights) %plus% l$biases)
   )
   
   # Nothing should change during feedforward except the listed fields
@@ -82,14 +82,14 @@ test_that("Multi-layer feedforward works", {
   
   expect_equal(
     net$layers[[1]]$nonlinearity$f(
-      (cbind(ranefs, net$x[net$row.selector$minibatch.ids, ]) %*% net$layers[[1]]$coefficients) %plus% net$layers[[1]]$biases
+      (cbind(ranefs, net$x[net$row.selector$minibatch.ids, ]) %*% net$layers[[1]]$weights) %plus% net$layers[[1]]$biases
     ),
     net$layers[[1]]$outputs[,,2]
   )
   
   expect_equal(
     net$layers[[2]]$nonlinearity$f(
-      (net$layers[[1]]$outputs[,,2] %*% net$layers[[2]]$coefficients) %plus% net$layers[[2]]$biases
+      (net$layers[[1]]$outputs[,,2] %*% net$layers[[2]]$weights) %plus% net$layers[[2]]$biases
     ),
     net$layers[[2]]$outputs[,,2]
   )
@@ -97,7 +97,7 @@ test_that("Multi-layer feedforward works", {
   
   expect_equal(
     net$layers[[3]]$nonlinearity$f(
-      (net$layers[[2]]$outputs[,,2] %*% net$layers[[3]]$coefficients) %plus% net$layers[[3]]$biases
+      (net$layers[[2]]$outputs[,,2] %*% net$layers[[3]]$weights) %plus% net$layers[[3]]$biases
     ),
     net$layers[[3]]$outputs[,,2]
   )

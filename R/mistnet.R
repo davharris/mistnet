@@ -20,7 +20,7 @@
 #'  in each stochastic estimate of the likelihood gradient.
 #' @param training.iterations an \code{integer} number of minibatches to process
 #'  before terminating. Currently, it is best practice to leave this value at 0
-#'  and manually initialize the model's coefficients before beginning training
+#'  and manually initialize the model's weights before beginning training
 #' @seealso \code{\link{network}}
 #' @include prior.R
 #' @include nonlinearity.R
@@ -59,10 +59,10 @@
 #'   training.iterations = 0
 #' )
 #' 
-#' # Currently, mistnet does not initialize the coefficients automatically.
+#' # Currently, mistnet does not initialize the weights automatically.
 #' # This gets it started with nonzero values.
 #' for(layer in net$layers){
-#'   layer$coefficients[ , ] = rnorm(length(layer$coefficients), sd = .01)
+#'   layer$weights[ , ] = rnorm(length(layer$weights), sd = .01)
 #' }
 #' 
 #' # Fit the model
@@ -85,7 +85,7 @@ mistnet = function(
   training.iterations = 0,
   shuffle = TRUE,
   initialize.biases = FALSE,
-  initialize.coefficients = FALSE
+  initialize.weights = FALSE
 ){  
   assert_that(is.matrix(x))
   assert_that(is.matrix(y))
@@ -157,16 +157,16 @@ mistnet = function(
   )
   
   
-  colnames(net$layers[[net$n.layers]]$coefficients) = colnames(y)
+  colnames(net$layers[[net$n.layers]]$weights) = colnames(y)
   dimnames(net$layers[[net$n.layers]]$outputs) = list(NULL, colnames(y), NULL)
   
   if(initialize.biases){
     final.biases = net$layers[[net$n.layers]]$nonlinearity$initializeFinalBiases(y)
     net$layers[[net$n.layers]]$biases[] = final.biases
   }
-  if(initialize.coefficients){
+  if(initialize.weights){
     for(layer in net$layers){
-      layer$coefficients[] = layer$prior$sample(length(layer$coefficients))
+      layer$weights[] = layer$prior$sample(length(layer$weights))
     }
   }
   

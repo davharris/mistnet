@@ -63,7 +63,7 @@ sgd.updater = setRefClass(
 #' adagrad updater
 #' 
 #' @description An updater with adaptive step sizes. Adagrad allows different 
-#' coefficients to have different effective learning rates, depending on how 
+#' weights to have different effective learning rates, depending on how 
 #' much that parameter has moved so far.
 #'
 #' @details __

@@ -38,7 +38,7 @@ test_that("Prediction works",{
   
   expect_equal(dim(p), c(2 * nrow(x), ncol(y), n.importance.samples))
   
-  expect_true(all(p == 0.5)) # With no coefficients, everything should be 0.5
+  expect_true(all(p == 0.5)) # With no weights, everything should be 0.5
   
   # With these settings, prediction should just make a copy (except for latent
   # variables)

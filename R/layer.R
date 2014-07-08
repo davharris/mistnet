@@ -5,7 +5,7 @@
 #' @details __
 #'
 #' @field coef.dim a length-two integer vector
-#' @field coefficients a matrix of real numbers
+#' @field weights a matrix of real numbers
 #' @field biases a numeric vector containing the intercept for each node
 #' @field nonlinearity a \code{\link{nonlinearity}} object
 #' @field prior a \code{\link{prior}} object
@@ -27,7 +27,7 @@ layer = setRefClass(
   Class = "layer",
   fields = list(
     coef.dim = "integer",
-    coefficients = "matrix",
+    weights = "matrix",
     biases = "matrix",
     nonlinearity = "nonlinearity",
     prior = "prior",
@@ -47,7 +47,7 @@ layer = setRefClass(
       
       if(missing(sample.num)){stop("sample.num is missing in forwardPass")}
       
-      inputs[ , , sample.num] <<- (input %*% coefficients) %plus% biases
+      inputs[ , , sample.num] <<- (input %*% weights) %plus% biases
       outputs[ , , sample.num] <<- nonlinearity$f(inputs[ , , sample.num])
     },
     
@@ -66,13 +66,13 @@ layer = setRefClass(
       dataset.size, 
       n.minibatch
     ){
-      "Calculate coef.delta and add it to coefficients. Update biases"
-      log.prior.grad = prior$getLogGrad(coefficients) / dataset.size
+      "Calculate coef.delta and add it to weights. Update biases"
+      log.prior.grad = prior$getLogGrad(weights) / dataset.size
       grad = weighted.llik.grads / n.minibatch - log.prior.grad
       
       coef.updater$computeDelta(grad)
       
-      coefficients <<- coefficients + coef.updater$delta
+      weights <<- weights + coef.updater$delta
       
       bias.updater$computeDelta(weighted.bias.grads / n.minibatch)
       biases <<- biases + bias.updater$delta
