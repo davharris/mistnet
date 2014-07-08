@@ -9,15 +9,16 @@ prior = setRefClass(
   )
 )
 
-# Annoyingly, var's class will be different if it's a scalar or a matrix...
-#  Set to "any" as a stopgap.
+# gaussian.prior$sd can be a numeric matrix OR a numeric vector
+setClassUnion("any.numeric", c("numeric", "matrix"))
+
 #' @export gaussian.prior
 #' @exportClass gaussian.prior
 gaussian.prior = setRefClass(
   Class = "gaussian.prior",
   fields = list(
     mean = "numeric",
-    sd = "ANY"
+    sd = "any.numeric"
   ),
   contains = "prior",
   methods = list(
