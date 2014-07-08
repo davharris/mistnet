@@ -71,7 +71,7 @@ fit = function(x, y, hyperparams, i){
     if(is.nan(net$layers[[3]]$outputs[[1]])){
       stop("NaNs detected :-(")
     }
-    net$fit(1)
+    net$fit(10)
     cat(".")
     # Update prior variance
     for(layer in net$layers){
