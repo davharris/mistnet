@@ -153,7 +153,7 @@ save(mistnet.results, file = "mistnet-results.Rdata")
 
 library(dplyr)
 
-logliks = (mistnet.results %>% group_by(iteration) %>% summarize(mean(loglik)))
+logliks = mistnet.results %>% group_by(iteration) %>% summarize(mean(loglik))
 
 net = fit(
   x = scale(env)[in.train, ], 
