@@ -1,5 +1,7 @@
 # devtools::install_github("davharris/mistnet")
 
+START = Sys.time()
+
 library(mistnet)
 set.seed(1)
 
@@ -157,3 +159,5 @@ net = fit(
 )
 
 save(net, file = "mistnet.model.Rdata")
+
+difftime(Sys.time(), START)
