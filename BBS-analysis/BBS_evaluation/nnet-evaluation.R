@@ -19,7 +19,7 @@ start.time = Sys.time()
 
 # allocate 14+ hours for hyperparameter optimization
 while(
-  as.numeric(Sys.time()) - as.numeric(start.time) < 14 * 60 * 60
+  difftime(Sys.time(), start.time, units = "secs") < 20 * 60 * 60
 ){
   i = i + 1
   cat(i, "\n")

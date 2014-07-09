@@ -3,7 +3,7 @@ library(gbm)
 
 set.seed(1)
 
-interaction.depths = c(1, 2, 3, 5, 8)
+interaction.depths = c(2, 5, 8)
 
 env = as.data.frame(x[ , grep("^bio", colnames(x))])
 
@@ -30,7 +30,8 @@ species.gbm = function(species.num, interaction.depths){
       n.trees = 1E4,
       interaction.depth = interaction.depths[[i]],
       shrinkage = 0.001,
-      cv.folds = 5
+      cv.folds = 5,
+      n.cores = 1
     )
     
     errors[[i]] = min(model$cv.error)
