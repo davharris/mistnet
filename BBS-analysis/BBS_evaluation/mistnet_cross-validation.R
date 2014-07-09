@@ -30,7 +30,7 @@ hyperparams = data.frame(
   n.layer1 = rlunif(n.iterations, 20, 50),
   n.layer2 = rlunif(n.iterations, 5, 20),
   learning.rate = 0.1,
-  fit.seconds = 18 * 60
+  fit.seconds = 20 * 60
 )
 
 
