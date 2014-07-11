@@ -1,3 +1,4 @@
 
 gbm: 76974.38 seconds elapsed (21.4 hours)
-nnet: 1.083772 days
+nnet: 1.083772 days 26.01
+mistnet: 17.48936 plus prediction time

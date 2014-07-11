@@ -15,7 +15,7 @@ n.prediction.samples = 250L
 
 # Number of times to do fit & evaluate loop. Total training time is thus up to
 # cv.seconds * n.iterations * n.folds, plus prediction time.
-n.iterations = 12L
+n.iterations = 10L
 
 # Random log-uniform samples between min and max
 rlunif = function(n, min, max){
