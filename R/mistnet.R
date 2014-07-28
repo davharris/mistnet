@@ -37,7 +37,7 @@
 #' @import assertthat
 #' @examples
 #' # 107 rows of fake data
-#' x = matrix(rnorm(1819), ncol = 17, nrow = 107) 
+#' x = matrix(rnorm(1819), nrow = 107, ncol = 17) 
 #' y = dropoutMask(107, 14)
 #' 
 #' # Create the network object
