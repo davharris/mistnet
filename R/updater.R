@@ -92,7 +92,11 @@ adagrad.updater = setRefClass(
       if(!missing(delta)){
         delta <<- delta
         # Don't initialize squared.grad at 0 to prevent divide by zero errors
-        squared.grad <<- delta * sqrt(.Machine$double.eps)
+        squared.grad <<- matrix(
+          sqrt(.Machine$double.eps),
+          nrow = nrow(delta),
+          ncol = ncol(delta)
+        )
       }
       if(!missing(learning.rate)){
         learning.rate <<- learning.rate
