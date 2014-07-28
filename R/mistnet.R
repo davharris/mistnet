@@ -8,7 +8,7 @@
 #'   column per response variable.
 #' @param layer.definitions a \code{list} of specifications for each layer in 
 #'   the network, as produced by \code{\link{defineLayer}}.
-#' @param loss a \code{\link{loss}}£ object, defining the function for 
+#' @param loss a \code{\link{loss}} object, defining the function for 
 #'   optimization to minimize, as well as its gradient.
 #' @param updater an \code{\link{updater}} object, specifying how the model 
 #'   should move across the likelihood surface (e.g. stochastic gradient descent

@@ -16,6 +16,7 @@ safe.as.integer = function(x){
 #' https://gist.github.com/sckott/3639688
 #' @param n.row the number of rows desired
 #' @param n.col the number of columns desired
+#' @param prob the probability that an element of the matrix is one rather than zero
 #' @export
 dropoutMask = function(n.row, n.col, prob = 0.5) {
   out = - 1L +  sample.int(n = 2L, 

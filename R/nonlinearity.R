@@ -38,8 +38,13 @@ expGrad = function(x){
 
 # Nonlinearity classes ----------------------------------------------------
 
+#' nonlinearities
+#' 
+#' --
+#' 
 #' @include updater.R
 #' @export nonlinearity
+#' @rdname nonlinearity
 #' @exportClass nonlinearity
 nonlinearity = setRefClass(
   Class = "nonlinearity",
@@ -60,7 +65,10 @@ nonlinearity = setRefClass(
   )
 )
 
+#' \code{linear.nonlinearity}:
+#' identity function
 #' @exportClass linear.nonlinearity
+#' @rdname nonlinearity
 #' @export linear.nonlinearity
 linear.nonlinearity = setRefClass(
   Class = "linear.nonlinearity",
@@ -75,7 +83,10 @@ linear.nonlinearity = setRefClass(
   )
 )
 
+#' \code{sigmoid.nonlinearity}:
+#' logistic function
 #' @exportClass sigmoid.nonlinearity
+#' @rdname nonlinearity
 #' @export sigmoid.nonlinearity
 sigmoid.nonlinearity = setRefClass(
   Class = "sigmoid.nonlinearity",
@@ -92,7 +103,10 @@ sigmoid.nonlinearity = setRefClass(
   )
 )
 
+#' \code{rectify.nonlinearity}:
+#' \code{max(0, x)}
 #' @exportClass rectify.nonlinearity
+#' @rdname nonlinearity
 #' @export rectify.nonlinearity
 rectify.nonlinearity = setRefClass(
   Class = "rectify.nonlinearity",
@@ -109,6 +123,7 @@ rectify.nonlinearity = setRefClass(
 
 
 #' @exportClass exp.nonlinearity
+#' @rdname nonlinearity
 #' @export exp.nonlinearity
 exp.nonlinearity = setRefClass(
   Class = "exp.nonlinearity",
@@ -133,6 +148,7 @@ exp.nonlinearity = setRefClass(
 
 
 #' @exportClass mf_mrf.nonlinearity
+#' @rdname nonlinearity
 #' @export mf_mrf.nonlinearity
 mf_mrf.nonlinearity = setRefClass(
   Class = "mf_mrf.nonlinearity",

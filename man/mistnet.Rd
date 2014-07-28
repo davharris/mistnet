@@ -18,7 +18,7 @@ column per response variable.}
 \item{layer.definitions}{a \code{list} of specifications for each layer in
 the network, as produced by \code{\link{defineLayer}}.}
 
-\item{loss}{a \code{\link{loss}}£ object, defining the function for
+\item{loss}{a \code{\link{loss}} object, defining the function for
 optimization to minimize, as well as its gradient.}
 
 \item{updater}{an \code{\link{updater}} object, specifying how the model

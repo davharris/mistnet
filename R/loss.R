@@ -1,3 +1,16 @@
+#' Loss functions
+#' 
+#' Loss functions are minimized during model training. \code{loss} objects contain
+#'  a \code{loss} function as well as a \code{grad} function, specifying the gradient.
+#'  Many \code{loss} objects do not require any arguments.
+#' 
+#' @rdname loss
+loss = NULL
+
+#' \code{bernoulliLoss}:
+#' cross-entropy for 0-1 data. Equal to 
+#'   \code{-(y * log(yhat) + (1 - y) * log(1 - yhat))}
+#' @rdname loss
 #' @export
 bernoulliLoss = function(){
   structure(
@@ -9,6 +22,11 @@ bernoulliLoss = function(){
   )
 }
 
+#' \code{bernoulliRegLoss}: cross-entropy loss, regularized by a 
+#'   beta-distributed prior
+#' @param a the \code{a} shape parameter in \code{\link{dbeta}}
+#' @param b the \code{b} shape parameter in \code{\link{dbeta}}
+#' @rdname loss
 #' @export
 bernoulliRegLoss = function(a, b = a){
   structure(
@@ -21,6 +39,9 @@ bernoulliRegLoss = function(a, b = a){
 }
 
 
+#' \code{poissonLoss}: loss based on the Poisson likelihood.  
+#'   See \code{\link{dpois}}
+#' @rdname loss
 #' @export
 poissonLoss = function(){
   structure(
@@ -36,6 +57,8 @@ poissonLoss = function(){
   )
 }
 
+#' \code{squaredLoss}: Squared error, for linear models
+#' @rdname loss
 #' @export
 squaredLoss = function(){
   structure(
@@ -52,7 +75,10 @@ squaredLoss = function(){
   
 }
 
-# n is the size argument for dbinom
+#' \code{binomialLoss}: loss for binomial responses. 
+#' @param n specifies the number of Bernoulli trials (\code{size} in 
+#'   \code{\link{dbinom}})
+#' @rdname loss
 #' @export
 binomialLoss = function(n){
   

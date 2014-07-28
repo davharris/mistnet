@@ -9,6 +9,8 @@ dropoutMask(n.row, n.col, prob = 0.5)
 \item{n.row}{the number of rows desired}
 
 \item{n.col}{the number of columns desired}
+
+\item{prob}{the probability that an element of the matrix is one rather than zero}
 }
 \description{
 Produces a binary matrix, with each element independently sampled as 1 or 0

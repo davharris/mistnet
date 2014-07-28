@@ -1,3 +1,7 @@
+#' Samplers
+#' 
+#' Samplers produce Monte Carlo samples for \code{\link{network}} objects.
+#' @rdname sampler
 sampler = setRefClass(
   Class = "sampler",
   fields = list(),
@@ -10,6 +14,7 @@ sampler = setRefClass(
 
 #' @export gaussian.sampler
 #' @exportClass gaussian.sampler
+#' @rdname sampler
 gaussian.sampler = setRefClass(
   Class = "gaussian.sampler",
   fields = list(
