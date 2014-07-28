@@ -29,9 +29,11 @@ test_that("Prediction works",{
     ),
     n.minibatch = nrow(x),
     loss = bernoulliLoss(),
-    updater = sgd.updater(learning.rate = 0, momentum = 0)
+    updater = sgd.updater(learning.rate = 0, momentum = 0),
+    initialize.weights = FALSE,
+    initialize.biases = FALSE
   )
-  net$fit(1) # Feed forward
+  net$fit(1)
   net$layers[[3]]$biases[] = 0 # Undo bias updates
   
   p = predict(net, rbind(x, x), n.importance.samples = n.importance.samples)

@@ -67,7 +67,10 @@ test_that("Multi-layer feedforward works", {
     loss = bernoulliLoss(),
     n.importance.samples = 27L,
     sampler = gaussian.sampler(ncol = 3L, sd = 1),
-    training.iterations = 0L
+    training.iterations = 0L,
+    updater = adagrad.updater(learning.rate = .01),
+    initialize.weights = FALSE,
+    initialize.biases = FALSE
   )
   
   ranefs = net$sampler$sample(nrow = net$row.selector$n.minibatch)

@@ -115,7 +115,7 @@ network = setRefClass(
           n.minibatch = row.selector$n.minibatch
         )
         layers[[i]]$nonlinearity$update(
-          observed = y[minibatch.ids, ],
+          observed = y[row.selector$minibatch.ids, ],
           predicted = layers[[i]]$outputs, 
           importance.weights = importance.weights
         )

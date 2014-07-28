@@ -17,7 +17,8 @@ test_that("Correct behavior for fewer than one iteration",{
     n.importance.samples = 10L,
     n.minibatch = 10L,
     training.iterations = 0L,
-    loss = bernoulliLoss()
+    loss = bernoulliLoss(),
+    updater = adagrad.updater(learning.rate = .01)
   )
   
   expect_equal(net$completed.iterations, 0)

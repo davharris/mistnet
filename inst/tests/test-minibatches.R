@@ -17,7 +17,10 @@ test_that("minibatches work", {
     ),
     loss = bernoulliLoss(),
     n.minibatch = 4L,
-    shuffle = TRUE
+    shuffle = TRUE,
+    updater = adagrad.updater(learning.rate = .01),
+    initialize.weights = FALSE,
+    initialize.biases = FALSE
   )
   
   tally = rep(0L, nrow(x))

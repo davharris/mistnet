@@ -9,26 +9,27 @@ mistnet(x, y, layer.definitions, loss, updater = adagrad.updater(learning.rate
   shuffle = TRUE, initialize.biases = FALSE, initialize.weights = FALSE)
 }
 \arguments{
-\item{x}{a \code{numeric} \code{matrix} of predictor variables.  One row
-per example, one column per predictive feature.}
+\item{x}{a \code{numeric} \code{matrix} of predictor variables.  One row per
+record, one column per predictive feature.}
 
-\item{y}{a \code{matrix} of responses to \code{x}.  One row per example, one
+\item{y}{a \code{matrix} of responses to \code{x}.  One row per record, one
 column per response variable.}
 
 \item{layer.definitions}{a \code{list} of specifications for each layer in
-the network, as produced by \code{defineLayer}.}
+the network, as produced by \code{\link{defineLayer}}.}
 
-\item{loss}{a \code{loss} object, defining the function for optimization to
-minimize, as well as its gradient}
+\item{loss}{a \code{\link{loss}} object, defining the function for
+optimization to minimize, as well as its gradient.}
 
-\item{updater}{an \code{updater} object, specifying how the model should move
+\item{updater}{an \code{\link{updater}} object, specifying how the model should move
 across the likelihood surface (e.g. stochastic gradient descent or adagrad)}
 
-\item{sampler}{a \code{sampler} object, specifying the distribution of the
+\item{sampler}{a \code{\link{sampler}} object, specifying the distribution of the
 latent variables}
 
-\item{n.importance.samples}{an \code{integer}. More samples will take more time
-to compute, but will provide a more precise estimate of the likelihood gradient.}
+\item{n.importance.samples}{an \code{integer}. More samples will take more
+time to compute, but will provide a more precise estimate of the likelihood
+gradient.}
 
 \item{n.minibatch}{an \code{integer} specifying the number of rows to include
 in each stochastic estimate of the likelihood gradient.}
@@ -36,6 +37,9 @@ in each stochastic estimate of the likelihood gradient.}
 \item{training.iterations}{an \code{integer} number of minibatches to process
 before terminating. Currently, it is best practice to leave this value at 0
 and manually initialize the model's weights before beginning training}
+
+\item{shuffle}{logical.  Should the data be shuffled after each epoch?
+Defaults to TRUE.}
 }
 \description{
 This function creates a \code{network} object for fitting a mistnet model.

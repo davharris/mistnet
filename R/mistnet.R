@@ -2,25 +2,35 @@
 #' 
 #' This function creates a \code{network} object for fitting a mistnet model.
 #' 
-#' @param x a \code{numeric} \code{matrix} of predictor variables.  One row
-#'  per example, one column per predictive feature.
-#' @param y a \code{matrix} of responses to \code{x}.  One row per example, one
-#'  column per response variable.
-#' @param layer.definitions a \code{list} of specifications for each layer in
-#'  the network, as produced by \code{defineLayer}.
-#' @param loss a \code{loss} object, defining the function for optimization to 
-#' minimize, as well as its gradient
-#' @param updater an \code{updater} object, specifying how the model should move
-#'  across the likelihood surface (e.g. stochastic gradient descent or adagrad)
-#' @param sampler a \code{sampler} object, specifying the distribution of the
-#'  latent variables
-#' @param n.importance.samples an \code{integer}. More samples will take more time
-#'  to compute, but will provide a more precise estimate of the likelihood gradient.
+#' @param x a \code{numeric} \code{matrix} of predictor variables.  One row per 
+#'   record, one column per predictive feature.
+#' @param y a \code{matrix} of responses to \code{x}.  One row per record, one 
+#'   column per response variable.
+#' @param layer.definitions a \code{list} of specifications for each layer in 
+#'   the network, as produced by \code{\link{defineLayer}}.
+#' @param loss a \code{\link{loss}}£ object, defining the function for 
+#'   optimization to minimize, as well as its gradient.
+#' @param updater an \code{\link{updater}} object, specifying how the model 
+#'   should move across the likelihood surface (e.g. stochastic gradient descent
+#'   or adagrad)
+#' @param sampler a \code{\link{sampler}} object, specifying the distribution of
+#'   the latent variables
+#' @param n.importance.samples an \code{integer}. More samples will take more 
+#'   time to compute, but will provide a more precise estimate of the likelihood
+#'   gradient.
 #' @param n.minibatch an \code{integer} specifying the number of rows to include
-#'  in each stochastic estimate of the likelihood gradient.
+#'   in each stochastic estimate of the likelihood gradient.
 #' @param training.iterations an \code{integer} number of minibatches to process
-#'  before terminating. Currently, it is best practice to leave this value at 0
-#'  and manually initialize the model's weights before beginning training
+#'   before terminating. Defaults to zero so that the user can adjust the 
+#'   network before training begins.
+#' @param shuffle logical.  Should the data be shuffled after each epoch? 
+#'   Defaults to TRUE.
+#' @param initialize.biases logical.  Should the network's final layer's biases 
+#'   be initialized to nonzero values? Initial values depend on the 
+#'   \code{\link{nonlinearity}} of the final layer.
+#' @param initialize.weights logical.  Should the weights in each layer be 
+#'   initialized automatically? If \code{TRUE}, each layer's weights will be 
+#'   sampled randomly from their \code{\link{prior}}s.
 #' @seealso \code{\link{network}}
 #' @include prior.R
 #' @include nonlinearity.R
@@ -59,12 +69,6 @@
 #'   training.iterations = 0
 #' )
 #' 
-#' # Currently, mistnet does not initialize the weights automatically.
-#' # This gets it started with nonzero values.
-#' for(layer in net$layers){
-#'   layer$weights[ , ] = rnorm(length(layer$weights), sd = .01)
-#' }
-#' 
 #' # Fit the model
 #' net$fit(iterations = 10)
 #' @useDynLib mistnet
@@ -78,14 +82,14 @@ mistnet = function(
   y,
   layer.definitions,
   loss,
-  updater = adagrad.updater(learning.rate = .01),
+  updater,
   sampler = gaussian.sampler(ncol = 10L, sd = 1),
   n.importance.samples = 30,
   n.minibatch = 10,
   training.iterations = 0,
   shuffle = TRUE,
-  initialize.biases = FALSE,
-  initialize.weights = FALSE
+  initialize.biases = TRUE,
+  initialize.weights = TRUE
 ){  
   assert_that(is.matrix(x))
   assert_that(is.matrix(y))

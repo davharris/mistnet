@@ -26,7 +26,10 @@ test_that("net$copy works", {
     n.importance.samples = 10L,
     n.minibatch = 10L,
     training.iterations = 0L,
-    loss = bernoulliLoss()
+    loss = bernoulliLoss(),
+    updater = adagrad.updater(learning.rate = .01),
+    initialize.weights = FALSE,
+    initialize.biases = FALSE
   )
   
   net2 = net$copy()

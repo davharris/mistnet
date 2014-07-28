@@ -35,7 +35,8 @@ test_that("3-layer backprop works", {
     n.importance.samples = 1L,
     training.iterations = 0L,
     initialize.weights = FALSE,
-    initialize.biases = FALSE
+    initialize.biases = FALSE,
+    updater = adagrad.updater(learning.rate = .01)
   )
   
   net$fit(1)
