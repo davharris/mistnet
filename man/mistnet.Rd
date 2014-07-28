@@ -3,10 +3,10 @@
 \alias{mistnet}
 \title{Construct a mistnet model}
 \usage{
-mistnet(x, y, layer.definitions, loss, updater = adagrad.updater(learning.rate
-  = 0.01), sampler = gaussian.sampler(ncol = 10L, sd = 1),
-  n.importance.samples = 30, n.minibatch = 10, training.iterations = 0,
-  shuffle = TRUE, initialize.biases = FALSE, initialize.weights = FALSE)
+mistnet(x, y, layer.definitions, loss, updater,
+  sampler = gaussian.sampler(ncol = 10L, sd = 1), n.importance.samples = 25,
+  n.minibatch = 25, training.iterations = 0, shuffle = TRUE,
+  initialize.biases = TRUE, initialize.weights = TRUE)
 }
 \arguments{
 \item{x}{a \code{numeric} \code{matrix} of predictor variables.  One row per
@@ -18,14 +18,15 @@ column per response variable.}
 \item{layer.definitions}{a \code{list} of specifications for each layer in
 the network, as produced by \code{\link{defineLayer}}.}
 
-\item{loss}{a \code{\link{loss}} object, defining the function for
+\item{loss}{a \code{\link{loss}}£ object, defining the function for
 optimization to minimize, as well as its gradient.}
 
-\item{updater}{an \code{\link{updater}} object, specifying how the model should move
-across the likelihood surface (e.g. stochastic gradient descent or adagrad)}
+\item{updater}{an \code{\link{updater}} object, specifying how the model
+should move across the likelihood surface (e.g. stochastic gradient descent
+or adagrad)}
 
-\item{sampler}{a \code{\link{sampler}} object, specifying the distribution of the
-latent variables}
+\item{sampler}{a \code{\link{sampler}} object, specifying the distribution of
+the latent variables}
 
 \item{n.importance.samples}{an \code{integer}. More samples will take more
 time to compute, but will provide a more precise estimate of the likelihood
@@ -35,11 +36,19 @@ gradient.}
 in each stochastic estimate of the likelihood gradient.}
 
 \item{training.iterations}{an \code{integer} number of minibatches to process
-before terminating. Currently, it is best practice to leave this value at 0
-and manually initialize the model's weights before beginning training}
+before terminating. Defaults to zero so that the user can adjust the
+network before training begins.}
 
 \item{shuffle}{logical.  Should the data be shuffled after each epoch?
 Defaults to TRUE.}
+
+\item{initialize.biases}{logical.  Should the network's final layer's biases
+be initialized to nonzero values? Initial values depend on the
+\code{\link{nonlinearity}} of the final layer.}
+
+\item{initialize.weights}{logical.  Should the weights in each layer be
+initialized automatically? If \code{TRUE}, each layer's weights will be
+sampled randomly from their \code{\link{prior}}s.}
 }
 \description{
 This function creates a \code{network} object for fitting a mistnet model.
@@ -77,12 +86,6 @@ net = mistnet(
   n.minibatch = 10,
   training.iterations = 0
 )
-
-# Currently, mistnet does not initialize the weights automatically.
-# This gets it started with nonzero values.
-for(layer in net$layers){
-  layer$weights[ , ] = rnorm(length(layer$weights), sd = .01)
-}
 
 # Fit the model
 net$fit(iterations = 10)

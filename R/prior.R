@@ -1,3 +1,7 @@
+#' Prior distributions
+#' 
+#' Prior distributions regularize the model's weights during training
+#' 
 #' @exportClass prior
 prior = setRefClass(
   Class = "prior",
