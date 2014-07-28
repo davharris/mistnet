@@ -26,7 +26,6 @@ net = mistnet(
       prior = gaussian.prior(mean = 0, sd = .5)
     )
   ),
-  n.minibatch = 10L,
   loss = bernoulliLoss(),
   updater = adagrad.updater(learning.rate = .1),
   initialize.biases = TRUE, 
@@ -94,3 +93,4 @@ points(
   pch = 16,
   col = "#00000040"
 )
+

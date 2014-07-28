@@ -93,7 +93,7 @@ adagrad.updater = setRefClass(
         delta <<- delta
         # Don't initialize squared.grad at 0 to prevent divide by zero errors
         squared.grad <<- matrix(
-          sqrt(.Machine$double.eps),
+          .Machine$double.eps,
           nrow = nrow(delta),
           ncol = ncol(delta)
         )

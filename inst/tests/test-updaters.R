@@ -42,6 +42,16 @@ test_that("adagrad works",{
   
   expect_equal(coefs, true.coefs)
   
+  
+  # adagrad works when gradient is zero
+  updater = adagrad.updater( 
+    delta = coefs * 0, 
+    learning.rate = 1
+  )
+  updater$computeDelta(coefs * 0)
+  updater$computeDelta(coefs)
+  expect_true(all(is.finite(updater$delta)))
+  
 })
 
 test_that("adadelta works",{
@@ -63,5 +73,4 @@ test_that("adadelta works",{
   }
   
   expect_equal(coefs, true.coefs)
-  
 })
