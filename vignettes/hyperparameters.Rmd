@@ -1,11 +1,19 @@
 <!--
 %\VignetteEngine{knitr}
-%\VignetteIndexEntry{Databases}
+%\VignetteIndexEntry{hyperparameters}
 -->
 
-test
+# Choosing hyperparameters
 
-```{r one}
-1+1
-```
+Mistnet models can require a lot of tuning.
 
+* Standardize the input variables (`x`). Otherwise, the model will expect variables with larger means or larger ranges to play a disproportionate role in your predictions.  Consider other preprocessing steps, such as independent components analysis as well.
+* Start with the default initializations for weights and biases.  For weights, this involves sampling from the corresponding layer's prior distribution.  For biases, only the final layer is initialized with nonzero values: these values should allow the output units to produce approximately the correct values, on average, assuming that their input from the previous layer is about zero.
+* Selecting good priors may be the hardest part.  Consider using the priors' `update` method periodically---especially when first applying mistnet to a new problem---to share information among weights within the same layer, as in multilevel/hierarchical modeling or empirical Bayes.
+* Layer sizes and number of layers are very problem-dependent.  Adding neurons to existing layers or adding layers to the model will increase its capacity, as well as the risk of overfitting.  For difficult problems with lots of data, very deep networks (e.g. six large layers) work best.  For modeling species assemblages, 1-2 hidden layers seems more appropriate.  The best way to evaluate the optimal model structure for your problem is cross-validation.
+* Use the `adagrad` updater for routine work, and the `sgd.updater` when you can afford to do lots of tuning. For the `sgd.updater`, start with a momentum of 0.8 and see if you can get better results with 0.9 or 0.95.
+* Start with the highest learning rate that doesn't introduce numerical problems, but see if you can get better results if you drop the learning rate by an order of magnitude. Consider annealing the learning rate if using an `sgd.updater`.
+* Common values for `n.minibatch` range from 10 to 100.  The default of 25 should work well in most cases. Larger minibatches will lead to more accurate gradient estimates, at the cost of additional computation per update.
+* The optimal `sampler` is very problem-dependent. The default (a ten-dimensional isotropic Gaussian) seems to work for modeling species assemblages, but much higher dimensions could be necessary for other applications.
+* `n.importance.samples` involves another speed-accuracy tradeoff.  25 is probably good for many applications.
+* The final layer's `nonlinearity` should match the `loss` function you're optimizing.  For the other layers, `rectify.nonlinearities` tend to work best.
