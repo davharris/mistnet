@@ -31,7 +31,37 @@
 #' @param initialize.weights logical.  Should the weights in each layer be 
 #'   initialized automatically? If \code{TRUE}, each layer's weights will be 
 #'   sampled randomly from their \code{\link{prior}}s.
+#' @details The \code{mistnet} function produces a \code{\link{network}} object 
+#'   that produces a joint distribution over \code{y} given \code{x}. This 
+#'   distribution is defined by a stochastic feed-forward neural network (Neal 
+#'   1992), which is trained using a variant of backpropagation described in 
+#'   Tang and Salakhutdinov (2013) and Harris (2014). During each training
+#'   iteration, model descends the gradient defined by its \code{\link{loss}}
+#'   function, averaged over a number of Monte Carlo samples and a number of
+#'   rows of data.
+#'   
+#'   A \code{\link{network}} concatenates the predictor variables in \code{x} 
+#'   with random variables produced by a \code{\link{sampler}} and passes the 
+#'   resulting data vectors through one or more \code{\link{layer}} objects to 
+#'   make predictions about \code{y}. The \code{weights} and \code{biases} in 
+#'   each \code{\link{layer}} can be trained using the \code{\link{network}}'s 
+#'   \code{fit} method (see example below).
+#'   
+#' @note \code{\link{network}} objects produced by \code{mistnet} are 
+#'   \code{\link{ReferenceClasses}}, and behave differently from other R 
+#'   objects. In particular, binding a \code{\link{network}} or other reference 
+#'   class object to a new variable name will not produce a copy of the original
+#'   object, but will instead create a new alias for it.
 #' @seealso \code{\link{network}}
+#' @seealso \code{\link{layer}}
+#' @references Harris, D.J. Building realistic assemblages with a Joint Species 
+#'   Distribution Model. BioRxiv preprint. http://dx.doi.org/10.1101/003947
+#' @references Neal, R.M. (1992) Connectionist learning of belief networks. 
+#'   Artificial Intelligence, 56, 71-113.
+#' @references Tang, Y. & Salakhutdinov, R. (2013) Learning Stochastic 
+#'   Feedforward Neural Networks. Advances in Neural Information Processing 
+#'   Systems 26 (eds & trans C.J.C. Burges), L. Bottou), M. Welling), Z. 
+#'   Ghahramani), & K.Q. Weinberger), pp. 530-538.
 #' @include prior.R
 #' @include nonlinearity.R
 #' @import assertthat
