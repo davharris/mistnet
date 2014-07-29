@@ -43,12 +43,15 @@ network before training begins.}
 Defaults to TRUE.}
 
 \item{initialize.biases}{logical.  Should the network's final layer's biases
-be initialized to nonzero values? Initial values depend on the
-\code{\link{nonlinearity}} of the final layer.}
+be initialized to nonzero values? If \code{TRUE}, initial values will
+depend on the \code{\link{nonlinearity}} of the final layer. Otherwise, all
+values will be zero.}
 
 \item{initialize.weights}{logical.  Should the weights in each layer be
-initialized automatically? If \code{TRUE}, each layer's weights will be
-sampled randomly from their \code{\link{prior}}s.}
+initialized automatically? If \code{TRUE}, each \code{\link{layer}}'s
+weights will be sampled randomly from their \code{\link{prior}}s.
+Otherwise, all values will be zero, which can prevent the network from
+learning.}
 }
 \description{
 This function creates a \code{network} object for fitting a mistnet model.

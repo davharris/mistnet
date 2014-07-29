@@ -26,18 +26,21 @@
 #' @param shuffle logical.  Should the data be shuffled after each epoch? 
 #'   Defaults to TRUE.
 #' @param initialize.biases logical.  Should the network's final layer's biases 
-#'   be initialized to nonzero values? Initial values depend on the 
-#'   \code{\link{nonlinearity}} of the final layer.
+#'   be initialized to nonzero values? If \code{TRUE}, initial values will 
+#'   depend on the \code{\link{nonlinearity}} of the final layer. Otherwise, all
+#'   values will be zero.
 #' @param initialize.weights logical.  Should the weights in each layer be 
-#'   initialized automatically? If \code{TRUE}, each layer's weights will be 
-#'   sampled randomly from their \code{\link{prior}}s.
+#'   initialized automatically? If \code{TRUE}, each \code{\link{layer}}'s
+#'   weights will be sampled randomly from their \code{\link{prior}}s.
+#'   Otherwise, all values will be zero, which can prevent the network from
+#'   learning.
 #' @details The \code{mistnet} function produces a \code{\link{network}} object 
 #'   that produces a joint distribution over \code{y} given \code{x}. This 
 #'   distribution is defined by a stochastic feed-forward neural network (Neal 
 #'   1992), which is trained using a variant of backpropagation described in 
-#'   Tang and Salakhutdinov (2013) and Harris (2014). During each training
-#'   iteration, model descends the gradient defined by its \code{\link{loss}}
-#'   function, averaged over a number of Monte Carlo samples and a number of
+#'   Tang and Salakhutdinov (2013) and Harris (2014). During each training 
+#'   iteration, model descends the gradient defined by its \code{\link{loss}} 
+#'   function, averaged over a number of Monte Carlo samples and a number of 
 #'   rows of data.
 #'   
 #'   A \code{\link{network}} concatenates the predictor variables in \code{x} 
