@@ -23,7 +23,7 @@ outer.radius = 3E5
 
 
 
-source("BBS-analysis/data_extraction/species-handling.R")
+source("extras/BBS-analysis/data_extraction/species-handling.R")
 
 # eliminate unacceptable (e.g. non-species) taxa
 valid.species.df = validateSpecies()

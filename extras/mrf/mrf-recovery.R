@@ -1,7 +1,7 @@
 set.seed(1)
 
 devtools::load_all()
-load("inst/fakedata.Rdata")
+load("extras/mrf/fakedata.Rdata")
 
 scale = mean(abs(lateral[upper.tri(lateral)]))
 
@@ -18,11 +18,12 @@ net = mistnet(
         updater = new(
           "adagrad.updater",
           delta = matrix(0, nrow = ncol(fakedata), ncol = ncol(fakedata)),
-          learning.rate = .05
+          learning.rate = .1
         ),
         l1.decay = 1 / scale / nrow(env)
       ),
       size = ncol(fakedata),
+      sampler = gaussian.sampler(ncol = 5L, sd = 1),
       prior = gaussian.prior(mean = 0, sd = .5)
     )
   ),
@@ -34,7 +35,7 @@ net = mistnet(
 
 
 
-
+net$layers[[1]]$nonlinearity$updater$learning.rate = .05
 par(mfrow = c(1, 2))
 for(i in 1:25){
   net$fit(100)
@@ -62,11 +63,13 @@ for(i in 1:25){
   abline(v = 0)
 }
 
+
+
 pcs = predict(prcomp(t(net$layers[[1]]$weights[4:(3 + 10), ])))
 
-summary(lm(coefs[1, ] ~ 0 + net$layers[[1]]$weights[1, ]))
-summary(lm(coefs[2, ] ~ 0 + net$layers[[1]]$weights[2, ]))
-summary(lm(coefs[3, ] ~ 0 + net$layers[[1]]$weights[3, ]))
+summary(lm(coefs[1, ] ~ net$layers[[1]]$weights[1, ]))
+summary(lm(coefs[2, ] ~ net$layers[[1]]$weights[2, ]))
+summary(lm(coefs[3, ] ~ net$layers[[1]]$weights[3, ]))
 
 summary(lm(coefs[4, ] ~ PC1+PC2, data = as.data.frame(pcs)))
 summary(lm(coefs[5, ] ~ PC1+PC2, data = as.data.frame(pcs)))

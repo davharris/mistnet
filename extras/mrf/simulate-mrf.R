@@ -39,4 +39,4 @@ for(i in 1:iter){
 
 fakedata = state
 
-save(coefs, fakedata, env, lateral, biases = biases, file = "inst/fakedata.Rdata")
+save(coefs, fakedata, env, lateral, biases = biases, file = "extras/mrf/fakedata.Rdata")
