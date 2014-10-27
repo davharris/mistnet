@@ -1,6 +1,8 @@
 mistnet: Structured prediction with neural networks in R
 =========
 
+https://zenodo.org/badge/doi/10.5281/zenodo.12423.png
+
 Mistnet is an R package that produces probability densities over multivariate outcomes.  Ecologists can use it to define probability densities over possible species assemblages.
 
 **Note that this software is under active development and that there will be major changes to the user interface and default methods in the next few months.**  Development should stabilize some time this summer (2014).
