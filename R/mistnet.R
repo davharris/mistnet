@@ -104,6 +104,8 @@
 #' 
 #' # Fit the model
 #' net$fit(iterations = 10)
+#' 
+#' predict(net, newdata = x, n.importance.samples = 10)
 #' @useDynLib mistnet
 #' @import Rcpp
 #' @import RcppArmadillo
