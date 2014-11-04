@@ -69,3 +69,52 @@ laplace.prior = setRefClass(
     }
   )
 ) 
+
+
+
+#' @export gp.prior
+#' @exportClass gp.prior
+laplace.prior = setRefClass(
+  Class = "gp.prior",
+  fields = list(
+    means = "matrix",
+    K = "array",
+    L = "array",
+    v = "array",
+    inverse.var = "matrix",
+    process_noise = "numeric"
+  ),
+  contains = "prior",
+  methods = list(
+    initialize = function(){
+      
+    },
+    getLogGrad = function(x){
+      # L <<- t(chol(K + diag(nrow(dists)) * process_noise^2))
+      # v <<- solve(L, K)
+      # inverse.var <<- solve(K - t(v) %*% v)
+      
+      
+      sapply(
+        1:nrow(x),
+        function(i){
+          - inverse.var %*% (x[i, ] - means[i, ])
+        }
+      )
+      
+      
+    },
+    updateMeans = function(coefs){
+      # Each row of coefficients has its own posterior mean
+      if(length(means) == 0){
+        means <<- matrix(NA, nrow = nrow(coefs), ncol = ncol(coefs))
+      }
+      for(i in 1:nrow(coefs)){
+        y = coefs[i, ]
+        centered.y = y - mean(y)
+        alpha = solve(t(L[i, , ]), solve(L[i, , ], centered.y))
+        means[i, ] <<- t(K[i, , ]) %*% alpha + mean(y)
+      }
+    }
+  )
+)
