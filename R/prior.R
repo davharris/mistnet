@@ -74,7 +74,7 @@ laplace.prior = setRefClass(
 
 #' @export gp.prior
 #' @exportClass gp.prior
-laplace.prior = setRefClass(
+gp.prior = setRefClass(
   Class = "gp.prior",
   fields = list(
     means = "matrix",
