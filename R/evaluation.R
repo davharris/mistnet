@@ -22,6 +22,7 @@ importanceSamplingEvaluation = function(
   object, 
   newdata, 
   y, 
+  loss,
   batches, 
   batch.size,
   verbose = FALSE
@@ -38,7 +39,7 @@ importanceSamplingEvaluation = function(
         predictions, 
         3, 
         function(x){
-          -rowSums(object$loss(y = y, yhat = x))
+          -rowSums(loss(y = y, yhat = x))
         }
       )
       
