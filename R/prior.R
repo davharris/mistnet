@@ -80,29 +80,46 @@ gp.prior = setRefClass(
     means = "matrix",
     K = "array",
     L = "array",
-    v = "array",
-    inverse.var = "matrix",
-    process_noise = "numeric"
+    inverse_var = "array"
   ),
   contains = "prior",
   methods = list(
-    initialize = function(){
+    initialize = function(K, means){
+      # Notation roughly follows Rasmussen & Williams 2006
+      # Gaussian Processes for Machine Learning
+      # Algorithm 2.1, page 19
       
+      means <<- means    # 
+      
+      K <<- K            # K[ , , j] is the jth covariance matrix.
+                         # All matrices should include noise along the diagonal
+      
+      # Initialize L, v, and inverse_var with correct dimensions
+      L           <<- K * 0
+      v           <<- K * 0
+      inverse_var <<- K * 0
+      
+      for(i in seq_len(dim(K)[[3]])){
+        # Cholesky decomposition is transposed to match algorithm in textbook
+        L[ , , i]           <<- t(chol(K[ , , i]))
+        
+        # decomposition of variance explained by the data??
+        v[ , , i]           <<- solve(L, K)
+        
+        # Inverting predictive variance for use in gradient
+        inverse_var[ , , i] <<- solve(K - crossprod(v[ , , i]))
+      }
     },
     getLogGrad = function(x){
-      # L <<- t(chol(K + diag(nrow(dists)) * process_noise^2))
-      # v <<- solve(L, K)
-      # inverse.var <<- solve(K - t(v) %*% v)
-      
-      
+      # Calculate gradient for each row of x independently
       sapply(
         1:nrow(x),
         function(i){
-          - inverse.var %*% (x[i, ] - means[i, ])
+          # https://stats.stackexchange.com/questions/90134/gradient-of-gaussian-log-likelihood
+          # {1 \over 2}{\partial (\theta - \mu)^T\Sigma^{-1}(\theta - \mu) \over \partial \theta} = \Sigma^{-1}(\theta - \mu).
+          - inverse_var[i, , ] %*% (x[i, ] - means[i, ])
         }
       )
-      
-      
     },
     updateMeans = function(coefs){
       # Each row of coefficients has its own posterior mean
