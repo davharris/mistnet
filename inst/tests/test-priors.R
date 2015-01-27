@@ -52,3 +52,22 @@ test_that("Laplace prior works", {
   )
   
 })
+
+
+test_that("GP prior works", {
+  library("mvtnorm")
+  
+  dim = 5
+  d = as.matrix(dist(seq(1, 3, length = 10)))
+  
+  K = array(0, dim = c(dim(d), dim))
+  
+  # covariance matrices with different lengthscales and noise
+  for(i in 1:dim){
+    K[, ,  i] = exp(- i * d^2) + diag(ncol(d)) / i
+  }
+  
+  x = matrix(rnorm(dim * ncol(K)), nrow = dim)
+  
+  prior = gp.prior$new(K = K, coefs = x)
+})

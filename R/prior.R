@@ -79,17 +79,16 @@ gp.prior = setRefClass(
   fields = list(
     means = "matrix",
     K = "array",
+    v = "array",
     L = "array",
     inverse_var = "array"
   ),
   contains = "prior",
   methods = list(
-    initialize = function(K, means){
+    initialize = function(K, coefs){
       # Notation roughly follows Rasmussen & Williams 2006
       # Gaussian Processes for Machine Learning
       # Algorithm 2.1, page 19
-      
-      means <<- means    # 
       
       K <<- K            # K[ , , j] is the jth covariance matrix.
                          # All matrices should include noise along the diagonal
@@ -104,11 +103,15 @@ gp.prior = setRefClass(
         L[ , , i]           <<- t(chol(K[ , , i]))
         
         # decomposition of variance explained by the data??
-        v[ , , i]           <<- solve(L, K)
+        v[ , , i]           <<- solve(L[ , , i], K[ , , i])
         
         # Inverting predictive variance for use in gradient
-        inverse_var[ , , i] <<- solve(K - crossprod(v[ , , i]))
+        inverse_var[ , , i] <<- solve(K[ , , i] - crossprod(v[ , , i]))
       }
+
+      # Create a mean function
+      updateMeans(coefs)
+      
     },
     getLogGrad = function(x){
       # Calculate gradient for each row of x independently
@@ -124,13 +127,14 @@ gp.prior = setRefClass(
     updateMeans = function(coefs){
       # Each row of coefficients has its own posterior mean
       if(length(means) == 0){
+        # Initialize means as NAs if blank
         means <<- matrix(NA, nrow = nrow(coefs), ncol = ncol(coefs))
       }
       for(i in 1:nrow(coefs)){
         y = coefs[i, ]
         centered.y = y - mean(y)
-        alpha = solve(t(L[i, , ]), solve(L[i, , ], centered.y))
-        means[i, ] <<- t(K[i, , ]) %*% alpha + mean(y)
+        alpha = solve(t(L[ , , i]), solve(L[ , , i], centered.y))
+        means[i, ] <<- t(K[, , i]) %*% alpha + mean(y)
       }
     }
   )
