@@ -15,11 +15,12 @@ Imports:
     Rcpp (>= 0.11.1),
     RcppArmadillo (>= 0.4.100.2.1)
 LinkingTo: Rcpp, RcppArmadillo
-Sugests: mda
+Sugests: mda, geiger
 VignetteBuilder: knitr
 Collate:
     'RcppExports.R'
     'evaluation.R'
+    'geiger_OU.R'
     'helpers.R'
     'initializeMars.R'
     'prior.R'
