@@ -15,7 +15,7 @@ Imports:
     Rcpp (>= 0.11.1),
     RcppArmadillo (>= 0.4.100.2.1)
 LinkingTo: Rcpp, RcppArmadillo
-Sugests: mda, geiger, mvtnorm, kernlab
+Sugests: mda, geiger, mvtnorm, kernlab, gtools
 VignetteBuilder: knitr
 Collate:
     'RcppExports.R'
