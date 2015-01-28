@@ -77,38 +77,52 @@ laplace.prior = setRefClass(
 gp.prior = setRefClass(
   Class = "gp.prior",
   fields = list(
+    noise_sd = "numeric",
     means = "matrix",
     K = "array",
-    v = "array",
     L = "array",
+    alpha = "array",
+    v = "array",
+    posterior_var = "array",
     inverse_var = "array"
   ),
   contains = "prior",
   methods = list(
-    initialize = function(K, coefs){
+    initialize = function(K, noise_sd, coefs){
       # Notation roughly follows Rasmussen & Williams 2006
       # Gaussian Processes for Machine Learning
       # Algorithm 2.1, page 19
       
-      K <<- K            # K[ , , j] is the jth covariance matrix.
-                         # All matrices should include noise along the diagonal
+      noise_sd <<- noise_sd  # Noise SD is SD of data around the true function
       
-      # Initialize L, v, and inverse_var with correct dimensions
-      L           <<- K * 0
-      v           <<- K * 0
-      inverse_var <<- K * 0
+      K <<- K                # K[ , , j] is the jth prior covariance matrix.
+                             # All matrices should include noise along the diagonal
+      
+      # Initialize L, v, posterior_var, and inverse_var with correct dimensions
+      L             <<- K * 0
+      v             <<- K * 0
+      posterior_var <<- K * 0
+      inverse_var   <<- K * 0
+      
+      I = diag(ncol(K)) # identity matrix, gets added to diagonal of K
       
       for(i in seq_len(dim(K)[[3]])){
+        # K matrix plus noise variance along the diagonal
+        K_plus = K[ , , i] + I * noise_sd[i]^2
+        
         # Cholesky decomposition is transposed to match algorithm in textbook
-        L[ , , i]           <<- t(chol(K[ , , i]))
+        L[ , , i]             <<- t(chol(K_plus))
         
         # decomposition of variance explained by the data??
-        v[ , , i]           <<- solve(L[ , , i], K[ , , i])
+        v[ , , i]             <<- solve(L[ , , i], K[ , , i])
         
+        # posterior variation, used for sampling from posterior
+        posterior_var[ , , i] <<- K_plus - crossprod(v[ , , i])
+                           
         # Inverting predictive variance for use in gradient
-        inverse_var[ , , i] <<- solve(K[ , , i] - crossprod(v[ , , i]))
+        inverse_var[ , , i]   <<- solve(posterior_var[ , , i])
       }
-
+      
       # Create a mean function
       updateMeans(coefs)
       
@@ -127,14 +141,15 @@ gp.prior = setRefClass(
     updateMeans = function(coefs){
       # Each row of coefficients has its own posterior mean
       if(length(means) == 0){
-        # Initialize means as NAs if blank
+        # Initialize means and alphas as NAs if blank
         means <<- matrix(NA, nrow = nrow(coefs), ncol = ncol(coefs))
+        alpha <<- matrix(NA, nrow = nrow(coefs), ncol = ncol(coefs))
       }
       for(i in 1:nrow(coefs)){
         y = coefs[i, ]
         centered.y = y - mean(y)
-        alpha = solve(t(L[ , , i]), solve(L[ , , i], centered.y))
-        means[i, ] <<- t(K[, , i]) %*% alpha + mean(y)
+        alpha[i, ] <<- solve(t(L[ , , i]), solve(L[ , , i], centered.y))
+        means[i, ] <<- K[, , i] %*% alpha[i, ] + mean(y)
       }
     }
   )

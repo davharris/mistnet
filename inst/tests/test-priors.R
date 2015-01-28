@@ -55,19 +55,75 @@ test_that("Laplace prior works", {
 
 
 test_that("GP prior works", {
-  library("mvtnorm")
+  dim = 2
   
-  dim = 5
-  d = as.matrix(dist(seq(1, 3, length = 10)))
+  x = seq(1, 7, length = 50)
   
-  K = array(0, dim = c(dim(d), dim))
+  truth = sin(x)
   
-  # covariance matrices with different lengthscales and noise
+  y = matrix(rnorm(dim * length(x), sd = .1), nrow = dim)
+  y = t(t(y) + truth)
+  y[1, ] = -y[1, ]
+  y = t(scale(t(y)))
+
+  lengthscale = c(pi, exp(1))
+  
+  
+  # kernlab solution
+  var = c(.02, .04)
+  sigma = 1/2/lengthscale^2
+  
+  gp1 = kernlab::gausspr(x = x, y = y[1, ], variance.model = TRUE, scaled = FALSE, var = var[1], kpar = list(sigma = sigma[1]), tol = 1E-6)
+  gp2 = kernlab::gausspr(x = x, y = y[2, ], variance.model = TRUE, scaled = FALSE, var = var[2], kpar = list(sigma = sigma[2]), tol = 1E-6)
+  
+  
+  # mistnet solution
+  K = array(0, dim = c(length(x), length(x), dim))
+  d_squared = as.matrix(dist(x))^2
+  
+  K[,,1] = exp(-d_squared * sigma[1]) # sigma is 0.5/lengthscale^2
+  K[,,2] = exp(-d_squared * sigma[2])
+  
+  prior = gp.prior$new(K = K, coefs = y, noise_sd = sqrt(var))
+
+  expect_equal(c(gp1@fitted), c(prior$means[1, ]))
+  expect_equal(c(gp2@fitted), c(prior$means[2, ]))
+  
+  # Posterior variance should equal function variance plus residual variance
+  expect_equal(
+    diag(prior$posterior_var[ , , 1]),
+    c(predict(gp1, x, type = "variance")) + var[1]
+  )
+
+  expect_equal(
+    diag(prior$posterior_var[ , , 2]),
+    c(predict(gp2, x, type = "variance")) + var[2]
+  )
+  
+  # several variables should be stored as-is
+  expect_equal(prior$noise_sd, sqrt(var))
+  expect_equal(K, prior$K)
+  
   for(i in 1:dim){
-    K[, ,  i] = exp(- i * d^2) + diag(ncol(d)) / i
-  }
+    # inverse_var is the matrix inverse of posterior_var
+    expect_equal(prior$inverse_var[,,i], solve(prior$posterior_var[,,i]))
+  }  
   
-  x = matrix(rnorm(dim * ncol(K)), nrow = dim)
   
-  prior = gp.prior$new(K = K, coefs = x)
+  # Should also test that all this works with a one-dimensional prior...
+  
+  
+  # Test the gradient numerically by setting adding epsilon to the first element of y
+  # and seeing how much the log-likelihood changes
+  eps = 0 * y[1, ]
+  eps[1] = 1E-6
+  ll_plus = mvtnorm::dmvnorm(y[1, ] + eps, prior$means[1, ], prior$posterior_var[ , , 1], log = TRUE)
+  ll_minus = mvtnorm::dmvnorm(y[1, ] - eps, prior$means[1, ], prior$posterior_var[ , , 1], log = TRUE)
+
+  grad_est = (ll_plus - ll_minus) / 2 / eps[1]
+  
+  grad = prior$inverse_var[,,1] %*% (y[1, ] - prior$means[1, ])
+
+  # (minus because grad is for negative log likelihood)
+  expect_equal(-grad[1], grad_est)
 })
