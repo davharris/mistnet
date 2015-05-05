@@ -92,12 +92,12 @@ test_that("GP prior works", {
   # Posterior variance should equal function variance plus residual variance
   expect_equal(
     diag(prior$posterior_var[ , , 1]),
-    c(predict(gp1, x, type = "variance")) + var[1]
+    c(kernlab::predict(gp1, x, type = "variance")) + var[1]
   )
 
   expect_equal(
     diag(prior$posterior_var[ , , 2]),
-    c(predict(gp2, x, type = "variance")) + var[2]
+    c(kernlab::predict(gp2, x, type = "variance")) + var[2]
   )
   
   # several variables should be stored as-is

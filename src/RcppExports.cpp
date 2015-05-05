@@ -10,66 +10,50 @@ using namespace Rcpp;
 NumericMatrix rcpp_add_biases(NumericMatrix m, NumericVector v);
 RcppExport SEXP mistnet_rcpp_add_biases(SEXP mSEXP, SEXP vSEXP) {
 BEGIN_RCPP
-    SEXP __sexp_result;
-    {
-        Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< NumericMatrix >::type m(mSEXP );
-        Rcpp::traits::input_parameter< NumericVector >::type v(vSEXP );
-        NumericMatrix __result = rcpp_add_biases(m, v);
-        PROTECT(__sexp_result = Rcpp::wrap(__result));
-    }
-    UNPROTECT(1);
-    return __sexp_result;
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type m(mSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type v(vSEXP);
+    __result = Rcpp::wrap(rcpp_add_biases(m, v));
+    return __result;
 END_RCPP
 }
 // matrixMultiplyGrad
 NumericMatrix matrixMultiplyGrad(int n_out, NumericMatrix error_grad, NumericMatrix input_act);
 RcppExport SEXP mistnet_matrixMultiplyGrad(SEXP n_outSEXP, SEXP error_gradSEXP, SEXP input_actSEXP) {
 BEGIN_RCPP
-    SEXP __sexp_result;
-    {
-        Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< int >::type n_out(n_outSEXP );
-        Rcpp::traits::input_parameter< NumericMatrix >::type error_grad(error_gradSEXP );
-        Rcpp::traits::input_parameter< NumericMatrix >::type input_act(input_actSEXP );
-        NumericMatrix __result = matrixMultiplyGrad(n_out, error_grad, input_act);
-        PROTECT(__sexp_result = Rcpp::wrap(__result));
-    }
-    UNPROTECT(1);
-    return __sexp_result;
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< int >::type n_out(n_outSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type error_grad(error_gradSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type input_act(input_actSEXP);
+    __result = Rcpp::wrap(matrixMultiplyGrad(n_out, error_grad, input_act));
+    return __result;
 END_RCPP
 }
 // mrf_meanfield
 NumericMatrix mrf_meanfield(NumericMatrix rinput, NumericMatrix rlateral, int maxit, double damp, double tol);
 RcppExport SEXP mistnet_mrf_meanfield(SEXP rinputSEXP, SEXP rlateralSEXP, SEXP maxitSEXP, SEXP dampSEXP, SEXP tolSEXP) {
 BEGIN_RCPP
-    SEXP __sexp_result;
-    {
-        Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< NumericMatrix >::type rinput(rinputSEXP );
-        Rcpp::traits::input_parameter< NumericMatrix >::type rlateral(rlateralSEXP );
-        Rcpp::traits::input_parameter< int >::type maxit(maxitSEXP );
-        Rcpp::traits::input_parameter< double >::type damp(dampSEXP );
-        Rcpp::traits::input_parameter< double >::type tol(tolSEXP );
-        NumericMatrix __result = mrf_meanfield(rinput, rlateral, maxit, damp, tol);
-        PROTECT(__sexp_result = Rcpp::wrap(__result));
-    }
-    UNPROTECT(1);
-    return __sexp_result;
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type rinput(rinputSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type rlateral(rlateralSEXP);
+    Rcpp::traits::input_parameter< int >::type maxit(maxitSEXP);
+    Rcpp::traits::input_parameter< double >::type damp(dampSEXP);
+    Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
+    __result = Rcpp::wrap(mrf_meanfield(rinput, rlateral, maxit, damp, tol));
+    return __result;
 END_RCPP
 }
 // rectify
 NumericMatrix rectify(NumericMatrix m);
 RcppExport SEXP mistnet_rectify(SEXP mSEXP) {
 BEGIN_RCPP
-    SEXP __sexp_result;
-    {
-        Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< NumericMatrix >::type m(mSEXP );
-        NumericMatrix __result = rectify(m);
-        PROTECT(__sexp_result = Rcpp::wrap(__result));
-    }
-    UNPROTECT(1);
-    return __sexp_result;
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< NumericMatrix >::type m(mSEXP);
+    __result = Rcpp::wrap(rectify(m));
+    return __result;
 END_RCPP
 }
