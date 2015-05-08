@@ -6,3 +6,5 @@ src/*.so
 src/*.dll
 wc10
 AllBirdsEricson1.tre
+mistnet.Rproj
+db.sqlite
