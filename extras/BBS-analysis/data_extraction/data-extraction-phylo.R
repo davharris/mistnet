@@ -54,10 +54,39 @@ runs = inner_join(
   c("countrynum", "statenum", "route")
 ) %>% collect()
 
-# Identify occupants ------------------------------------------------------
-collected_counts = counts %>% collect %>% as.data.frame
+# train-test split --------------------------------------------------------
 
-rdids = unique(collected_counts$RouteDataID)
+# All the points within inner.radius of a center point will be in the test set.
+# Everything more than outer.radius away will be in the training set.
+# radii are in meters
+centers = regularCoordinates(16)
+inner.radius = 1.0E5
+outer.radius = 2.5E5
+
+dists = pointDistance(centers, cbind(runs$loni, runs$lati), longlat = TRUE)
+
+runs$in.train = apply(
+  dists, 
+  2,
+  function(x) min(x) > outer.radius
+)
+
+in.test = apply(
+  dists, 
+  2,
+  function(x) min(x) < inner.radius
+)
+
+valid_runs = runs[runs$in.train | in.test, ]
+
+# Identify occupants ------------------------------------------------------
+
+rdids = valid_runs %>% extract2("RouteDataID")
+
+collected_counts = counts %>% 
+  collect %>% 
+  filter_(~RouteDataID %in% rdids) %>% 
+  as.data.frame
 
 occurrences_by_rdid = lapply(
   rdids,
@@ -100,15 +129,17 @@ valid_species = included_species %>% filter_(~row_valid)
 subspecies_rows = grep(" .+ ", valid_species$spanish_common_name)
 
 # Find the corresponding rows for the whole species
-species_rows = valid_species[subspecies_rows, ] %>% 
-  extract(c("genus", "species")) %>%
-  apply(1, paste, collapse = " ") %>% 
+species_rows = valid_species[["spanish_common_name"]][subspecies_rows] %>%
+  gsub(" \\S+$", "", .) %>%
   match(valid_species$spanish_common_name)
 
 # Replace subspecies rows with species rows
 valid_species[subspecies_rows, ] = valid_species[species_rows, ]
 
 valid_aous = unique(valid_species$AOU)
+
+
+
 
 # presence-absence matrix -------------------------------------------------
 
@@ -128,11 +159,27 @@ pa = structure(
   )
 )
 
+stop()
 
-
-# Phylogenies -------------------------------------------------------------
+# Import phylogeny -------------------------------------------------------------
 
 tre = read.tree("AllBirdsEricson1.tre", n = 1)
+
+# merge synonyms ----------------------------------------------------------
+
+library(taxize)
+
+matchless = colnames(pa)[!(colnames(pa) %in% gsub("_", " ", tre$tip.label))]
+
+syns = synonyms(matchless, db = c("itis"), accepted = FALSE)
+
+matchless[is.na(syns)]
+
+
+
+# prune tree --------------------------------------------------------------
+
+pruned = drop.tip(tre, which(!(gsub("_", " ", tre$tip.label) %in% colnames(pa))))
 
 # x = structure(
 #   rnorm(length(tre$tip.label)),
@@ -141,27 +188,3 @@ tre = read.tree("AllBirdsEricson1.tre", n = 1)
 # 
 # 
 # fit = fitContinuous(tre, dat = x, SE = NA, model = "white")
-
-
-# train-test split --------------------------------------------------------
-
-# All the points within inner.radius of a center point will be in the test set.
-# Everything more than outer.radius away will be in the training set.
-# radii are in meters
-centers = regularCoordinates(12)
-inner.radius = 1.5E5
-outer.radius = 3E5
-
-dists = pointDistance(centers, latlon, longlat = TRUE)
-
-in.train = apply(
-  dists, 
-  2,
-  function(x) min(x) > outer.radius
-)
-
-in.test = apply(
-  dists, 
-  2,
-  function(x) min(x) < inner.radius
-)
