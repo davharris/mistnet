@@ -1,3 +1,5 @@
+`%nin%` = function(a, b){!(a %in% b)}
+
 library(geosphere) # for regularCoordinates
 library(raster)    # for worldclim
 library(ape)       # for read.tree
@@ -16,7 +18,7 @@ wc = getData("worldclim", var = "bio", res = 10)[[retained_layers]]
 if (!file.exists("db.sqlite")) {
   library(ecoretriever)
   
-  # Version 1.7 of retriever has a 
+  # Version 1.7 of retriever has a problem with the current BBS web site.
   download.file(
     "https://raw.githubusercontent.com/weecology/retriever/master/scripts/bbs50stop.py",
     "~/.retriever/scripts/bbs50stop.py",
@@ -102,44 +104,10 @@ aous = occurrences_by_rdid %>%
   sort
 
 # find valid species ------------------------------------------------------
-french = grep("french", colnames(species)) # bad unicode causes problems
+
+# drop French column: bad unicode causes problems
+french = grep("french", colnames(species))
 included_species = species[match(aous, species$AOU), -french]
-
-# species with slashes, " or ", " x " or " X " or " sp." "unid", etc.
-# are either unknown or hybrids.
-bad_species = "/| or | X | x | sp\\.|unid|hybrid|Admin Code"
-
-# Bad genera include a bad species and start with a capital letter
-bad_genera = included_species %>% 
-  extract2("spanish_common_name") %>%
-  grep(bad_species, ., value = TRUE) %>%
-  strsplit(" ") %>% 
-  unlist %>% 
-  grep("^[A-Z]", ., value = TRUE) %>%
-  unique %>%
-  paste0(collapse = "|")
-
-row_valid = !grepl(bad_species, included_species$spanish_common_name) & 
-  !grepl(bad_genera, included_species$spanish_common_name)
-
-valid_species = included_species %>% filter_(~row_valid)
-
-
-# Find rows with subspecies (three Latin names)
-subspecies_rows = grep(" .+ ", valid_species$spanish_common_name)
-
-# Find the corresponding rows for the whole species
-species_rows = valid_species[["spanish_common_name"]][subspecies_rows] %>%
-  gsub(" \\S+$", "", .) %>%
-  match(valid_species$spanish_common_name)
-
-# Replace subspecies rows with species rows
-valid_species[subspecies_rows, ] = valid_species[species_rows, ]
-
-valid_aous = unique(valid_species$AOU)
-
-
-
 
 # presence-absence matrix -------------------------------------------------
 
@@ -147,7 +115,7 @@ valid_aous = unique(valid_species$AOU)
 pa_list = lapply(
   occurrences_by_rdid, 
   function(x){
-    valid_aous %in% x
+    included_species$AOU %in% x
   }
 )
 
@@ -155,11 +123,140 @@ pa = structure(
   do.call(rbind, pa_list),
   dimnames = list(
     names(occurrences_by_rdid), 
-    valid_species$spanish_common_name[match(valid_aous, valid_species$AOU)]
+    included_species$spanish_common_name
   )
 )
 
+
+# Collapse subspecies -----------------------------------------------------
+
+# Subspecies have three names separated by two spaces.
+# For our purposes, "Colaptes auratus auratus x auratus cafer" is a subspecies
+# because both parents of the hybrid belonged to the same species
+subspecies = c(
+  grep("^\\S* \\S* \\S*$", colnames(pa), value = TRUE),
+  "Colaptes auratus auratus x auratus cafer"
+)
+
+full_species = gsub("^(\\S* \\S*).*", "\\1", subspecies)
+
+# If a subspecies is present, the full species is present too
+for(i in 1:length(subspecies)){
+  pa[, full_species[i]] = pmax(pa[, subspecies[i]], pa[, full_species[i]])
+}
+
+# Drop subspecies
+pa = pa[ , colnames(pa) %nin% subspecies]
+
+
+# Impute hybrids and "slash" species as 50% of each parent ------------------------------------
+
+# If a hybrid can live there, then both parent species could have been there.
+# If an observer narrows it down to two species, treat it as 50-50
+
+hybrids = grep(" [x/] ", colnames(pa), value = TRUE)
+for(i in 1:length(hybrids)){
+  parent1 = gsub(" x .*", "", hybrids[i])
+  parent2 = gsub("\\S* x ", "", hybrids[i])
+  
+  # If a parent was absent, it is now considered 50% present
+  pa[ , parent1] = pmax(pa[ , parent1], pa[ , hybrids[i]] / 2)
+  pa[ , parent2] = pmax(pa[ , parent2], pa[ , hybrids[i]] / 2)
+}
+
+pa = pa[ , colnames(pa) %nin% hybrids]
+
+
+
+# Identify possible meanings of “sp." -------------------------------------
+
+# only include species in the presence/absence matrix
+included_species = included_species[included_species$spanish_common_name %in% colnames(pa), ]
+
+
+# I'm interpreting "Crow sp." as "Corvus sp."
+colnames(pa)[colnames(pa) == "\\\"Crow\\\" sp."] = "Corvus sp."
+
+
+sps = grep("^[A-Z].* sp\\.", colnames(pa), value = TRUE)
+
+change_list = lapply(
+  sps,
+  function(x){
+    regex = paste0(strsplit(x, " ")[[1]][[1]], "[^/]*[^\\.]$")
+    colnames(pa[ , grep(regex, colnames(pa))])
+  }
+)
+names(change_list) = sps
+
+
+# I'm using common names for the unidentified Tern because the family-level taxonomy has changed since
+# the data was recorded.
+change_list$`\\\"Tern\\\" sp.` = 
+  included_species[grep("[^\\.] Tern$", included_species$english_common_name), ]$spanish_common_name
+
+# Also using common names for ravens
+change_list$`\\\"Raven\\\" sp.` = 
+  included_species[grep("[^\\.] Raven$", included_species$english_common_name), ]$spanish_common_name
+
+change_list$`\\\"Gull\\\" sp.` = 
+  included_species[included_species$genus %in% c("Larus", "Chroicocephalus", "Leucophaeus"), ]$spanish_common_name
+
+change_list$`\\\"Woodpecker\\\" sp.` = 
+  included_species[included_species$family == "Picidae", ]$spanish_common_name
+
+change_list$`\\\"Ardeid\\\" sp.` = 
+  included_species[included_species$family == "Ardeidae", ]$spanish_common_name
+
+change_list$`\\\"Trochilid\\\" sp.` = 
+  included_species[included_species$family == "Trochilidae", ]$spanish_common_name
+
+
+stopifnot(all(grep("\\\"", colnames(pa), value = TRUE) %in% names(change_list)))
+
+# Drop quoted "species" from change_list
+change_list = lapply(
+  change_list, function(x){
+    grep("^[A-Z]", x, value = TRUE)
+  }
+)
+
+
 stop()
+# Impute partial observations ---------------------------------------------
+
+
+
+run_dists = pointDistance(
+  cbind(valid_runs$loni, valid_runs$lati), 
+  cbind(valid_runs$loni, valid_runs$lati),
+  longlat = TRUE, 
+  allpairs = TRUE
+)
+
+sigma = 1000 * 1000 # 1000 kilo-meters
+
+k = exp(-0.5 * run_dists^2 / sigma^2)
+
+for(unknown in sps){
+  regex = paste0(strsplit(unknown, " ")[[1]][[1]], "[^/]*[^\\.]$")
+  knowns = colnames(pa[ , grep(regex, colnames(pa))])
+  
+  intensities = sapply(
+    knowns, 
+    function(x){colSums(k * pa[,x]) / colSums(k)}
+  )
+  p = intensities / rowSums(intensities)
+  
+  uncertain_rows = pa[,unknown]
+  
+  imputed = pmax(p, pa[, knowns])
+  
+  pa[uncertain_rows, knowns] = imputed[uncertain_rows, ]
+}
+
+
+
 
 # Import phylogeny -------------------------------------------------------------
 
