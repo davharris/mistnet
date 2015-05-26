@@ -1,4 +1,4 @@
-`%nin%` = function(a, b){!(a %in% b)}
+`%notin%` = function(a, b){!(a %in% b)}
 
 library(geosphere) # for regularCoordinates
 library(raster)    # for worldclim
@@ -67,19 +67,19 @@ outer.radius = 2.5E5
 
 dists = pointDistance(centers, cbind(runs$loni, runs$lati), longlat = TRUE)
 
-runs$in.train = apply(
+runs$in_train = apply(
   dists, 
   2,
   function(x) min(x) > outer.radius
 )
 
-in.test = apply(
+in_test = apply(
   dists, 
   2,
   function(x) min(x) < inner.radius
 )
 
-valid_runs = runs[runs$in.train | in.test, ]
+valid_runs = runs[runs$in_train | in_test, ]
 
 # Identify occupants ------------------------------------------------------
 
@@ -146,7 +146,7 @@ for(i in 1:length(subspecies)){
 }
 
 # Drop subspecies
-pa = pa[ , colnames(pa) %nin% subspecies]
+pa = pa[ , colnames(pa) %notin% subspecies]
 
 
 # Impute hybrids and "slash" species as 50% of each parent ------------------------------------
@@ -160,11 +160,13 @@ for(i in 1:length(hybrids)){
   parent2 = gsub("\\S* x ", "", hybrids[i])
   
   # If a parent was absent, it is now considered 50% present
+  # The "pmax" means that presence of a hybrid never *decreases* one's belief that the 
+  # parent species was present.
   pa[ , parent1] = pmax(pa[ , parent1], pa[ , hybrids[i]] / 2)
   pa[ , parent2] = pmax(pa[ , parent2], pa[ , hybrids[i]] / 2)
 }
 
-pa = pa[ , colnames(pa) %nin% hybrids]
+pa = pa[ , colnames(pa) %notin% hybrids]
 
 
 
@@ -199,22 +201,27 @@ change_list$`\\\"Tern\\\" sp.` =
 change_list$`\\\"Raven\\\" sp.` = 
   included_species[grep("[^\\.] Raven$", included_species$english_common_name), ]$spanish_common_name
 
+# I'm limiting the term "gull" to the genera "Larus", "Chroicocephalus", and "Leucophaeus"
 change_list$`\\\"Gull\\\" sp.` = 
   included_species[included_species$genus %in% c("Larus", "Chroicocephalus", "Leucophaeus"), ]$spanish_common_name
 
+# "woodpecker" is any member of the family
 change_list$`\\\"Woodpecker\\\" sp.` = 
   included_species[included_species$family == "Picidae", ]$spanish_common_name
 
+# Ardeids could be any member of the family
 change_list$`\\\"Ardeid\\\" sp.` = 
   included_species[included_species$family == "Ardeidae", ]$spanish_common_name
 
+# Ditto for trochilids
 change_list$`\\\"Trochilid\\\" sp.` = 
   included_species[included_species$family == "Trochilidae", ]$spanish_common_name
 
 
+# Do we have all the "quoted" species?
 stopifnot(all(grep("\\\"", colnames(pa), value = TRUE) %in% names(change_list)))
 
-# Drop quoted "species" from change_list
+# "quoted" species don't belong inside the lists, just as names of the list elements
 change_list = lapply(
   change_list, function(x){
     grep("^[A-Z]", x, value = TRUE)
@@ -222,10 +229,7 @@ change_list = lapply(
 )
 
 
-stop()
 # Impute partial observations ---------------------------------------------
-
-
 
 run_dists = pointDistance(
   cbind(valid_runs$loni, valid_runs$lati), 
@@ -238,50 +242,95 @@ sigma = 1000 * 1000 # 1000 kilo-meters
 
 k = exp(-0.5 * run_dists^2 / sigma^2)
 
-for(unknown in sps){
-  regex = paste0(strsplit(unknown, " ")[[1]][[1]], "[^/]*[^\\.]$")
-  knowns = colnames(pa[ , grep(regex, colnames(pa))])
+for(i in 1:length(change_list)){
+  name = names(change_list)[i]
+  sp_names = change_list[[i]]
   
   intensities = sapply(
-    knowns, 
+    change_list[[i]], 
     function(x){colSums(k * pa[,x]) / colSums(k)}
   )
   p = intensities / rowSums(intensities)
   
-  uncertain_rows = pa[,unknown]
+  imputed = pmax(p, pa[, sp_names])
   
-  imputed = pmax(p, pa[, knowns])
+  uncertain_rows = as.logical(pa[ , name])
   
-  pa[uncertain_rows, knowns] = imputed[uncertain_rows, ]
+  pa[uncertain_rows , sp_names] = imputed[uncertain_rows, sp_names]
 }
 
-
+# Drop columns from change_list
+pa = pa[ , colnames(pa) %notin% names(change_list)]
 
 
 # Import phylogeny -------------------------------------------------------------
 
 tre = read.tree("AllBirdsEricson1.tre", n = 1)
 
-# merge synonyms ----------------------------------------------------------
+phylo_names = gsub("_", " ", tre$tip.label)
 
-library(taxize)
-
-matchless = colnames(pa)[!(colnames(pa) %in% gsub("_", " ", tre$tip.label))]
-
-syns = synonyms(matchless, db = c("itis"), accepted = FALSE)
-
-matchless[is.na(syns)]
-
-
-
-# prune tree --------------------------------------------------------------
-
-pruned = drop.tip(tre, which(!(gsub("_", " ", tre$tip.label) %in% colnames(pa))))
-
-# x = structure(
-#   rnorm(length(tre$tip.label)),
-#   names = tre$tip.label
+# # merge synonyms ----------------------------------------------------------
+# 
+# library(taxize)
+# 
+# matchless = colnames(pa)[!(colnames(pa) %in% gsub("_", " ", tre$tip.label))]
+# 
+# syns = synonyms(matchless, db = c("itis"), accepted = FALSE)
+# 
+# na_matches = names(which(is.na(syns)))
+# 
+# for(bbs_name in names(syns)){
+#   if(length(syns[[bbs_name]]) == 2){
+#     syns[[bbs_name]]$bbs_name = bbs_name
+#   }
+# }
+# 
+# syns_df = bind_rows(syns[sapply(syns, function(x) length(x) > 1)])
+# 
+# syns_df$name = gsub("^(\\S* \\S*).*", "\\1", syns_df$name)
+# 
+# renames = syns_df[syns_df$name %in% phylo_names, ]
+# 
+# fixed_by_renames = sapply(
+#   syns[!is.na(syns)],
+#   function(x){
+#     gsub("^(\\S* \\S*).*", "\\1", x$name) %in% phylo_names
+#   }
 # )
 # 
 # 
-# fit = fitContinuous(tre, dat = x, SE = NA, model = "white")
+# failed_matches = sapply(
+#   syns[!is.na(syns)], 
+#   function(x){any(x$name %in% phylo_names)}
+# ) %>% 
+#   not %>% 
+#   which %>% 
+#   names
+# 
+# 
+
+
+# Wrap everything up ------------------------------------------------------
+
+phylogeny = drop.tip(tre, which(!(gsub("_", " ", tre$tip.label) %in% colnames(pa))))
+pa = pa[ , match(gsub("_", " ", phylogeny$tip.label), colnames(pa))]
+species = included_species[match(colnames(pa), included_species$spanish_common_name),]
+
+colnames(pa) = gsub(" ", "_", colnames(pa))
+
+runs = runs[match(row.names(pa), runs$RouteDataID), ]
+
+env = raster::extract(
+  raster::getData("worldclim", var = "bio", res = "10"), 
+  as.matrix(runs[, c("loni", "lati")])
+)
+
+
+save(
+  phylogeny, 
+  pa, 
+  env, 
+  runs, 
+  species, 
+  file = "phylo-birds.Rdata"
+)
