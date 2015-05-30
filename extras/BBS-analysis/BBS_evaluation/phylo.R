@@ -73,34 +73,34 @@ while(net$row.selector$completed.epochs < max_epochs){
   net$layers[[3]]$prior$update(weights = net$layers[[3]]$weights, 
                                update.mean = TRUE, 
                                update.sd = FALSE, 
-                               min.sd = NA
+                               min.sd = NULL
   )
   
   if(net$row.selector$completed.epochs != completed_epoch){
-    
-    message("updating phylogenetic priors...")
-    K_array = array(NA, c(ncol(pa), ncol(pa), 10))
-    noise_sd = rep(0, dim(K_array)[3])
-    for(i in 1:dim(K_array)[3]){
-      fit = fitContinuous(
-        phy = phylogeny, 
-        dat = structure(net$layers[[3]]$weights[i, ], names = colnames(pa)), 
-        SE = NA, 
-        model = "OU"
-      )
-      K_array[,,i] = vcv(rescale(phylogeny, "OU", alpha = fit$opt$alpha, sigsq = fit$opt$sigsq))
-      noise_sd[i] = fit$opt$SE
-    }
-    net$layers[[3]]$prior = gp.prior(
-      K = K_array, 
-      noise_sd = pmax(noise_sd, .01), 
-      coefs = net$layers[[3]]$weights
-    )
-    message("updating other priors...")
+#     
+#     message("updating phylogenetic priors...")
+#     K_array = array(NA, c(ncol(pa), ncol(pa), 10))
+#     noise_sd = rep(0, dim(K_array)[3])
+#     for(i in 1:dim(K_array)[3]){
+#       fit = fitContinuous(
+#         phy = phylogeny, 
+#         dat = structure(net$layers[[3]]$weights[i, ], names = colnames(pa)), 
+#         SE = NA, 
+#         model = "OU"
+#       )
+#       K_array[,,i] = vcv(rescale(phylogeny, "OU", alpha = fit$opt$alpha, sigsq = fit$opt$sigsq))
+#       noise_sd[i] = fit$opt$SE
+#     }
+#     net$layers[[3]]$prior = gp.prior(
+#       K = K_array, 
+#       noise_sd = pmax(noise_sd, .01), 
+#       coefs = net$layers[[3]]$weights
+#     )
+#     message("updating other priors...")
     
     cat("Completed epoch", completed_epoch, "\n")
-    # Update prior variance in the first two layers
-    for(layer in net$layers[1:2]){
+    # Update prior variance
+    for(layer in net$layers[1:3]){
       layer$prior$update(
         layer$weights, 
         update.mean = FALSE, 
@@ -114,9 +114,9 @@ while(net$row.selector$completed.epochs < max_epochs){
 }
 net$completed.iterations
 
-z = predict(net, ic_env, 10)
+z = predict(net, ic_env[!runs$in_train, ], 100)
 zz = apply(z, 2, rowMeans)
-
+colnames(z) = colnames(zz) = colnames(pa)
 
 i = 9
 hist(

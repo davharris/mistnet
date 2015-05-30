@@ -1,12 +1,30 @@
 `%notin%` = function(a, b){!(a %in% b)}
 
-library(geosphere) # for regularCoordinates
-library(raster)    # for worldclim
-library(ape)       # for read.tree
-library(geiger)    # for fitContinuous
-
+library(ecoretriever) # for install
+library(geosphere)    # for regularCoordinates
+library(raster)       # for worldclim
+library(NMF)          # for non-negative matrix factorization
+library(dplyr)        # for data manipulation
+library(magrittr)     # for data manipulation
+library("RSQLite")    # for data extraction
+library(parallel)     # for mclapply
+library(traits)       # for birdlife data
+library(beepr)        # for audible progress notification
 
 Year = 2014
+
+iucn_id = function(sciname , silent = FALSE){
+  spec <- tolower(sciname)
+  spec <- gsub(" ", "-", spec)
+  url <- paste("http://api.iucnredlist.org/go/", spec, sep = "")
+  e <- try(readLines(url), silent = silent)
+  
+  id_plus = grep("http://www.iucnredlist.org/apps/redlist/details/", e, value = TRUE)
+  gsub(".*/", "", id_plus)
+  
+}
+
+
 
 # environment -------------------------------------------------------------
 
@@ -16,7 +34,6 @@ wc = getData("worldclim", var = "bio", res = 10)[[retained_layers]]
 
 # BBS ---------------------------------------------------------------------
 if (!file.exists("db.sqlite")) {
-  library(ecoretriever)
   
   # Version 1.7 of retriever has a problem with the current BBS web site.
   download.file(
@@ -26,11 +43,6 @@ if (!file.exists("db.sqlite")) {
   )
   install("BBS50", "sqlite", data_dir = "bbs_data", db_file = "db.sqlite")
 }
-
-
-library(dplyr)
-library(magrittr)
-library("RSQLite")
 
 
 # Extract valid data components
@@ -263,11 +275,141 @@ for(i in 1:length(change_list)){
 pa = pa[ , colnames(pa) %notin% names(change_list)]
 
 
-# Import phylogeny -------------------------------------------------------------
+# Import traits -------------------------------------------------------------
 
-tre = read.tree("AllBirdsEricson1.tre", n = 1)
+if(!file.exists("iucns.csv")){
+  iucns = mclapply(
+    colnames(pa), 
+    function(x){
+      id = iucn_id(x)
+      c(x, ifelse(length(id) == 1, id, NA))
+    }
+  )
+  iucn_matrix = do.call(rbind, iucns)
+  iucns = data_frame(name = iucn_matrix[,1], id = iucn_matrix[,2])
+  beepr::beep()
+  write.csv(iucns, file = "iucns.csv", row.names = FALSE)
+}else{
+  iucns = read.csv("iucns.csv", stringsAsFactors = FALSE)
+}
 
-phylo_names = gsub("_", " ", tre$tip.label)
+iucns = na.omit(iucns)
+
+if(!file.exists("habitats.csv")){
+  habitats = lapply(
+    iucns[[2]],
+    function(x){
+      if(!is.na(x)){
+        message(x)
+        birdlife_habitat(x)
+      }
+    }
+  )
+  beepr::beep()
+  habitats = bind_rows(habitats)
+  write.csv(habitats, "habitats.csv", row.names = FALSE)
+}else{
+  habitats = read.csv("habitats.csv", stringsAsFactors = FALSE)
+}
+
+habitats = merge.data.frame(habitats, iucns, by = "id")
+
+habitats = habitats[habitats$Importance %in% c("major", "suitable"), ]
+habitats = habitats[habitats$Occurrence %in% c("breeding", "resident"), ]
+habitats$bilevel = paste(habitats$Habitat..level.1., habitats$Habitat..level.2., sep = ": ")
+
+habitats$Importance = 1 + (habitats$Importance == "major")
+
+traits = iucns[ , FALSE]
+for(level_name in c("Habitat..level.1.", "Habitat..level.2.", "bilevel")){
+  habs = unique(habitats[[level_name]])
+  for(hab in habs[nchar(habs) > 0]){
+    hab_names = list(
+      unique(habitats[habitats[[level_name]] == hab & habitats$Importance == 1, "name"]),
+      unique(habitats[habitats[[level_name]] == hab & habitats$Importance == 2, "name"])
+    )
+    
+    traits[iucns$name %in% hab_names[[1]], hab] = 1
+    traits[iucns$name %in% hab_names[[2]], hab] = 2
+    traits[is.na(traits[[hab]]), hab] = 0
+  }
+}
+
+max_cor = 0.85
+
+traits = traits[ , colSums(traits > 0) > 10]
+
+# Function to drop variables that are collinear with target variable
+dropcor = function(x, target, max_cor){
+  traits[ , cor(traits)[, target] < max_cor | colnames(traits) == target]  
+}
+
+ordered_categories = lapply(
+  sort(unique(colSums(traits)), decreasing = TRUE),
+  function(x){
+    tied_columns = colnames(traits)[colSums(traits) == x]
+    tied_columns[order(nchar(tied_columns))]
+  }
+)
+
+
+
+for(trait in unlist(ordered_categories)){
+  # If the trait is still in the matrix, check it for collinear variables
+  if(trait %in% colnames(traits)){
+    traits = dropcor(traits, trait, max_cor = max_cor)
+  }
+}
+
+stopifnot(
+  sum(cor(traits)[upper.tri(cor(traits))] > max_cor) == 0
+)
+  
+
+K = 15
+
+set.seed(1)
+
+nmf_object = nmf(traits, K, nrun = 10)
+
+for(i in 1:K){
+  message(i)
+  row = coef(nmf_object)[i, ]
+  print(round(sort(row[row > 1E-8], decreasing = TRUE), 2))
+}
+
+trait_ids = c(
+  temperate_shrubland = 1,
+  coastal = 2,
+  warm_dry_shrubland = 3,
+  warm_moist_montane_forest = 4,
+  human = 5,
+  marine = 6,
+  freshwater = 7,
+  temperate_forest = 8,
+  wetlands = 9,
+  boreal_forest = 10,
+  subtropical_forest = 11,
+  agricultural = 12, 
+  rocky_desert = 13, 
+  temperate_grassland = 14, 
+  other_grassland = 15
+)
+stopifnot(all(trait_ids == 1:K))
+trait_names = names(trait_ids)
+
+
+summary(lm(unlist(traits) ~ c(basis(nmf_object) %*% coef(nmf_object))))
+
+prior_means = round(apply(basis(nmf_object), 2, function(traits) traits / sd(traits)), 8)
+rownames(prior_means) = iucns$name
+colnames(prior_means) = trait_names
+
+nmf_coefficients = round(coef(nmf_object), 8)
+
+row.names(nmf_coefficients) = trait_names
+
+pa = pa[ , traits$name]
 
 # # merge synonyms ----------------------------------------------------------
 # 
@@ -312,11 +454,7 @@ phylo_names = gsub("_", " ", tre$tip.label)
 
 # Wrap everything up ------------------------------------------------------
 
-phylogeny = drop.tip(tre, which(!(gsub("_", " ", tre$tip.label) %in% colnames(pa))))
-pa = pa[ , match(gsub("_", " ", phylogeny$tip.label), colnames(pa))]
 species = included_species[match(colnames(pa), included_species$spanish_common_name),]
-
-colnames(pa) = gsub(" ", "_", colnames(pa))
 
 runs = runs[match(row.names(pa), runs$RouteDataID), ]
 
@@ -327,10 +465,13 @@ env = raster::extract(
 
 
 save(
-  phylogeny, 
+  prior_means, 
+  nmf_coefficients,
+  nmf_object,
   pa, 
   env, 
   runs, 
   species, 
-  file = "phylo-birds.Rdata"
+  file = "birds-traits.Rdata"
 )
+
