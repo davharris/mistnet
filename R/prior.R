@@ -10,7 +10,7 @@ prior = setRefClass(
   methods = list(
     getLogGrad = function(x) stop({"log gradient not defined for this prior"}),
     sample = function(n){stop("sampler not defined for this prior")},
-    update = function(){stop("update not defined for this prior")}
+    update = function(...){stop("update not defined for this prior")}
   )
 )
 
@@ -65,7 +65,7 @@ laplace.prior = setRefClass(
       - sign(x - location) / scale
     },
     sample = function(n){
-      rexp(n, rate  = 1 / scale) * sample(c(-1, 1), size = n, replace = TRUE)
+      rexp(n, rate  = 1 / scale) * base::sample(c(-1, 1), size = n, replace = TRUE)
     }
   )
 ) 
@@ -93,6 +93,11 @@ gp.prior = setRefClass(
   contains = "prior",
   methods = list(
     initialize = function(K, noise_sd, coefs){
+      
+      if(any(missing(K), missing(noise_sd), missing(coefs))){
+        return()
+      }
+      
       # Notation roughly follows Rasmussen & Williams 2006
       # Gaussian Processes for Machine Learning
       # Algorithm 2.1, page 19
@@ -105,11 +110,10 @@ gp.prior = setRefClass(
                              # Old comment says this should include noise along,
                              # the diagonal, but now I'm pretty sure that's incorrect?
       
-      # Initialize L, v, posterior_var, and inverse_var with correct dimensions
+      # Initialize L, v, posterior_var with correct dimensions
       L             <<- K * 0
       v             <<- K * 0
       posterior_var <<- K * 0
-      inverse_var   <<- K * 0
       
       I = diag(ncol(K)) # identity matrix, gets scaled by SD & added to diagonal of K
       
@@ -119,10 +123,10 @@ gp.prior = setRefClass(
         K_plus = K[ , , i] + I * noise_sd[i]^2
         
         # Cholesky decomposition is transposed to match algorithm in textbook
-        L[ , , i]             <<- t(chol(K_plus))
+        L[ , , i] <<- t(chol(K_plus))
         
         # decomposition of variance explained by the data??
-        v[ , , i]             <<- solve(L[ , , i], K[ , , i])
+        v[ , , i] <<- solve(L[ , , i], K[ , , i])
         
         # posterior variation, used for sampling from posterior
         posterior_var[ , , i] <<- K_plus - crossprod(v[ , , i])
@@ -133,8 +137,9 @@ gp.prior = setRefClass(
       
     },
     getLogGrad = function(x){
-      # Calculate gradient for each row of x independently
-      sapply(
+      # Calculate gradient for each row of x independently.
+      # sapply's output is transposed compared with what I want
+      t_out = sapply(
         1:nrow(x),
         function(i){
           # https://stats.stackexchange.com/questions/90134/gradient-of-gaussian-log-likelihood
@@ -142,8 +147,18 @@ gp.prior = setRefClass(
           - (x[i, ] - means[i, ]) / diag(posterior_var[,,i])
         }
       )
+      
+      t(t_out)
     },
-    updateMeans = function(coefs){
+    update = function(weights, update.mean, update.sd, min.sd){
+      if(update.mean){
+        updateMeans(weights)
+      }
+      if(update.sd){
+        warning("no update.sd method implemented for gp priors")
+      }
+    },
+    updateMeans = function(coefs, ...){
       # Each row of coefficients has its own posterior mean
       if(length(means) == 0){
         # Initialize means and alphas as NAs if blank
@@ -154,6 +169,9 @@ gp.prior = setRefClass(
         y = coefs[i, ]
         centered.y = y - mean(y)
         
+        # Does this improperly pull species toward their current values, rather than just
+        # toward their neighbors??
+        
         # calculate new prior means on centered variables, then add the mean back on
         alpha[i, ] <<- solve(t(L[ , , i]), solve(L[ , , i], centered.y))
         means[i, ] <<- K[, , i] %*% alpha[i, ] + mean(y)
@@ -161,5 +179,4 @@ gp.prior = setRefClass(
     }
   )
 )
-
 
