@@ -121,6 +121,24 @@ rectify.nonlinearity = setRefClass(
   )
 )
 
+#' \code{leaky.rectify.nonlinearity}:
+#' \code{ifelse(x>0, x, x * .01)}
+#' @exportClass rectify.nonlinearity
+#' @rdname nonlinearity
+#' @export leaky.rectify.nonlinearity
+leaky.rectify.nonlinearity = setRefClass(
+  Class = "leaky.rectify.nonlinearity",
+  fields = list(),
+  contains = "nonlinearity",
+  methods = list(
+    f = function(x){ifelse(x>0, x, x * .01)},
+    grad = function(x){ifelse(x>0, 1, .01)},
+    initializeFinalBiases = function(y){
+      rep(0, ncol(y))
+    }
+  )
+)
+
 
 #' @exportClass exp.nonlinearity
 #' @rdname nonlinearity
