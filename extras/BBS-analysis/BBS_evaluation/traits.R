@@ -34,7 +34,9 @@ net = mistnet(
   loss = bernoulliRegLoss(1 + 1E-6, 1 + 1E-6),
   updater = adagrad.updater(learning.rate = .1),
   initialize.weights = FALSE,
-  initialize.biases = FALSE
+  initialize.biases = FALSE,
+  n.minibatch = 20,
+  n.importance.samples = 30
 )
 
 message("initializing weights...")
@@ -67,10 +69,7 @@ for(i in 1:10){
 }
 
 message("fitting...")
-for(i in 1:25){
+for(i in 1:50){
   cat(".")
   net$fit(10)
-  
-  hist(net$layers[[3]]$weights - net$layers[[3]]$prior$mean)
 }
-
