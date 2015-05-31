@@ -409,7 +409,7 @@ nmf_coefficients = round(coef(nmf_object), 8)
 
 row.names(nmf_coefficients) = trait_names
 
-pa = pa[ , traits$name]
+pa = pa[ , iucns$name]
 
 # # merge synonyms ----------------------------------------------------------
 # 
