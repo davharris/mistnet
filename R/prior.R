@@ -14,7 +14,7 @@ prior = setRefClass(
   )
 )
 
-# gaussian.prior$sd can be a numeric matrix OR a numeric vector
+# gaussian.prior can accept a numeric matrix OR a numeric vector
 setClassUnion("any.numeric", c("numeric", "matrix"))
 
 #' @export gaussian.prior
@@ -22,7 +22,7 @@ setClassUnion("any.numeric", c("numeric", "matrix"))
 gaussian.prior = setRefClass(
   Class = "gaussian.prior",
   fields = list(
-    mean = "numeric",
+    mean = "any.numeric",
     sd = "any.numeric"
   ),
   contains = "prior",
@@ -31,7 +31,10 @@ gaussian.prior = setRefClass(
       - (x - .self$mean) / .self$sd^2
     },
     sample = function(n){
-      rnorm(n, mean = mean, sd = sd)
+      structure(
+        rnorm(n, mean = mean, sd = sd),
+        dim = dim(mean)
+      )
     },
     update = function(weights, update.mean, update.sd, min.sd){
       if(update.mean){
