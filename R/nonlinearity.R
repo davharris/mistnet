@@ -96,8 +96,7 @@ sigmoid.nonlinearity = setRefClass(
     f = sigmoid,
     grad = sigmoidGrad,
     initializeFinalBiases = function(y){
-      out = qlogis(colMeans(y))
-      assert_that(all(is.finite(out)))
+      out = qlogis((colSums(y) + 1) / (nrow(y) + 2))
       out
     }
   )

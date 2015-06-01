@@ -109,6 +109,7 @@
 #' @useDynLib mistnet
 #' @import Rcpp
 #' @import RcppArmadillo
+#' @import GPArotation
 #' @export
 
 
@@ -205,7 +206,12 @@ mistnet = function(
   }
   if(initialize.weights){
     for(layer in net$layers){
-      layer$weights[] = layer$prior$sample(length(layer$weights))
+      init_var = 2 / layer$coef.dim[1]
+      # Orthogonal matrix with the variance proposed above
+      w = t(GPArotation::Random.Start(max(layer$coef.dim)))[1:layer$coef.dim[1], 1:layer$coef.dim[2]]
+      w = w / sqrt(var(c(w))) * sqrt(init_var)
+      
+      layer$weights[] = w
     }
   }
   

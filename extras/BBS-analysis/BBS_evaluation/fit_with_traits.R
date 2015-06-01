@@ -1,7 +1,7 @@
 library(fastICA)
 library(mistnet)
 library(GPArotation)
-
+library(progress)
 
 load("birds-traits.Rdata")
 
@@ -11,11 +11,11 @@ stopifnot(all.equal(apply(prior_means, 2, sd), rep(1, ncol(prior_means)), check.
 # Add extra columns for anonymous environmental influences
 prior_means = cbind(prior_means, matrix(0, nrow = nrow(prior_means), ncol = 5))
 
-
 set.seed(1)
 
 ic_env = fastICA(scale(env), 6)$S
 
+# Create the network object. Note that priors are (numeric) NAs for now.
 net = mistnet(
   x = ic_env[runs$in_train, ],
   y = pa[runs$in_train, ],
@@ -38,75 +38,32 @@ net = mistnet(
   ),
   loss = bernoulliRegLoss(1 + 1E-5, 1 + 1E-5),
   updater = adagrad.updater(learning.rate = 0.1),
-  initialize.weights = FALSE,
-  initialize.biases = FALSE,
+  initialize.weights = TRUE,
+  initialize.biases = TRUE,
   n.minibatch = 25,
-  n.importance.samples = 35,
-  sampler = gaussian.sampler(ncol = ncol(prior_means), sd = 1L)
+  n.importance.samples = 35
 )
 
-message("priors initializing weights...")
-
-for(i in 1:length(net$layers)){
-  layer = net$layers[[i]]
-  
-  # According to http://andyljones.tumblr.com/post/110998971763/an-explanation-of-xavier-initialization
-  # ... the paper at arXiv:1502.01852 recommends initializing with variance of 2/n_inputs
-  init_var = 2 / layer$coef.dim[1]
-  
-  # Update prior
-  layer$prior$sd = sqrt(init_var)
-  
-  warning("figure out transposition")
-  
-  # Orthogonal matrix with the variance proposed above
-  w = t(Random.Start(max(layer$coef.dim)))[1:layer$coef.dim[1], 1:layer$coef.dim[2]]
-  w = w / sqrt(var(c(w))) * sqrt(init_var)
-  
-  layer$weights[] = w
+message("initializing priors...")
+for(layer in net$layers){
+  layer$prior$sd = sd(layer$weights)
 }
-
 prior_sd = net$layers[[3]]$prior$sd
 scaled_prior_means = apply(prior_means * prior_sd, 2, function(x) x - mean(x))
 
-# Initialize the third layer near its prior, but with mean zero
+
+message("Initializing final layer...")
+
+# Initialize the third layer near a rescaled version of its prior (mean zero, standardized SD)
 net$layers[[3]]$weights = t(scaled_prior_means) + net$layers[[3]]$weights
 
-message("Initializing biases...")
-
-#net$layers[[1]]$biases[] = 1
-#net$layers[[2]]$biases[] = 1
-
-# Third layer: 
-# Start with final-layer initialization based on regularizedcolumn means
-net$layers[[3]]$biases[] = qlogis(
-  (1 + colSums(net$y)) / (2 + nrow(net$y))
-)
-
-bias_grad = 0
-for(i in 1:10){
-  net$selectMinibatch()
-  net$estimateGrad()
-  
-  # Adjust third layer's biases so that the species means are about right.
-  # Because the last layer's weights are non-standard, I'm optimiging this by gradient descent
-  # rater than using a rule of thumb.
-  bias_grad = net$layers[[3]]$weighted.bias.grads + .1 * bias_grad
-  net$layers[[3]]$biases = net$layers[[3]]$biases - 1 / (5 + i) * bias_grad
-}
 
 
-
-
-
-library(progress)
+message("fitting...")
 maxit = 500
 ticksize = 10
 pb <- progress_bar$new(total = maxit)
 pb$tick(0)
-
-message("fitting...")
-
 
 for(i in 1:(maxit / ticksize)){
   net$fit(ticksize)
@@ -115,7 +72,9 @@ for(i in 1:(maxit / ticksize)){
 }
 
 sort(structure(apply(net$layers[[2]]$outputs, 2, sd), names = colnames(prior_means)))
+sort(apply(net$layers[[3]]$weights - net$layers[[3]]$prior$mean, 1, sd))
+
 
 pred = predict(net, ic_env, 100, return.model = TRUE)
-structure(round(apply(pred$layers[[2]]$outputs, 2, max), 3), names = colnames(prior_means))
+sort(structure(round(apply(pred$layers[[2]]$outputs, 2, sd), 3), names = colnames(prior_means)))
 
