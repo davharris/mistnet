@@ -1,3 +1,4 @@
+#' @import progress
 #' @export
 predict.network = function(
   object, 
@@ -18,7 +19,10 @@ predict.network = function(
   cpy$row.selector$n.minibatch = 0L
   cpy$selectMinibatch(1:nrow(newdata))
   
+  pb = progress_bar$new(total = n.importance.samples)
+  
   for(i in 1:n.importance.samples){
+    pb$tick()
     cpy$inputs[ , , i] = cbind(
       cpy$x[cpy$row.selector$minibatch.ids, ], 
       cpy$sampler$sample(nrow = cpy$row.selector$n.minibatch)

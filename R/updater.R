@@ -66,7 +66,8 @@ sgd.updater = setRefClass(
 #' weights to have different effective learning rates, depending on how 
 #' much that parameter has moved so far.
 #'
-#' @details __
+#' @details __. Following Senior et al. ("An empirical study of learning rates in deep neural networks for speech recognition"), 
+#' the squared gradients are initialized at K instead of 0.
 #'
 #' @field learning.rate the learning rate (set to one in the original paper)
 #' @field squared.grad a matrix summing the squared gradients over all previous
@@ -85,15 +86,13 @@ adagrad.updater = setRefClass(
   methods = list(
     computeDelta = function(gradient){
       squared.grad <<- squared.grad + gradient^2
-      
       delta <<- -learning.rate / sqrt(squared.grad) * gradient
     },
-    initialize = function(delta, learning.rate, ...){
+    initialize = function(delta, learning.rate, K = 1, ...){
       if(!missing(delta)){
         delta <<- delta
-        # Don't initialize squared.grad at 0 to prevent divide by zero errors
         squared.grad <<- matrix(
-          .Machine$double.eps,
+          K,
           nrow = nrow(delta),
           ncol = ncol(delta)
         )

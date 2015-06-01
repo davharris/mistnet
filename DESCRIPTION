@@ -13,7 +13,8 @@ Imports:
     methods,
     assertthat,
     Rcpp (>= 0.11.1),
-    RcppArmadillo (>= 0.4.100.2.1)
+    RcppArmadillo (>= 0.4.100.2.1),
+    progress
 LinkingTo: Rcpp, RcppArmadillo
 Sugests: mda, geiger, mvtnorm, kernlab, gtools
 VignetteBuilder: knitr

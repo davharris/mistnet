@@ -11,7 +11,8 @@ weights to have different effective learning rates, depending on how
 much that parameter has moved so far.
 }
 \details{
-__
+__. Following Senior et al. ("An empirical study of learning rates in deep neural networks for speech recognition"),
+the squared gradients are initialized at K instead of 0.
 }
 \section{Fields}{
 
