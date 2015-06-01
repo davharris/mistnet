@@ -16,10 +16,12 @@ updater = setRefClass(
   fields = list(
     delta = "matrix"
   ),
+  
   methods = list(
     computeDelta = function(...){
       stop("computeDelta not defined for this updater")
-    }
+    },
+    initialize = function(...){}
   )
 )
 
@@ -67,7 +69,7 @@ sgd.updater = setRefClass(
 #' much that parameter has moved so far.
 #'
 #' @details __. Following Senior et al. ("An empirical study of learning rates in deep neural networks for speech recognition"), 
-#' the squared gradients are initialized at K instead of 0.
+#' the squared gradients are initialized at K instead of 0. By default, K == 0.1
 #'
 #' @field learning.rate the learning rate (set to one in the original paper)
 #' @field squared.grad a matrix summing the squared gradients over all previous
@@ -81,18 +83,26 @@ adagrad.updater = setRefClass(
   fields = list(
     delta = "matrix",
     learning.rate = "numeric",
-    squared.grad = "matrix"
+    squared.grad = "matrix",
+    K = "numeric"
   ),
   methods = list(
     computeDelta = function(gradient){
       squared.grad <<- squared.grad + gradient^2
       delta <<- -learning.rate / sqrt(squared.grad) * gradient
     },
-    initialize = function(delta, learning.rate, K = 1, ...){
+    initialize = function(delta, learning.rate, K, ...){
+      if(!missing(K)){
+        K <<- K
+      }else{
+        if(length(.self$K) == 0){
+          K <<- 0.1
+        }
+      }
       if(!missing(delta)){
         delta <<- delta
         squared.grad <<- matrix(
-          K,
+          .self$K,
           nrow = nrow(delta),
           ncol = ncol(delta)
         )

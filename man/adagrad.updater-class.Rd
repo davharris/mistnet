@@ -12,7 +12,7 @@ much that parameter has moved so far.
 }
 \details{
 __. Following Senior et al. ("An empirical study of learning rates in deep neural networks for speech recognition"),
-the squared gradients are initialized at K instead of 0.
+the squared gradients are initialized at K instead of 0. By default, K == 0.1
 }
 \section{Fields}{
 
