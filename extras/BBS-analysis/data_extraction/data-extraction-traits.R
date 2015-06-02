@@ -464,14 +464,17 @@ env = raster::extract(
 )
 
 
-save(
-  prior_means, 
-  nmf_coefficients,
-  nmf_object,
-  pa, 
-  env, 
-  runs, 
-  species, 
-  file = "birds-traits.Rdata"
-)
+my_save = function(x){
+  saveRDS(
+    x, 
+    paste0("bbs_data/", as.character(substitute(x)), ".rds")
+  )
+}
 
+my_save(prior_means)
+my_save(nmf_coefficients)
+my_save(nmf_object)
+my_save(pa)
+my_save(env)
+my_save(runs)
+my_save(species)
