@@ -187,3 +187,49 @@ adadelta.updater = setRefClass(
     }
   )
 )
+
+#' rmsprop updater
+#' 
+#' @description Another updater with adaptive step sizes, like adagrad and adadelta.
+#'
+#' @details https://climin.readthedocs.org/en/latest/rmsprop.html
+#'
+#' @field learning.rate the learning rate (set to one in the original paper)
+#' @field squared.grad a matrix summing the squared gradients over previous
+#' updates (decays according to gamma)
+#' @field decay how quickly should squared gradients decay?
+#' @field delta the delta matrix (see \code{updater})
+#' @export rmsprop.updater
+#' @exportClass rmsprop.updater
+rmsprop.updater = setRefClass(
+  Class = "rmsprop.updater",
+  contains = "updater",
+  fields = list(
+    delta = "matrix",
+    learning.rate = "numeric",
+    squared.grad = "matrix",
+    decay = "numeric"
+  ),
+  methods = list(
+    computeDelta = function(gradient){
+      squared.grad <<- squared.grad * (1 - decay) + (decay) * gradient^2
+      delta <<- -learning.rate / sqrt(squared.grad + 1E-8) * gradient
+    },
+    initialize = function(delta, learning.rate, decay, ...){
+      if(!missing(delta)){
+        delta <<- delta
+        squared.grad <<- matrix(
+          0,
+          nrow = nrow(delta),
+          ncol = ncol(delta)
+        )
+      }
+      if(!missing(learning.rate)){
+        learning.rate <<- learning.rate
+      }
+      if(!missing(decay)){
+        decay <<- decay
+      }
+    }
+  )
+)

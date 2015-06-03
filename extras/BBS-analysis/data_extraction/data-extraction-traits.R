@@ -139,7 +139,6 @@ pa = structure(
   )
 )
 
-
 # Collapse subspecies -----------------------------------------------------
 
 # Subspecies have three names separated by two spaces.
@@ -274,6 +273,8 @@ for(i in 1:length(change_list)){
 # Drop columns from change_list
 pa = pa[ , colnames(pa) %notin% names(change_list)]
 
+# Drop unused runs
+runs = runs[match(row.names(pa), runs$RouteDataID), ]
 
 # Import traits -------------------------------------------------------------
 
@@ -366,50 +367,42 @@ stopifnot(
 )
   
 
-K = 15
+
+pa = pa[ , iucns$name]
+K = 5
 
 set.seed(1)
 
-nmf_object = nmf(traits, K, nrun = 10)
+site_trait_sums = pa[runs$in_train, ] %*% as.matrix(traits)
+
+nmf_object = nmf(site_trait_sums, K, nrun = 10)
 
 for(i in 1:K){
   message(i)
   row = coef(nmf_object)[i, ]
-  print(round(sort(row[row > 1E-8], decreasing = TRUE), 2))
+  print(round(sort(row[row > .05], decreasing = TRUE), 2))
 }
 
 trait_ids = c(
-  temperate_shrubland = 1,
-  coastal = 2,
-  warm_dry_shrubland = 3,
-  warm_moist_montane_forest = 4,
-  human = 5,
-  marine = 6,
-  freshwater = 7,
-  temperate_forest = 8,
-  wetlands = 9,
-  boreal_forest = 10,
-  subtropical_forest = 11,
-  agricultural = 12, 
-  rocky_desert = 13, 
-  temperate_grassland = 14, 
-  other_grassland = 15
+  grassland = 1,
+  wetland = 2,
+  generalist = 3,
+  forest = 4,
+  shrubland = 5
 )
 stopifnot(all(trait_ids == 1:K))
 trait_names = names(trait_ids)
 
 
-summary(lm(unlist(traits) ~ c(basis(nmf_object) %*% coef(nmf_object))))
+summary(lm(c(site_trait_sums) ~ c(basis(nmf_object) %*% coef(nmf_object))))
 
-prior_means = round(apply(basis(nmf_object), 2, function(traits) traits / sd(traits)), 8)
+prior_means = as.matrix(traits) %*% t(coef(nmf_object))
 rownames(prior_means) = iucns$name
 colnames(prior_means) = trait_names
 
 nmf_coefficients = round(coef(nmf_object), 8)
 
 row.names(nmf_coefficients) = trait_names
-
-pa = pa[ , iucns$name]
 
 # # merge synonyms ----------------------------------------------------------
 # 
@@ -455,8 +448,6 @@ pa = pa[ , iucns$name]
 # Wrap everything up ------------------------------------------------------
 
 species = included_species[match(colnames(pa), included_species$spanish_common_name),]
-
-runs = runs[match(row.names(pa), runs$RouteDataID), ]
 
 env = raster::extract(
   raster::getData("worldclim", var = "bio", res = "10"), 
