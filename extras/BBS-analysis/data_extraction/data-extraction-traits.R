@@ -367,42 +367,57 @@ stopifnot(
 )
   
 
+# Assign low-dimensional traits -------------------------------------------
 
 pa = pa[ , iucns$name]
 K = 5
 
-set.seed(1)
 
-site_trait_sums = pa[runs$in_train, ] %*% as.matrix(traits)
+site_trait_scores = matrix(
+  NA, 
+  nrow = nrow(pa), 
+  ncol = ncol(traits), 
+  dimnames = list(row.names(pa), colnames(traits))
+)
 
-nmf_object = nmf(site_trait_sums, K, nrun = 10)
-
-for(i in 1:K){
-  message(i)
-  row = coef(nmf_object)[i, ]
-  print(round(sort(row[row > .05], decreasing = TRUE), 2))
+for(i in 1:ncol(traits)){
+  trait = traits[,i]
+  site_trait_scores[,i] = apply(
+    pa,
+    1,
+    function(x){
+      weighted_occurrences_plus_one = sum(trait * x) + 1
+      total_weight_plus_two = sum(trait) + 2
+      qlogis(weighted_occurrences_plus_one / total_weight_plus_two) * sum(trait)
+    }
+  )
 }
 
-trait_ids = c(
-  grassland = 1,
-  wetland = 2,
-  generalist = 3,
-  forest = 4,
-  shrubland = 5
-)
-stopifnot(all(trait_ids == 1:K))
-trait_names = names(trait_ids)
+# Start with the most variable 
+trait_vars = diag(var(site_trait_scores))
+included_scores = which.max(trait_vars)
 
+for(i in 2:5){
+  unexplained = sapply(
+    1:ncol(site_trait_scores),
+    function(j){
+      if(j %in% included_scores){
+        0
+      }else{
+        model = lm(
+          site_trait_scores[,j] ~ ., 
+          data = as.data.frame(site_trait_scores[ , included_scores])
+        )
+        trait_vars[j] * (1 - summary(model)$r.squared)
+      }
+    }
+  )
+  print(sum(unexplained) / sum(trait_vars))
+  included_scores = c(included_scores, which.max(unexplained))
+}
 
-summary(lm(c(site_trait_sums) ~ c(basis(nmf_object) %*% coef(nmf_object))))
+prior_means = traits[, included_scores]
 
-prior_means = as.matrix(traits) %*% t(coef(nmf_object))
-rownames(prior_means) = iucns$name
-colnames(prior_means) = trait_names
-
-nmf_coefficients = round(coef(nmf_object), 8)
-
-row.names(nmf_coefficients) = trait_names
 
 # # merge synonyms ----------------------------------------------------------
 # 
@@ -463,8 +478,6 @@ my_save = function(x){
 }
 
 my_save(prior_means)
-my_save(nmf_coefficients)
-my_save(nmf_object)
 my_save(pa)
 my_save(env)
 my_save(runs)
