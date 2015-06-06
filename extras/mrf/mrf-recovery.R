@@ -1,9 +1,14 @@
 set.seed(1)
+library(beepr)
+
+maxit = 2500
+tick_size = 10
+
+n_random_env = 3L
 
 devtools::load_all()
+library(progress)
 load("extras/mrf/fakedata.Rdata")
-
-scale = mean(abs(lateral[upper.tri(lateral)]))
 
 net = mistnet(
   x = env[ , 1:3],
@@ -18,61 +23,89 @@ net = mistnet(
         updater = new(
           "adagrad.updater",
           delta = matrix(0, nrow = ncol(fakedata), ncol = ncol(fakedata)),
-          learning.rate = .1
+          learning.rate = .05
         ),
-        l1.decay = 1 / scale / nrow(env)
+        prior = logistic.prior(location = 0, scale = 1)
       ),
       size = ncol(fakedata),
-      sampler = gaussian.sampler(ncol = 5L, sd = 1),
-      prior = gaussian.prior(mean = 0, sd = .5)
+      sampler = gaussian.sampler(ncol = n_random_env, sd = 1),
+      prior = gaussian.prior(mean = 0, sd = 1)
     )
   ),
   loss = bernoulliLoss(),
   updater = adagrad.updater(learning.rate = .1),
   initialize.biases = TRUE, 
-  initialize.weights = TRUE
+  initialize.weights = TRUE,
+  sampler = gaussian.sampler(ncol = n_random_env, sd = 1)
 )
 
 
+pb <- progress_bar$new(
+  format = "  Fitting [:bar] :percent eta: :eta",
+  total = maxit,
+  clear = FALSE
+)
 
-net$layers[[1]]$nonlinearity$updater$learning.rate = .05
 par(mfrow = c(1, 2))
-for(i in 1:25){
-  net$fit(100)
+pb$tick(0)
+for(i in 1:(maxit / tick_size)){
+  net$fit(tick_size)
+  net$layers[[1]]$prior$update(
+    net$layers[[1]]$weights,
+    update.mean = FALSE,
+    update.sd = TRUE,
+    min.sd = .1
+  )
+  net$layers[[1]]$nonlinearity$prior$update(
+    weights = matrix(c(net$layers[[1]]$nonlinearity$lateral), nrow = 1), 
+    update.location = FALSE, 
+    update.scale = TRUE, 
+    min.scale = .05
+  )
+  
   if(any(is.na(net$layers[[1]]$nonlinearity$lateral))){
     stop()
   }
   
-  plot(
-    net$layers[[1]]$weights[1:3, ], 
-    coefs[1:3, ], 
-    asp = 1,
-    main = net$completed.iterations
-  )
-  abline(0,1)
-  plot(
-    net$layers[[1]]$nonlinearity$lateral,
-    lateral, 
-    cex = .8,
-    col = "#00000020",
-    pch = 16,
-    asp = 1
-  )
-  abline(0,1)
-  abline(0,0)
-  abline(v = 0)
+  
+  if(i %% 10 == 0){
+    plot(
+      net$layers[[1]]$weights[1:3, ], 
+      coefs[1:3, ], 
+      asp = 1,
+      main = net$completed.iterations
+    )
+    abline(0,1)
+    plot(
+      net$layers[[1]]$nonlinearity$lateral,
+      lateral, 
+      cex = .8,
+      col = "#00000008",
+      pch = 16,
+      asp = 1
+    )
+    abline(0,1)
+    abline(0,0)
+    abline(v = 0)
+  }
+  
+  pb$tick(tick_size)
 }
+beep()
 
 
-
-pcs = predict(prcomp(t(net$layers[[1]]$weights[4:(3 + 10), ])))
 
 summary(lm(coefs[1, ] ~ net$layers[[1]]$weights[1, ]))
 summary(lm(coefs[2, ] ~ net$layers[[1]]$weights[2, ]))
 summary(lm(coefs[3, ] ~ net$layers[[1]]$weights[3, ]))
 
-summary(lm(coefs[4, ] ~ PC1+PC2, data = as.data.frame(pcs)))
-summary(lm(coefs[5, ] ~ PC1+PC2, data = as.data.frame(pcs)))
+pcs = predict(
+  prcomp(
+    t(net$layers[[1]]$weights[4:(3 + n_random_env), ])
+  )
+)
+summary(lm(coefs[4, ] ~ ., data = as.data.frame(pcs)))
+summary(lm(coefs[5, ] ~ ., data = as.data.frame(pcs)))
 
 summary(lm(c(lateral) ~ 0+c(net$layers[[1]]$nonlinearity$lateral)))
 
@@ -94,6 +127,6 @@ points(
   lateral,
   cex = .5,
   pch = 16,
-  col = "#00000040"
+  col = "#00000010"
 )
 
