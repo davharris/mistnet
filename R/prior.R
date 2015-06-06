@@ -74,6 +74,64 @@ laplace.prior = setRefClass(
 ) 
 
 
+
+#' @export logistic.prior
+#' @exportClass logistic.prior
+logistic.prior = setRefClass(
+  Class = "logistic.prior",
+  fields = list(
+    location = "numeric",
+    scale = "numeric"
+  ),
+  contains = "prior",
+  methods = list(
+    getLogGrad = function(x){
+      -tanh((x - location)/scale/2) / scale
+    },
+    sample = function(n){
+      rlogis(n, location, scale)
+    },
+    update = function(weights, update.location, update.scale, min.scale){
+      if(update.location){
+        location_loss = function(location, w){
+          sum(-dlogis(w, location = location, log = TRUE))
+        }
+        location_vector = apply(
+          weights,
+          1,
+          function(w){
+            optimize(
+              f = function(w)location_loss(w), 
+              interval = quantile(w, c(.01, .99)),
+              w = w
+            )$minimum
+          }
+        )
+        location <<- replicate(ncol(weights), location_vector)
+      }
+      if(update.scale){
+        scale_loss = function(scale, w){
+          sum(-dlogis(w, scale = scale, log = TRUE))
+        }
+        scale_vector = apply(
+          weights,
+          1,
+          function(w){
+            optimize(
+              f = scale_loss, 
+              interval = c(min.scale, 10 * sd(w)),
+              w = w
+            )$minimum
+          }
+        )
+        scale <<- replicate(ncol(weights), scale_vector)
+      }
+    }
+  )
+) 
+
+
+
 # GP prior assumes that covariance matrices (K) have already been determined
 # by some other analysis.  Can re-initialize with new K & noise_sd after updating
 # kernel hyperparameters as often as desired, though. Alternatively, one can just
