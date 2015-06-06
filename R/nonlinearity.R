@@ -174,7 +174,7 @@ mf_mrf.nonlinearity = setRefClass(
     maxit = "integer",
     damp = "numeric",
     tol = "numeric",
-    l1.decay = "numeric",
+    prior = "prior",
     updater = "updater"
   ),
   contains = "sigmoid.nonlinearity",
@@ -203,7 +203,7 @@ mf_mrf.nonlinearity = setRefClass(
       )
       
       diff = predicted.crossprod - observed.crossprod
-      penalty = sign(lateral) * l1.decay
+      penalty = -prior$getLogGrad(lateral) / dataset.size
       
       updater$computeDelta((diff / nrow(observed) + penalty))
       diag(updater$delta) <<- 0

@@ -117,7 +117,8 @@ network = setRefClass(
         layers[[i]]$nonlinearity$update(
           observed = y[row.selector$minibatch.ids, ],
           predicted = layers[[i]]$outputs, 
-          importance.weights = importance.weights
+          importance.weights = importance.weights,
+          dataset.size = dataset.size
         )
       }
     },
