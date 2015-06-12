@@ -4,7 +4,7 @@ library(beepr)
 maxit = 2500
 tick_size = 10
 
-n_random_env = 3L
+n_random_env = 5L
 
 devtools::load_all()
 library(progress)
@@ -23,9 +23,9 @@ net = mistnet(
         updater = new(
           "adagrad.updater",
           delta = matrix(0, nrow = ncol(fakedata), ncol = ncol(fakedata)),
-          learning.rate = .05
+          learning.rate = .1
         ),
-        prior = logistic.prior(location = 0, scale = 1)
+        prior = logistic.prior(location = 0, scale = 0.05)
       ),
       size = ncol(fakedata),
       sampler = gaussian.sampler(ncol = n_random_env, sd = 1),
@@ -45,23 +45,21 @@ pb <- progress_bar$new(
   total = maxit,
   clear = FALSE
 )
-
+ 
 par(mfrow = c(1, 2))
 pb$tick(0)
 for(i in 1:(maxit / tick_size)){
   net$fit(tick_size)
+  
   net$layers[[1]]$prior$update(
     net$layers[[1]]$weights,
     update.mean = FALSE,
     update.sd = TRUE,
     min.sd = .1
   )
-  net$layers[[1]]$nonlinearity$prior$update(
-    weights = matrix(c(net$layers[[1]]$nonlinearity$lateral), nrow = 1), 
-    update.location = FALSE, 
-    update.scale = TRUE, 
-    min.scale = .05
-  )
+  lateral_estimates = net$layers[[1]]$nonlinearity$lateral
+  upper_lateral_estimates = lateral_estimates[upper.tri(lateral_estimates)]
+  
   
   if(any(is.na(net$layers[[1]]$nonlinearity$lateral))){
     stop()
@@ -107,9 +105,13 @@ pcs = predict(
 summary(lm(coefs[4, ] ~ ., data = as.data.frame(pcs)))
 summary(lm(coefs[5, ] ~ ., data = as.data.frame(pcs)))
 
-summary(lm(c(lateral) ~ 0+c(net$layers[[1]]$nonlinearity$lateral)))
+cor(lateral[upper.tri(lateral)], upper_lateral_estimates, method = "spearman")
 
-mean(abs(net$layers[[1]]$nonlinearity$lateral))
+library(quantreg)
+summary(
+  rq(lateral[upper.tri(lateral)] ~ upper_lateral_estimates), 
+  se = "ker"
+)
 
 
 par(mfrow = c(1, 1))
@@ -130,3 +132,14 @@ points(
   col = "#00000010"
 )
 
+library(rags2ridges)
+ridge = ridgeS(cov(fakedata), 5/nrow(fakedata))
+plot(
+  ridge[upper.tri(ridge)],
+  lateral[upper.tri(lateral)]
+)
+
+plot(
+  cor(fakedata)[upper.tri(cor(fakedata))],
+  lateral[upper.tri(lateral)]
+)
