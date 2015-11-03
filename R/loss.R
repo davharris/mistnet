@@ -82,7 +82,7 @@ nbLoss = setRefClass(
   Class = "nbLoss",
   contains = "loss",
   fields = list(
-    log_size = "any.numeric"
+    log_size = "numeric"
   ),
   methods = list(
     loss = function(y, yhat){
@@ -135,27 +135,28 @@ binomialLoss = setRefClass(
 )
 
 #' @export
-mrfLoss = function(){
-  structure(
-    list(
-      loss = function(y, yhat, lateral){
-        if(is.vector(y)){
-          y = matrix(y, nrow = 1) # row vector, not column vector
+mrfLoss = setRefClass(
+  Class = "mrfLoss",
+  contains = "loss",
+  methods = list(
+    loss = function(y, yhat, lateral){
+      if(is.vector(y)){
+        y = matrix(y, nrow = 1) # row vector, not column vector
+      }
+      cross.entropy.loss = rowSums(crossEntropy(y, yhat))
+      
+      # The factor of two is because we just use one triangle of `lateral`, 
+      # not the whole matrix.  See Equation 3 in Osindero and Hinton's
+      # "Modeling image patches with a directed hierarchy of Markov random ﬁelds"
+      cross.entropy.loss - sapply(
+        1:nrow(y),
+        function(i){
+          sum(lateral * crossprod(y[i, , drop = FALSE])) / 2
         }
-        cross.entropy.loss = rowSums(crossEntropy(y, yhat))
-        
-        # The factor of two is because we just use one triangle of `lateral`, 
-        # not the whole matrix.  See Equation 3 in Osindero and Hinton's
-        # "Modeling image patches with a directed hierarchy of Markov random ﬁelds"
-        cross.entropy.loss - sapply(
-          1:nrow(y),
-          function(i){
-            sum(lateral * crossprod(y[i, , drop = FALSE])) / 2
-          }
-        )
-      },
-      grad = crossEntropyGrad
-    )
+      )
+    },
+    grad = crossEntropyGrad
   )
-}
+)
+
 
