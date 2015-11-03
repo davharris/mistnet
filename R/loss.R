@@ -2,101 +2,137 @@
 #' 
 #' Loss functions are minimized during model training. \code{loss} objects contain
 #'  a \code{loss} function as well as a \code{grad} function, specifying the gradient.
-#'  Many \code{loss} objects do not require any arguments.
+#'  \{loss} classes like the negative binomial can also store parameters that can be
+#'  updated during training.
 #' 
 #' @rdname loss
-loss = NULL
+loss = setRefClass(
+  Class = "loss",
+  fields = list(),
+  methods = list(
+    loss = function(y, yhat) stop({"loss function not defined for this loss class"}),
+    grad = function(y, yhat){stop("gradient not defined for this loss class")},
+    update = function(y, yhat){
+      # (Do nothing for most loss classes)
+    }
+  )
+)
+
 
 #' \code{bernoulliLoss}:
 #' cross-entropy for 0-1 data. Equal to 
 #'   \code{-(y * log(yhat) + (1 - y) * log(1 - yhat))}
 #' @rdname loss
+#' @include cross-entropy.R
 #' @export
-bernoulliLoss = function(){
-  structure(
-    list(
-      loss = crossEntropy,
-      grad = crossEntropyGrad
-    ),
-    class = "loss"
+bernoulliLoss = setRefClass(
+  Class = "bernoulliLoss",
+  contains = "loss",
+  methods = list(
+    loss = crossEntropy,
+    grad = crossEntropyGrad
   )
-}
+)
+
 
 #' \code{bernoulliRegLoss}: cross-entropy loss, regularized by a 
-#'   beta-distributed prior
+#'   beta-distributed prior.
+#' Note that \code{a} and \code{b} are not 
 #' @param a the \code{a} shape parameter in \code{\link{dbeta}}
 #' @param b the \code{b} shape parameter in \code{\link{dbeta}}
 #' @rdname loss
+#' @include cross-entropy.R
 #' @export
-bernoulliRegLoss = function(a, b = a){
-  structure(
-    list(
-      loss = function(y, yhat){crossEntropyReg(y = y, yhat = yhat, a = a, b = b)},
-      grad = function(y, yhat){crossEntropyRegGrad(y = y, yhat = yhat, a = a, b = b)}
-    ),
-    class = "loss"
+#' 
+bernoulliRegLoss = setRefClass(
+  Class = "bernoulliRegLoss",
+  fields = list(
+    a = "any.numeric",
+    b = "any.numeric"
+  ),
+  contains = "loss",
+  methods = list(
+    loss = function(y, yhat){crossEntropyReg(y = y, yhat = yhat, a = a, b = b)},
+    grad = function(y, yhat){crossEntropyRegGrad(y = y, yhat = yhat, a = a, b = b)}
   )
-}
-
+)
 
 #' \code{poissonLoss}: loss based on the Poisson likelihood.  
 #'   See \code{\link{dpois}}
 #' @rdname loss
 #' @export
-poissonLoss = function(){
-  structure(
-    list(
+poissonLoss = setRefClass(
+  Class = "poissonLoss",
+  contains = "loss",
+  methods = list(
       loss = function(y, yhat){
         - dpois(x = y, lambda = yhat, log = TRUE)
       },
       grad = function(y, yhat){
         1 - y / yhat
       }
-    ),
-    class = "loss"
   )
-}
+)
+
+#' \code{nbLoss}: loss based on the negative binomial likelihood
+#'   See \code{\link{dnbinom}}
+#' @rdname loss
+#' @export
+nbLoss = setRefClass(
+  Class = "nbLoss",
+  contains = "loss",
+  fields = list(
+    log_size = "any.numeric"
+  ),
+  methods = list(
+    loss = function(y, yhat){
+      - dnbinom(x = y, size = exp(log_size), mu = yhat, log = TRUE)
+    },
+    grad = function(y, yhat){
+      stop("Negative binomial loss gradient not yet defined")
+    }
+  )
+)
+
 
 #' \code{squaredLoss}: Squared error, for linear models
 #' @rdname loss
 #' @export
-squaredLoss = function(){
-  structure(
-    list(
-      loss = function(y, yhat){
-        (y - yhat)^2
-      },
-      grad = function(y, yhat){
-        2 * (yhat - y)
-      }
-    ),
-    class = "loss"
+squaredLoss = setRefClass(
+  Class = "squaredLoss",
+  contains = "loss",
+  methods = list(
+    loss = function(y, yhat){
+      (y - yhat)^2
+    },
+    grad = function(y, yhat){
+      2 * (yhat - y)
+    }
   )
-  
-}
+)
+
 
 #' \code{binomialLoss}: loss for binomial responses. 
 #' @param n specifies the number of Bernoulli trials (\code{size} in 
 #'   \code{\link{dbinom}})
 #' @rdname loss
 #' @export
-binomialLoss = function(n){
-  
-  n = safe.as.integer(n)
-  
-  structure(
-    list(
-      loss = function(y, yhat){
-        # Should inherit `n` from the parent environment
-        -dbinom(x = y, size = n, prob = yhat, log = TRUE)
-      },
-      grad = function(y, yhat, n){
-        (n * yhat - y) / (yhat - yhat^2)
-      }
-    ),
-    class = "loss"
+binomialLoss = setRefClass(
+  Class = "binomialLoss",
+  contains = "loss",
+  fields = list(
+    n = "integer"
+  ),
+  methods = list(
+    loss = function(y, yhat){
+      # Should inherit `n` from the parent environment
+      -dbinom(x = y, size = n, prob = yhat, log = TRUE)
+    },
+    grad = function(y, yhat, n){
+      (n * yhat - y) / (yhat - yhat^2)
+    }
   )
-}
+)
 
 #' @export
 mrfLoss = function(){
@@ -123,24 +159,3 @@ mrfLoss = function(){
   )
 }
 
-
-
-
-# Cross Entropy functions -------------------------------------------------
-
-crossEntropy = function(y, yhat){
-  -(y * log(yhat) + (1 - y) * log(1 - yhat))
-}
-crossEntropyGrad = function(y, yhat){
-  (1 - y) / (1 - yhat) - (y / yhat)
-}
-
-# Regularized cross entropy: includes a beta prior that the predictions won't
-# be less than (a-1) when a==b.  Rules out things like billion-to-one odds if
-# a==1 + 1E-7
-crossEntropyReg = function(y, yhat, a, b){
-  -(y * log(yhat) + (1 - y) * log(1 - yhat)) - dbeta(yhat, a, b, log = TRUE)
-}
-crossEntropyRegGrad = function(y, yhat, a, b = a){
-  (1 - y) / (1 - yhat) - (y / yhat) - ((a - 1)/yhat + (b - 1)/(yhat - 1))
-}

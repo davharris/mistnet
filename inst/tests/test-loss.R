@@ -34,8 +34,8 @@ test_that("Poisson loss is correct",{
 })
 
 test_that("Binomial loss is correct",{
-  N = 1E3
-  n = 1E2
+  N = 1E3L
+  n = 1E2L
   yhat = matrix(runif(N), ncol = 10)
   y = matrix(rbinom(N, 5, prob = runif(N)), ncol = 10)
   expect_equal(

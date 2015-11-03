@@ -21,6 +21,7 @@ Sugests: mda, geiger, mvtnorm, kernlab, gtools
 VignetteBuilder: knitr
 Collate:
     'RcppExports.R'
+    'cross-entropy.R'
     'evaluation.R'
     'geiger_OU.R'
     'helpers.R'
