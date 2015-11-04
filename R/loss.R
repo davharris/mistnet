@@ -6,7 +6,7 @@
 #'  updated during training.
 #' 
 #' @rdname loss
-#' @export
+#' @export loss
 #' @exportClass loss
 loss = setRefClass(
   Class = "loss",
@@ -28,7 +28,7 @@ loss = setRefClass(
 #'   \code{-(y * log(yhat) + (1 - y) * log(1 - yhat))}
 #' @rdname loss
 #' @include cross-entropy.R
-#' @export
+#' @export bernoulliLoss
 #' @exportClass bernoulliLoss
 bernoulliLoss = setRefClass(
   Class = "bernoulliLoss",
@@ -47,7 +47,7 @@ bernoulliLoss = setRefClass(
 #' @param b the \code{b} shape parameter in \code{\link{dbeta}}
 #' @rdname loss
 #' @include cross-entropy.R
-#' @export
+#' @export bernoulliRegLoss
 #' @exportClass bernoulliRegLoss
 #' 
 bernoulliRegLoss = setRefClass(
@@ -66,7 +66,7 @@ bernoulliRegLoss = setRefClass(
 #' \code{poissonLoss}: loss based on the Poisson likelihood.  
 #'   See \code{\link{dpois}}
 #' @rdname loss
-#' @export
+#' @export poissonLoss
 #' @exportClass poissonLoss
 poissonLoss = setRefClass(
   Class = "poissonLoss",
@@ -84,7 +84,7 @@ poissonLoss = setRefClass(
 #' \code{nbLoss}: loss based on the negative binomial likelihood
 #'   See \code{\link{dnbinom}}
 #' @rdname loss
-#' @export
+#' @export nbLoss
 #' @exportClass nbLoss
 nbLoss = setRefClass(
   Class = "nbLoss",
@@ -105,7 +105,7 @@ nbLoss = setRefClass(
 
 #' \code{squaredLoss}: Squared error, for linear models
 #' @rdname loss
-#' @export
+#' @export squaredLoss
 #' @exportClass squaredLoss
 squaredLoss = setRefClass(
   Class = "squaredLoss",
@@ -138,7 +138,7 @@ normalLoss = setRefClass(
 #' @param n specifies the number of Bernoulli trials (\code{size} in 
 #'   \code{\link{dbinom}})
 #' @rdname loss
-#' @export
+#' @export binomialLoss
 #' @exportClass binomialLoss
 binomialLoss = setRefClass(
   Class = "binomialLoss",
@@ -157,7 +157,7 @@ binomialLoss = setRefClass(
   )
 )
 
-#' @export
+#' @export mrfLoss
 #' @exportClass mrfLoss
 mrfLoss = setRefClass(
   Class = "mrfLoss",
