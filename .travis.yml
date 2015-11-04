@@ -15,6 +15,7 @@ notifications:
 
 r_binary_packages:
   - knitr
+  - testthat
   - assertthat
   - Rcpp
   - RcppArmadillo
@@ -25,5 +26,5 @@ r_binary_packages:
   - kernlab
   - gtools
 
-script: 
+script:
   - Rscript -e "library(testthat);invisible(source_dir('./',env=globalenv()));test_dir('tests');test_dir('tests',reporter='stop')"
