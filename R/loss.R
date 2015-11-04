@@ -2,7 +2,7 @@
 #' 
 #' Loss functions are minimized during model training. \code{loss} objects contain
 #'  a \code{loss} function as well as a \code{grad} function, specifying the gradient.
-#'  \{loss} classes like the negative binomial can also store parameters that can be
+#'  \code{loss} classes like the negative binomial can also store parameters that can be
 #'  updated during training.
 #' 
 #' @rdname loss

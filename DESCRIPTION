@@ -5,8 +5,8 @@ Version: 0.2.0
 Date: 2014-07-08
 Author: David J. Harris
 Maintainer: David J. Harris <DavHarris@UCDavis.edu>
-Description: Sstochastic feed-forward neural networks, which describe a joint 
-    distribution over     a set of variables, conditional on some observed 
+Description: Sstochastic feed-forward neural networks, which describe a joint
+    distribution over     a set of variables, conditional on some observed
     predictors.
 License: GPL-2 | GPL-3
 Imports:
@@ -17,7 +17,12 @@ Imports:
     progress,
     GPArotation
 LinkingTo: Rcpp, RcppArmadillo
-Suggests: mda, mvtnorm, kernlab, gtools, knitr
+Suggests:
+    mda,
+    mvtnorm,
+    kernlab,
+    gtools,
+    knitr
 VignetteBuilder: knitr
 Collate:
     'RcppExports.R'
