@@ -31,7 +31,9 @@ Loss functions are minimized during model training. \code{loss} objects contain
  \code{loss} classes like the negative binomial can also store parameters that can be
  updated during training.
 
-\code{bernoulliLoss}: cross-entropy for 0-1 data.
+\code{bernoulliLoss}:
+cross-entropy for 0-1 data. Equal to
+  \code{-(y * log(yhat) + (1 - y) * log(1 - yhat))}
 
 \code{bernoulliRegLoss}: cross-entropy loss, regularized by a
   beta-distributed prior.

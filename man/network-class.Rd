@@ -36,9 +36,7 @@ in each stochastic estimate of the likelihood gradient.}
 with the most recent round of importance sampling.  (one row per observation,
 one column per Monte Carlo sample).}
 
-\item{\code{loss}}{the loss function being optimized (not a \code{\link{loss}} object!)}
-
-\item{\code{lossGradient}}{the gradient of the loss function being optimized}
+\item{\code{loss}}{the a \code{\link{loss}} object}
 
 \item{\code{sampler}}{the function used to generate Monte Carlo samples for
 importance sampling}
