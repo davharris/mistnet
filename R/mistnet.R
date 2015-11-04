@@ -67,6 +67,7 @@
 #'   Ghahramani), & K.Q. Weinberger), pp. 530-538.
 #' @include prior.R
 #' @include nonlinearity.R
+#' @include loss.R
 #' @import assertthat
 #' @examples
 #' # 107 rows of fake data
