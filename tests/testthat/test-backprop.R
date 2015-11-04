@@ -61,7 +61,7 @@ test_that("3-layer backprop works", {
   net$estimateGrad()
   plus.loss = mean(
     rowSums(
-      net$loss(
+      net$loss$loss(
         y = net$y[net$row.selector$minibatch.ids, ], 
         yhat = net$layers[[3]]$outputs[,,1]
       )
@@ -74,7 +74,7 @@ test_that("3-layer backprop works", {
   net$estimateGrad()
   minus.loss = mean(
     rowSums(
-      net$loss(
+      net$loss$loss(
         y = net$y[net$row.selector$minibatch.ids, ], 
         yhat = net$layers[[3]]$outputs[,,1]
       )
