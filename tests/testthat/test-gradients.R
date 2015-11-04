@@ -88,7 +88,7 @@ test_that("poissonLossGrad is accurate", {
 })
 
 
-test_that("squaredLossGrad is accurate", {
+test_that("nbLoss is accurate", {
   eps = 1E-5
   x = seq(0.1, 10, by = .1)
   y = nbLoss(log_size = 5)$loss(y = 1, yhat = x)

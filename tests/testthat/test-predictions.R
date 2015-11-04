@@ -36,7 +36,7 @@ test_that("Prediction works",{
   net$fit(1)
   net$layers[[3]]$biases[] = 0 # Undo bias updates
   
-  p = predict(net, rbind(x, x), n.importance.samples = n.importance.samples)
+  p = predict(net, rbind(x, x), n.importance.samples = n.importance.samples, show.progress = FALSE)
   
   expect_equal(dim(p), c(2 * nrow(x), ncol(y), n.importance.samples))
   
@@ -48,14 +48,15 @@ test_that("Prediction works",{
     net, 
     x * 2, 
     n.importance.samples = net$n.importance.samples, 
-    return.model = TRUE
+    return.model = TRUE,
+    show.progress = FALSE
   )
   
   copy2 = net$copy(shallow = FALSE)
   
   # Everything but inputs, x, y, and reference classes should be identical
   for(name in names(network$fields())){
-    if(!(name %in% c("x", "y", "inputs", "layers", "row.selector", "sampler"))){
+    if(!(name %in% c("x", "y", "inputs", "layers", "row.selector", "sampler", "loss"))){
       expect_identical(copy$field(name), copy2$field(name))
     }
   }

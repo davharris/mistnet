@@ -182,8 +182,7 @@ mistnet = function(
       pointer = 1L
     ),
     n.importance.samples = safe.as.integer(n.importance.samples),
-    loss = loss$loss,
-    lossGradient = loss$grad,
+    loss = loss,
     sampler = sampler,
     completed.iterations = 0L,
     debug = FALSE

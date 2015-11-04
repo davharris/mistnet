@@ -18,8 +18,7 @@
 #' @field importance.weights a numeric matrix containing the weights associated
 #'  with the most recent round of importance sampling.  (one row per observation,
 #'  one column per Monte Carlo sample).
-#' @field loss the loss function being optimized (not a \code{\link{loss}} object!)
-#' @field lossGradient the gradient of the loss function being optimized
+#' @field loss the a \code{\link{loss}} object
 #' @field sampler the function used to generate Monte Carlo samples for 
 #'  importance sampling
 #' @field completed.iterations a counter that increments after each iteration
@@ -44,8 +43,7 @@ network = setRefClass(
     row.selector = "row.selector",
     n.importance.samples = "integer",
     importance.weights = "matrix",
-    loss = "function",
-    lossGradient = "function",
+    loss = "loss",
     sampler = "sampler",
     completed.iterations = "integer",
     debug = "logical"
@@ -140,7 +138,7 @@ network = setRefClass(
     backprop = function(sample.num){
       # Final layer gets its error from the loss gradient
       layers[[n.layers]]$backwardPass(
-        lossGradient(
+        loss$grad(
           y = y[row.selector$minibatch.ids, ], 
           yhat = layers[[n.layers]]$outputs[ , , sample.num]
         ),
@@ -177,7 +175,7 @@ network = setRefClass(
       importance.errors = zeros(row.selector$n.minibatch, n.importance.samples)
       for(i in 1:n.importance.samples){
         importance.errors[ , i] = rowSums(
-          loss(
+          loss$loss(
             y = y[row.selector$minibatch.ids, ], 
             yhat = layers[[n.layers]]$outputs[ , , i]
           )

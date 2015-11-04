@@ -17,6 +17,8 @@ prior = setRefClass(
 # gaussian.prior can accept a numeric matrix OR a numeric vector
 setClassUnion("any.numeric", c("numeric", "matrix"))
 
+#' \code{gaussian.prior} Gaussian prior with mean and sd
+#' @rdname prior
 #' @export gaussian.prior
 #' @exportClass gaussian.prior
 gaussian.prior = setRefClass(
@@ -52,6 +54,8 @@ gaussian.prior = setRefClass(
   )
 )
 
+#' \code{laplace.prior} Laplace "double-exponential" prior with location and scale
+#' @rdname prior
 #' @export laplace.prior
 #' @exportClass laplace.prior
 laplace.prior = setRefClass(
@@ -74,7 +78,8 @@ laplace.prior = setRefClass(
 ) 
 
 
-
+#' \code{logistic.prior} logistic prior distribution with location and scale
+#' @rdname prior
 #' @export logistic.prior
 #' @exportClass logistic.prior
 logistic.prior = setRefClass(
@@ -136,7 +141,8 @@ logistic.prior = setRefClass(
 # by some other analysis.  Can re-initialize with new K & noise_sd after updating
 # kernel hyperparameters as often as desired, though. Alternatively, one can just
 # update the means, since that should be faster.
-
+#' \code{gp.prior} Gaussian process prior
+#' @rdname prior
 #' @export gp.prior
 #' @exportClass gp.prior
 gp.prior = setRefClass(
