@@ -22,7 +22,8 @@ Suggests:
     mvtnorm,
     kernlab,
     gtools,
-    knitr
+    knitr,
+    testthat
 VignetteBuilder: knitr
 Collate:
     'RcppExports.R'
