@@ -6,6 +6,7 @@
 #'  updated during training.
 #' 
 #' @rdname loss
+#' @export
 loss = setRefClass(
   Class = "loss",
   fields = list(
