@@ -12,3 +12,16 @@ notifications:
   email:
     on_success: change
     on_failure: change
+
+install:
+  - ./travis-tool.sh install_r knitr
+  - ./travis-tool.sh install_r assertthat
+  - ./travis-tool.sh install_r Rcpp
+  - ./travis-tool.sh install_r RcppArmadillo
+  - ./travis-tool.sh install_r progress
+  - ./travis-tool.sh install_r GPArotation
+  - ./travis-tool.sh install_r mda
+  - ./travis-tool.sh install_r geiger
+  - ./travis-tool.sh install_r kernlab
+  - ./travis-tool.sh install_r gtools
+  
