@@ -1,13 +1,13 @@
 Package: mistnet
 Type: Package
-Title: Stochastic neural networks
+Title: Stochastic Neural Networks
 Version: 0.2.0
 Date: 2014-07-08
 Author: David J. Harris
 Maintainer: David J. Harris <DavHarris@UCDavis.edu>
-Description: mistnet is a package for building stochastic feed-forward
-    neural networks.  These models describe a joint distribution over
-    a set of variables, conditional on some observed predictors.
+Description: Sstochastic feed-forward neural networks, which describe a joint
+    distribution over     a set of variables, conditional on some observed
+    predictors.
 License: GPL-2 | GPL-3
 Imports:
     methods,
@@ -17,7 +17,12 @@ Imports:
     progress,
     GPArotation
 LinkingTo: Rcpp, RcppArmadillo
-Sugests: mda, geiger, mvtnorm, kernlab, gtools
+Suggests:
+    mda,
+    mvtnorm,
+    kernlab,
+    gtools,
+    knitr
 VignetteBuilder: knitr
 Collate:
     'RcppExports.R'

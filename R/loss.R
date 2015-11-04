@@ -2,10 +2,12 @@
 #' 
 #' Loss functions are minimized during model training. \code{loss} objects contain
 #'  a \code{loss} function as well as a \code{grad} function, specifying the gradient.
-#'  \{loss} classes like the negative binomial can also store parameters that can be
+#'  \code{loss} classes like the negative binomial can also store parameters that can be
 #'  updated during training.
 #' 
 #' @rdname loss
+#' @export loss
+#' @exportClass loss
 loss = setRefClass(
   Class = "loss",
   fields = list(
@@ -26,7 +28,8 @@ loss = setRefClass(
 #'   \code{-(y * log(yhat) + (1 - y) * log(1 - yhat))}
 #' @rdname loss
 #' @include cross-entropy.R
-#' @export
+#' @export bernoulliLoss
+#' @exportClass bernoulliLoss
 bernoulliLoss = setRefClass(
   Class = "bernoulliLoss",
   contains = "loss",
@@ -44,7 +47,8 @@ bernoulliLoss = setRefClass(
 #' @param b the \code{b} shape parameter in \code{\link{dbeta}}
 #' @rdname loss
 #' @include cross-entropy.R
-#' @export
+#' @export bernoulliRegLoss
+#' @exportClass bernoulliRegLoss
 #' 
 bernoulliRegLoss = setRefClass(
   Class = "bernoulliRegLoss",
@@ -62,7 +66,8 @@ bernoulliRegLoss = setRefClass(
 #' \code{poissonLoss}: loss based on the Poisson likelihood.  
 #'   See \code{\link{dpois}}
 #' @rdname loss
-#' @export
+#' @export poissonLoss
+#' @exportClass poissonLoss
 poissonLoss = setRefClass(
   Class = "poissonLoss",
   contains = "loss",
@@ -79,7 +84,8 @@ poissonLoss = setRefClass(
 #' \code{nbLoss}: loss based on the negative binomial likelihood
 #'   See \code{\link{dnbinom}}
 #' @rdname loss
-#' @export
+#' @export nbLoss
+#' @exportClass nbLoss
 nbLoss = setRefClass(
   Class = "nbLoss",
   contains = "loss",
@@ -99,7 +105,8 @@ nbLoss = setRefClass(
 
 #' \code{squaredLoss}: Squared error, for linear models
 #' @rdname loss
-#' @export
+#' @export squaredLoss
+#' @exportClass squaredLoss
 squaredLoss = setRefClass(
   Class = "squaredLoss",
   contains = "loss",
@@ -131,7 +138,8 @@ normalLoss = setRefClass(
 #' @param n specifies the number of Bernoulli trials (\code{size} in 
 #'   \code{\link{dbinom}})
 #' @rdname loss
-#' @export
+#' @export binomialLoss
+#' @exportClass binomialLoss
 binomialLoss = setRefClass(
   Class = "binomialLoss",
   contains = "loss",
@@ -149,7 +157,8 @@ binomialLoss = setRefClass(
   )
 )
 
-#' @export
+#' @export mrfLoss
+#' @exportClass mrfLoss
 mrfLoss = setRefClass(
   Class = "mrfLoss",
   contains = "loss",
@@ -162,7 +171,7 @@ mrfLoss = setRefClass(
       
       # The factor of two is because we just use one triangle of `lateral`, 
       # not the whole matrix.  See Equation 3 in Osindero and Hinton's
-      # "Modeling image patches with a directed hierarchy of Markov random ﬁelds"
+      # "Modeling image patches with a directed hierarchy of Markov random fields"
       cross.entropy.loss - sapply(
         1:nrow(y),
         function(i){
