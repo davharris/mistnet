@@ -25,6 +25,3 @@ r_binary_packages:
   - geiger
   - kernlab
   - gtools
-
-script:
-  - Rscript -e "library(testthat);test_dir('tests');test_dir('tests',reporter='stop')"
