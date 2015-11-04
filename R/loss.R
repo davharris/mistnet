@@ -8,7 +8,9 @@
 #' @rdname loss
 loss = setRefClass(
   Class = "loss",
-  fields = list(),
+  fields = list(
+    updater = "updater"
+  ),
   methods = list(
     loss = function(y, yhat) stop({"loss function not defined for this loss class"}),
     grad = function(y, yhat){stop("gradient not defined for this loss class")},
@@ -89,7 +91,7 @@ nbLoss = setRefClass(
       - dnbinom(x = y, size = exp(log_size), mu = yhat, log = TRUE)
     },
     grad = function(y, yhat){
-      stop("Negative binomial loss gradient not yet defined")
+      - exp(log_size) * (y - yhat) / (yhat * (exp(log_size) + yhat))
     }
   )
 )
@@ -107,6 +109,19 @@ squaredLoss = setRefClass(
     },
     grad = function(y, yhat){
       2 * (yhat - y)
+    }
+  )
+)
+
+normalLoss = setRefClass(
+  Class = "normalLoss",
+  contains = "loss",
+  fields = list(sigma = "numeric"),
+  methods = list(
+    
+    update = function(y, yhat){
+      
+      (yhat^2 - sigma^2 + y^2 -2 *yhat * y)/sigma^3
     }
   )
 )
@@ -158,5 +173,7 @@ mrfLoss = setRefClass(
     grad = crossEntropyGrad
   )
 )
+
+
 
 

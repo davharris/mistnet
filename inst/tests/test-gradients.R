@@ -90,16 +90,20 @@ test_that("poissonLossGrad is accurate", {
 
 test_that("squaredLossGrad is accurate", {
   eps = 1E-5
-  x = seq(-10, 10, by = .1)
-  y = squaredLoss()$loss(y = 1, yhat = x)
-  y.plus  = squaredLoss()$loss(y = 1, yhat = x + eps)
-  y.minus = squaredLoss()$loss(y = 1, yhat = x - eps)
-  grad = squaredLoss()$grad(y = 1, yhat = x)
+  x = seq(0.1, 10, by = .1)
+  y = nbLoss(log_size = 5)$loss(y = 1, yhat = x)
+  y.plus  = nbLoss(log_size = 5)$loss(y = 1, yhat = x + eps)
+  y.minus = nbLoss(log_size = 5)$loss(y = 1, yhat = x - eps)
+  grad = nbLoss(log_size = 5)$grad(y = 1, yhat = x)
   
   expect_equal(
     (y.plus - y.minus)/2 / eps,
     grad
   )
+})
+
+test_that("nbLoss grad is accurate",{
+  
 })
 
 
