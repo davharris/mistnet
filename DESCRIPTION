@@ -17,7 +17,7 @@ Imports:
     progress,
     GPArotation
 LinkingTo: Rcpp, RcppArmadillo
-Suggests: mda, geiger, mvtnorm, kernlab, gtools, knitr
+Suggests: mda, mvtnorm, kernlab, gtools, knitr
 VignetteBuilder: knitr
 Collate:
     'RcppExports.R'
