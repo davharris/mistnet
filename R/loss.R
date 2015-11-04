@@ -163,7 +163,7 @@ mrfLoss = setRefClass(
       
       # The factor of two is because we just use one triangle of `lateral`, 
       # not the whole matrix.  See Equation 3 in Osindero and Hinton's
-      # "Modeling image patches with a directed hierarchy of Markov random ﬁelds"
+      # "Modeling image patches with a directed hierarchy of Markov random fields"
       cross.entropy.loss - sapply(
         1:nrow(y),
         function(i){
