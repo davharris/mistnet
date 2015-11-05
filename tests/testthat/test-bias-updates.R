@@ -42,12 +42,9 @@ test_that("biases update correctly",{
   
   # Delta should be calculated correctly.
   # Divide by n.minibatch to standardize the values regardless of # of examples
-  with(
-    net$layers[[1]],
-    expect_equal(
-      weighted.bias.grads / n.minibatch * bias.updater$learning.rate,
-      -c(bias.updater$delta)
-    )
+  expect_equal(
+    net$layers[[1]]$weighted.bias.grads / n.minibatch * net$layers[[1]]$bias.updater$learning.rate,
+    -c(net$layers[[1]]$bias.updater$delta)
   )
   
 })
