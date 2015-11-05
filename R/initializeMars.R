@@ -1,4 +1,3 @@
-#' @export
 marsInitializer = function(x, y){
   
   marsmodel = mda::mars(x, y)

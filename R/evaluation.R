@@ -14,9 +14,19 @@ logMeanExp = function(x, weights){
   log(sum(exp(x - biggest) * weights)) + biggest
 }
 
-# Evaluate a network object's predictions on newdata against observed y.
-# Rather than storing a huge number of samples in memory, we can do this in
-# batches of a specified size.
+#' Evaluate a network object's predictions on newdata against observed y.
+#' 
+#' Estimate the model's log-likelihood on data held out of sample.
+#' Rather than storing a huge number of sample predictions in memory, we can 
+#' do this in #' batches of a specified size and just work with the scalar likelihood.
+#' 
+#' @param object a \code{network} object
+#' @param newdata a matrix of predictor variables.
+#' @param y a matrix of response variables
+#' @param loss a \code{loss} function (e.g. from a \code{loss} object), assumed
+#'   to be a *negative* log-likelihood
+#' @param batches the number of importance sampling batches to perform
+#' @param batch.size the number of importance samples per batch
 #' @export
 importanceSamplingEvaluation = function(
   object, 
@@ -24,11 +34,13 @@ importanceSamplingEvaluation = function(
   y, 
   loss,
   batches, 
-  batch.size,
-  verbose = FALSE
+  batch.size
 ){
+  pb = progress::progress_bar()
+  
   logliks = replicate(
     batches,{
+      pb$tick()
       predictions = predict(
         object, 
         newdata, 
@@ -42,8 +54,6 @@ importanceSamplingEvaluation = function(
           -rowSums(loss(y = y, yhat = x))
         }
       )
-      
-      if(verbose){cat(".")}
       
       loglik
     },

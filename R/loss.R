@@ -157,8 +157,6 @@ binomialLoss = setRefClass(
   )
 )
 
-#' @export mrfLoss
-#' @exportClass mrfLoss
 mrfLoss = setRefClass(
   Class = "mrfLoss",
   contains = "loss",
