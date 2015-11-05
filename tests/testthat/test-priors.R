@@ -104,12 +104,6 @@ test_that("GP prior works", {
   expect_equal(prior$noise_sd, sqrt(var))
   expect_equal(K, prior$K)
   
-  for(i in 1:dim){
-    # inverse_var is the matrix inverse of posterior_var
-    expect_equal(prior$inverse_var[,,i], solve(prior$posterior_var[,,i]))
-  }  
-  
-  
   # Should also test that all this works with a one-dimensional prior...
   
   
@@ -122,7 +116,9 @@ test_that("GP prior works", {
 
   grad_est = (ll_plus - ll_minus) / 2 / eps[1]
   
-  grad = prior$inverse_var[,,1] %*% (y[1, ] - prior$means[1, ])
+  inverse_var = solve(prior$posterior_var[,,1])
+  
+  grad = inverse_var %*% (y[1, ] - prior$means[1, ])
 
   # (minus because grad is for negative log likelihood)
   expect_equal(-grad[1], grad_est)
