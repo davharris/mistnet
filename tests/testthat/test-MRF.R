@@ -117,7 +117,7 @@ test_that("lateral updates work", {
       maxit = 10L,
       damp = .2,
       tol = .01,
-      l1.decay = 0,
+      prior = gaussian.prior(mean = 0, sd = Inf),
       updater = new(
         "sgd.updater", 
         delta = matrix(0, nrow = ncol, ncol = ncol), 
@@ -135,7 +135,9 @@ test_that("lateral updates work", {
   l$nonlinearity$update(
     observed = y, 
     predicted = predicted,
-    importance.weights = importance.weights
+    importance.weights = importance.weights,
+    n.importance.samples = 1,
+    dataset.size = nrow(y)
   )
   
   # Since learning rate was zero, nothing should happen
@@ -152,7 +154,9 @@ test_that("lateral updates work", {
   l$nonlinearity$update(
     observed = y, 
     predicted = predicted,
-    importance.weights = importance.weights
+    importance.weights = importance.weights,
+    n.importance.samples = 1,
+    dataset.size = nrow(y)
   )
   
   expect_equal(
@@ -177,7 +181,9 @@ test_that("lateral updates work", {
   l$nonlinearity$update(
     observed = y, 
     predicted = predicted,
-    importance.weights = importance.weights
+    importance.weights = importance.weights,
+    n.importance.samples = 1,
+    dataset.size = nrow(y)
   )
   
   

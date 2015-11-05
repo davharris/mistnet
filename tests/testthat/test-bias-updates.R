@@ -11,21 +11,28 @@ test_that("biases update correctly",{
   net = mistnet(
     x = x,
     y = y,
-    nonlinearity.names = c("sigmoid"),
-    priors = list(gaussian.prior$new(mean = 0, var = 1)),
-    hidden.dims = NULL,
-    n.ranef = 3L,
-    n.minibatch = n.minibatch,
-    n.importance.samples = 5L,
-    loss.name = "crossEntropy",
-    ranefSample = gaussianRanefSample,
-    training.iterations = 0L
+    layer.definitions = list(
+      defineLayer(
+        nonlinearity = sigmoid.nonlinearity(), 
+        size = ncol(y), 
+        prior = gaussian.prior(mean = 0, sd = sqrt(.1))
+      )
+    ),
+    sampler = gaussian.sampler(ncol = 1L, sd = 1),
+    loss = bernoulliLoss(),
+    updater = sgd.updater(learning.rate = .01, momentum = .9),
+    n.minibatch = n.minibatch
   )
   
   initial.biases = rnorm(ncol(y))
   net$layers[[1]]$biases = matrix(initial.biases, nrow = 1)
     
   net$fit(1)
+  
+  # Confirm weighted bias gradients
+  
+  net$layers[[1]]$weighted.bias.grads
+  
   
   # Should actually do what the updater says
   expect_equal(
@@ -35,43 +42,9 @@ test_that("biases update correctly",{
   
   # Delta should be calculated correctly.
   # Divide by n.minibatch to standardize the values regardless of # of examples
-  with(
-    net$layers[[1]],
-    expect_equal(
-      weighted.bias.grads / n.minibatch * bias.updater$learning.rate,
-      -c(bias.updater$delta)
-    )
-  )
-  
-  #################
-  # Tests below this line haven't been updated
-  
-  # Reset weights to zero
-  net$layers[[1]]$weights[ , ] = 0
-  
-  # With reset weights, let's see what the loss is.
-  net$feedForward(1L)
-  updated.loss = sum(net$reportLoss())
-  
-  net$layers[[1]]$biases[] = initial.biases
-  
-  # the updated loss should be less than what was seen with the initial biases
-  net$feedForward()
-  initial.loss = sum(net$reportLoss())
-  expect_true(initial.loss > updated.loss)
-  
-  bias.to.update = sample.int(length(initial.biases), 1)
-  
-  net$layers[[1]]$biases[bias.to.update] = initial.biases[bias.to.update] + eps
-  net$feedForward()
-  plus.loss = sum(net$reportLoss())
-  
-  net$layers[[1]]$biases[bias.to.update] = initial.biases[bias.to.update] - eps
-  net$feedForward()
-  minus.loss = sum(net$reportLoss())
-  
   expect_equal(
-    (plus.loss - minus.loss) / 2,
-    grad[[bias.to.update]]
+    net$layers[[1]]$weighted.bias.grads / n.minibatch * net$layers[[1]]$bias.updater$learning.rate,
+    -c(net$layers[[1]]$bias.updater$delta)
   )
+  
 })

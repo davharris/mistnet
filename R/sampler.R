@@ -8,6 +8,9 @@ sampler = setRefClass(
   methods = list(
     sample = function(...){
       stop("no sampling method defined for this sampler")
+    },
+    log_density = function(){
+      stop("no log-density function defined for this sampler")
     }
   )
 )
@@ -27,6 +30,9 @@ gaussian.sampler = setRefClass(
       dim(out) = c(nrow, ncol)
       
       out
+    },
+    log_density = function(x){
+      dnorm(x, mean = 0, sd = sd, log = TRUE)
     }
   ),
   contains = "sampler"
