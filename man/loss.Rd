@@ -12,6 +12,8 @@
 \alias{loss-class}
 \alias{nbLoss}
 \alias{nbLoss-class}
+\alias{nbRegLoss}
+\alias{nbRegLoss-class}
 \alias{poissonLoss}
 \alias{poissonLoss-class}
 \alias{squaredLoss}
@@ -43,6 +45,9 @@ Note that \code{a} and \code{b} are not
   See \code{\link{dpois}}
 
 \code{nbLoss}: loss based on the negative binomial likelihood
+  See \code{\link{dnbinom}}
+
+\code{nbRegLoss}: loss based on the negative binomial likelihood with a lognormal prior on mu
   See \code{\link{dnbinom}}
 
 \code{squaredLoss}: Squared error, for linear models
