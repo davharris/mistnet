@@ -103,6 +103,32 @@ nbLoss = setRefClass(
 )
 
 
+#' \code{nbRegLoss}: loss based on the negative binomial likelihood with a lognormal prior on mu
+#'   See \code{\link{dnbinom}}
+#' @rdname loss
+#' @export nbRegLoss
+#' @exportClass nbRegLoss
+nbRegLoss = setRefClass(
+  Class = "nbRegLoss",
+  contains = "loss",
+  fields = list(
+    log_size = "numeric",
+    prior_meanlog = "numeric",
+    prior_sdlog = "numeric"
+  ),
+  methods = list(
+    loss = function(y, yhat){
+      - dnbinom(x = y, size = exp(log_size), mu = yhat, log = TRUE) - 
+        dlnorm(x = yhat, meanlog = prior_meanlog, sdlog = prior_sdlog, log = TRUE)
+    },
+    grad = function(y, yhat){
+      - exp(log_size) * (y - yhat) / (yhat * (exp(log_size) + yhat)) + 
+        (-prior_meanlog + prior_sdlog^2 + log(yhat)) / (prior_sdlog^2 * yhat)
+    }
+  )
+)
+
+
 #' \code{squaredLoss}: Squared error, for linear models
 #' @rdname loss
 #' @export squaredLoss

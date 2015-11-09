@@ -135,6 +135,27 @@ logistic.prior = setRefClass(
   )
 ) 
 
+#' \code{lognormal.prior} lognormal prior with meanlog and sdlog parameters
+#' @rdname prior
+#' @export lognormal.prior
+#' @exportClass lognormal.prior
+lognormal.prior = setRefClass(
+  Class = "lognormal.prior",
+  fields = list(
+    meanlog = "numeric",
+    sdlog = "numeric"
+  ),
+  contains = "prior",
+  methods = list(
+    getLogGrad = function(x){
+      - (sdlog^2 + log(x) - meanlog) / (sdlog^2 * x)
+    },
+    sample = function(n){
+      rlnorm(n, meanlog, sdlog)
+    }
+  )
+)
+
 
 
 # GP prior assumes that covariance matrices (K) have already been determined

@@ -10,6 +10,8 @@
 \alias{laplace.prior-class}
 \alias{logistic.prior}
 \alias{logistic.prior-class}
+\alias{lognormal.prior}
+\alias{lognormal.prior-class}
 \title{\code{gaussian.prior} Gaussian prior with mean and sd}
 \description{
 \code{gaussian.prior} Gaussian prior with mean and sd
@@ -17,6 +19,8 @@
 \code{laplace.prior} Laplace "double-exponential" prior with location and scale
 
 \code{logistic.prior} logistic prior distribution with location and scale
+
+\code{lognormal.prior} lognormal prior with meanlog and sdlog parameters
 
 \code{gp.prior} Gaussian process prior
 }
