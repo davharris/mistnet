@@ -114,6 +114,73 @@ adagrad.updater = setRefClass(
   )
 )
 
+#' adam updater
+#' 
+#' @description An updater with adaptive step sizes. Adam allows different 
+#' weights to have different effective learning rates, depending on how 
+#' much that parameter has moved so far and on how much it has moved recently 
+#' in one consistent direction.
+#'
+#' @field a_0 initial step size; default is 0.01
+#' @field rate_decay rate for exponential decay in step size; default is 0.999,
+#'        i.e. rate = a_0 * rate_decay^t
+#' @field b1 exponential decay rate for first moment estimate; default is 0.9
+#' @field b2 exponential decay rate for second moment estimate; default is 0.999
+#' @field e epsilon (prevents divide-by-zero errors); default is 1E-8
+#' @field m first moment estimates; all zero by default at initialization
+#' @field v second moment estimates; all zero by default at initialization
+#' @field t timestep; zero by default at initialization
+#' @field delta the delta matrix (see \code{updater})
+#' @export adam.updater
+#' @exportClass adam.updater
+adam.updater = setRefClass(
+  Class = "adam.updater",
+  contains = "updater",
+  fields = list(
+    a_0 = "numeric",
+    rate_decay = "numeric",
+    b1 = "numeric",
+    b2 = "numeric",
+    e = "numeric",
+    m = "matrix",
+    v = "matrix",
+    t = "integer",
+    delta = "matrix"
+  ),
+  methods = list(
+    computeDelta = function(gradient){
+      t <<- t + 1L
+      g = gradient
+      
+      rate = a_0 * rate_decay^t
+      
+      # Update biased moment estimates
+      m <<- b1 * m + (1 - b1) * g
+      v <<- b2 * v + (1 - b2) * g^2
+      
+      # Compute bias-corrected moment estimates
+      m_hat = m / (1 - b1^t)
+      v_hat = v / (1 - b2^t)
+       
+      delta <<- -rate * m_hat / (sqrt(v_hat) + e)
+    },
+    initialize = function(a_0 = 0.1, b1 = 0.9, b2 = 0.999, e = 1E-8,
+                          t = 0L, delta, rate_decay = 0.999, ...){
+      if (length(.self$rate_decay) == 0 | !missing(rate_decay))  {rate_decay <<- rate_decay}
+      if (length(.self$a_0) == 0 | !missing(a_0)) {a_0 <<- a_0}
+      if (length(.self$b1)  == 0 | !missing(b1))  {b1 <<- b1}
+      if (length(.self$b2)  == 0 | !missing(b2))  {b2 <<- b2}
+      if (length(.self$e)   == 0 | !missing(e))   {e <<- e}
+      if (length(.self$t)   == 0 | !missing(t))   {t <<- t}
+      if (!missing(delta)) {
+        delta <<- delta
+        m <<- delta * 0
+        v <<- delta * 0
+      }
+    }
+  )
+)
+
 
 # Epsilon is a fudge factor that determines initial rates and keeps things from
 #    approaching zero.
@@ -208,11 +275,12 @@ rmsprop.updater = setRefClass(
     delta = "matrix",
     learning.rate = "numeric",
     squared.grad = "matrix",
-    decay = "numeric"
+    decay = "numeric",
+    leakage = "numeric"
   ),
   methods = list(
     computeDelta = function(gradient){
-      squared.grad <<- squared.grad * (1 - decay) + (decay) * gradient^2
+      squared.grad <<- squared.grad * (1 - decay + leakage) + decay * gradient^2
       delta <<- -learning.rate / sqrt(squared.grad + 1E-8) * gradient
     },
     initialize = function(delta, learning.rate, decay, ...){
@@ -229,6 +297,11 @@ rmsprop.updater = setRefClass(
       }
       if(!missing(decay)){
         decay <<- decay
+      }
+      if(!missing(decay)){
+        leakage <<- leakage
+      }else{
+        leakage <<- 0
       }
     }
   )

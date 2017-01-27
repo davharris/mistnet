@@ -163,7 +163,7 @@ exp.nonlinearity = setRefClass(
 )
 
 
-
+#' @include prior.R
 #' @exportClass mf_mrf.nonlinearity
 #' @rdname nonlinearity
 #' @export mf_mrf.nonlinearity
