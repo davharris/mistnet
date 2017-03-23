@@ -14,7 +14,11 @@ in one consistent direction.
 \section{Fields}{
 
 \describe{
-\item{\code{a}}{step size; default is 0.001}
+\item{\code{a_0}}{initial step size; default is 0.01}
+
+\item{\code{annealing_rate}}{controls the step size at time \code{t}. Step size is 
+\code{a[t] = a_0 / sqrt(1 - annealing_rate + t*annealing_rate)}.
+Default is 0.001.}
 
 \item{\code{b1}}{exponential decay rate for first moment estimate; default is 0.9}
 

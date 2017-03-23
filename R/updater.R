@@ -122,8 +122,9 @@ adagrad.updater = setRefClass(
 #' in one consistent direction.
 #'
 #' @field a_0 initial step size; default is 0.01
-#' @field rate_decay rate for exponential decay in step size; default is 0.999,
-#'        i.e. rate = a_0 * rate_decay^t
+#' @field annealing_rate controls the step size at time \code{t}. Step size is 
+#'        \code{a[t] = a_0 / sqrt(1 - annealing_rate + t*annealing_rate)}.
+#'        Default is 0.001.
 #' @field b1 exponential decay rate for first moment estimate; default is 0.9
 #' @field b2 exponential decay rate for second moment estimate; default is 0.999
 #' @field e epsilon (prevents divide-by-zero errors); default is 1E-8
@@ -138,7 +139,7 @@ adam.updater = setRefClass(
   contains = "updater",
   fields = list(
     a_0 = "numeric",
-    rate_decay = "numeric",
+    annealing_rate = "numeric",
     b1 = "numeric",
     b2 = "numeric",
     e = "numeric",
@@ -152,7 +153,7 @@ adam.updater = setRefClass(
       t <<- t + 1L
       g = gradient
       
-      rate = a_0 * rate_decay^t
+      rate = a_0 / sqrt(1 - annealing_rate + t*annealing_rate)
       
       # Update biased moment estimates
       m <<- b1 * m + (1 - b1) * g
@@ -165,8 +166,8 @@ adam.updater = setRefClass(
       delta <<- -rate * m_hat / (sqrt(v_hat) + e)
     },
     initialize = function(a_0 = 0.1, b1 = 0.9, b2 = 0.999, e = 1E-8,
-                          t = 0L, delta, rate_decay = 0.999, ...){
-      if (length(.self$rate_decay) == 0 | !missing(rate_decay))  {rate_decay <<- rate_decay}
+                          t = 0L, delta, annealing_rate = .001, ...){
+      if (length(.self$annealing_rate) == 0 | !missing(annealing_rate))  {annealing_rate <<- annealing_rate}
       if (length(.self$a_0) == 0 | !missing(a_0)) {a_0 <<- a_0}
       if (length(.self$b1)  == 0 | !missing(b1))  {b1 <<- b1}
       if (length(.self$b2)  == 0 | !missing(b2))  {b2 <<- b2}
