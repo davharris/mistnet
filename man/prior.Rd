@@ -2,16 +2,16 @@
 % Please edit documentation in R/prior.R
 \docType{class}
 \name{gaussian.prior-class}
-\alias{gaussian.prior}
 \alias{gaussian.prior-class}
-\alias{gp.prior}
-\alias{gp.prior-class}
-\alias{laplace.prior}
+\alias{gaussian.prior}
 \alias{laplace.prior-class}
-\alias{logistic.prior}
+\alias{laplace.prior}
 \alias{logistic.prior-class}
-\alias{lognormal.prior}
+\alias{logistic.prior}
 \alias{lognormal.prior-class}
+\alias{lognormal.prior}
+\alias{gp.prior-class}
+\alias{gp.prior}
 \title{\code{gaussian.prior} Gaussian prior with mean and sd}
 \description{
 \code{gaussian.prior} Gaussian prior with mean and sd

@@ -43,4 +43,4 @@ Collate:
     'row.selector.R'
     'network.R'
     'predict.R'
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1

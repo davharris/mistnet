@@ -2,8 +2,8 @@
 % Please edit documentation in R/updater.R
 \docType{class}
 \name{updater-class}
-\alias{updater}
 \alias{updater-class}
+\alias{updater}
 \title{Updaters}
 \description{
 Classes for determining the optimization step to make given a

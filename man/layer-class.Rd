@@ -2,8 +2,8 @@
 % Please edit documentation in R/layer.R
 \docType{class}
 \name{layer-class}
-\alias{layer}
 \alias{layer-class}
+\alias{layer}
 \title{Layer}
 \description{
 A reference class object for one layer of computation in a network object.
@@ -38,6 +38,7 @@ node in response to each example, for each Monte Carlo sample}
 
 \item{\code{coef.updater}}{an \code{\link{updater}} object}
 }}
+
 \section{Methods}{
 
 \describe{
@@ -53,7 +54,7 @@ alter the minibatch size and number of importance samples if desired}
 
 \item{\code{updateCoefficients(dataset.size, n.minibatch)}}{Calculate coef.delta and add it to weights. Update biases}
 }}
+
 \seealso{
 \code{\link{network}}
 }
-

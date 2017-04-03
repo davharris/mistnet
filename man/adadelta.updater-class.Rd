@@ -2,8 +2,8 @@
 % Please edit documentation in R/updater.R
 \docType{class}
 \name{adadelta.updater-class}
-\alias{adadelta.updater}
 \alias{adadelta.updater-class}
+\alias{adadelta.updater}
 \title{adadelta updater}
 \description{
 An updater with adaptive step sizes, like adagrad. 
@@ -34,4 +34,5 @@ updates, but decayed according to rho.}
 \item{\code{squared.delta}}{a matrix summing the squared deltas over all previous
 updates, but decayed according to rho.}
 }}
+
 

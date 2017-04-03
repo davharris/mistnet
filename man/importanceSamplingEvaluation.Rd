@@ -25,4 +25,3 @@ Estimate the model's log-likelihood on data held out of sample.
 Rather than storing a huge number of sample predictions in memory, we can 
 do this in #' batches of a specified size and just work with the scalar likelihood.
 }
-

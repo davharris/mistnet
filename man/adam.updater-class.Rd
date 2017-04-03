@@ -2,8 +2,8 @@
 % Please edit documentation in R/updater.R
 \docType{class}
 \name{adam.updater-class}
-\alias{adam.updater}
 \alias{adam.updater-class}
+\alias{adam.updater}
 \title{adam updater}
 \description{
 An updater with adaptive step sizes. Adam allows different 
@@ -34,4 +34,5 @@ Default is 0.001.}
 
 \item{\code{delta}}{the delta matrix (see \code{updater})}
 }}
+
 

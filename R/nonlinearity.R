@@ -139,6 +139,27 @@ leaky.rectify.nonlinearity = setRefClass(
 )
 
 
+#' \code{elu.nonlinearity}:
+#' \code{ifelse(x > 0, x, exp(x) - 1)}
+#' @exportClass elu.nonlinearity
+#' @rdname nonlinearity
+#' @export elu.nonlinearity
+elu.nonlinearity = setRefClass(
+  Class = "elu.nonlinearity",
+  fields = list(),
+  contains = "nonlinearity",
+  methods = list(
+    f = function(x){ifelse(x > 0, x, exp(x) - 1)},
+    grad = function(x){
+      ifelse(x > 0, 1, exp(x))
+    },
+    initializeFinalBiases = function(y){
+      rep(0, ncol(y))
+    }
+  )
+)
+
+
 #' @exportClass exp.nonlinearity
 #' @rdname nonlinearity
 #' @export exp.nonlinearity

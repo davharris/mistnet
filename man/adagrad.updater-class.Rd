@@ -2,8 +2,8 @@
 % Please edit documentation in R/updater.R
 \docType{class}
 \name{adagrad.updater-class}
-\alias{adagrad.updater}
 \alias{adagrad.updater-class}
+\alias{adagrad.updater}
 \title{adagrad updater}
 \description{
 An updater with adaptive step sizes. Adagrad allows different 
@@ -24,4 +24,5 @@ updates}
 
 \item{\code{delta}}{the delta matrix (see \code{updater})}
 }}
+
 

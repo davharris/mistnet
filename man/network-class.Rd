@@ -2,8 +2,8 @@
 % Please edit documentation in R/network.R
 \docType{class}
 \name{network-class}
-\alias{network}
 \alias{network-class}
+\alias{network}
 \title{Network}
 \description{
 A reference class object for a mistnet \code{network} object.
@@ -48,7 +48,8 @@ of model fitting}
 should be enabled. Useful for diagnosing problems with the model, but 
 potentially slow.}
 }}
+
+
 \seealso{
 \code{\link{mistnet}}, \code{\link{layer}}
 }
-

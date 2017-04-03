@@ -14,4 +14,3 @@ zeros(n.row, n.col)
 \description{
 Produce a matrix of zeros
 }
-

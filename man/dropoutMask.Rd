@@ -19,4 +19,3 @@ with probabilty 0.5.
 Code is based on the "josh" function from 
 https://gist.github.com/sckott/3639688
 }
-

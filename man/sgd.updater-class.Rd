@@ -2,8 +2,8 @@
 % Please edit documentation in R/updater.R
 \docType{class}
 \name{sgd.updater-class}
-\alias{sgd.updater}
 \alias{sgd.updater-class}
+\alias{sgd.updater}
 \title{Stochastic gradient descent updater}
 \description{
 An updater for descending a gradient with momentum
@@ -20,4 +20,5 @@ __
 
 \item{\code{delta}}{the delta matrix (see \code{updater})}
 }}
+
 

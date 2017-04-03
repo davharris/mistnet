@@ -23,4 +23,3 @@ This function produces a description of a \code{layer} in a \code{network}
 \seealso{
 \code{\link{layer}}
 }
-

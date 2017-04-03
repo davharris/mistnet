@@ -137,4 +137,3 @@ Tang, Y. & Salakhutdinov, R. (2013) Learning Stochastic
 
 \code{\link{layer}}
 }
-

@@ -2,22 +2,22 @@
 % Please edit documentation in R/loss.R
 \docType{class}
 \name{loss-class}
-\alias{bernoulliLoss}
-\alias{bernoulliLoss-class}
-\alias{bernoulliRegLoss}
-\alias{bernoulliRegLoss-class}
-\alias{binomialLoss}
-\alias{binomialLoss-class}
-\alias{loss}
 \alias{loss-class}
-\alias{nbLoss}
-\alias{nbLoss-class}
-\alias{nbRegLoss}
-\alias{nbRegLoss-class}
-\alias{poissonLoss}
+\alias{loss}
+\alias{bernoulliLoss-class}
+\alias{bernoulliLoss}
+\alias{bernoulliRegLoss-class}
+\alias{bernoulliRegLoss}
 \alias{poissonLoss-class}
-\alias{squaredLoss}
+\alias{poissonLoss}
+\alias{nbLoss-class}
+\alias{nbLoss}
+\alias{nbRegLoss-class}
+\alias{nbRegLoss}
 \alias{squaredLoss-class}
+\alias{squaredLoss}
+\alias{binomialLoss-class}
+\alias{binomialLoss}
 \title{Loss functions}
 \arguments{
 \item{a}{the \code{a} shape parameter in \code{\link{dbeta}}}

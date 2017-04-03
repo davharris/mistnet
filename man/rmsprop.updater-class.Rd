@@ -2,8 +2,8 @@
 % Please edit documentation in R/updater.R
 \docType{class}
 \name{rmsprop.updater-class}
-\alias{rmsprop.updater}
 \alias{rmsprop.updater-class}
+\alias{rmsprop.updater}
 \title{rmsprop updater}
 \description{
 Another updater with adaptive step sizes, like adagrad and adadelta.
@@ -23,4 +23,5 @@ updates (decays according to gamma)}
 
 \item{\code{delta}}{the delta matrix (see \code{updater})}
 }}
+
 

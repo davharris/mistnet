@@ -2,20 +2,22 @@
 % Please edit documentation in R/nonlinearity.R
 \docType{class}
 \name{nonlinearity-class}
-\alias{exp.nonlinearity}
-\alias{exp.nonlinearity-class}
-\alias{leaky.rectify.nonlinearity}
-\alias{leaky.rectify.nonlinearity-class}
-\alias{linear.nonlinearity}
-\alias{linear.nonlinearity-class}
-\alias{mf_mrf.nonlinearity}
-\alias{mf_mrf.nonlinearity-class}
-\alias{nonlinearity}
 \alias{nonlinearity-class}
-\alias{rectify.nonlinearity}
-\alias{rectify.nonlinearity-class}
-\alias{sigmoid.nonlinearity}
+\alias{nonlinearity}
+\alias{linear.nonlinearity-class}
+\alias{linear.nonlinearity}
 \alias{sigmoid.nonlinearity-class}
+\alias{sigmoid.nonlinearity}
+\alias{rectify.nonlinearity-class}
+\alias{rectify.nonlinearity}
+\alias{leaky.rectify.nonlinearity-class}
+\alias{leaky.rectify.nonlinearity}
+\alias{elu.nonlinearity-class}
+\alias{elu.nonlinearity}
+\alias{exp.nonlinearity-class}
+\alias{exp.nonlinearity}
+\alias{mf_mrf.nonlinearity-class}
+\alias{mf_mrf.nonlinearity}
 \title{nonlinearities}
 \description{
 --
@@ -31,5 +33,8 @@ logistic function
 
 \code{leaky.rectify.nonlinearity}:
 \code{ifelse(x>0, x, x * .01)}
+
+\code{elu.nonlinearity}:
+\code{ifelse(x > 0, x, exp(x) - 1)}
 }
 
