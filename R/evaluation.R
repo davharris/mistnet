@@ -36,11 +36,9 @@ importanceSamplingEvaluation = function(
   batches, 
   batch.size
 ){
-  pb = progress::progress_bar()
   
   logliks = replicate(
     batches,{
-      pb$tick()
       predictions = predict(
         object, 
         newdata, 
