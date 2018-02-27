@@ -49,8 +49,13 @@ network = setRefClass(
     debug = "logical"
   ),
   methods = list(
-    
+
     fit = function(iterations){
+      "Update the coefficients of the network object iteratively by minibatch gradient 
+       descent. In each iteration, the gradient is estimated using importance sampling,
+       as described in (Tang and Salakhutdinov, ICML 2013) and in (Harris, Methods in 
+       Ecology and Evolution 2015)."
+      
       if(iterations < 1L){
         if(iterations == 0L){
           return(NULL)
@@ -58,11 +63,10 @@ network = setRefClass(
           stop(paste0(iterations, " is not a valid number of iterations"))
         }
       }
-      # Maybe put some (optional) assertions here?
-      # Do I have an opinion about non-integer iteration counts?
+
       for(i in 1:iterations){
-        selectMinibatch()
-        estimateGrad()
+        selectMinibatch()    # Identify the rows to use in this iteration
+        estimateGrad()       # Feedforward, then backprop for approximate gradients
         updateCoefficients()
         completed.iterations <<- completed.iterations + 1L
         
@@ -76,9 +80,12 @@ network = setRefClass(
     },
     
     selectMinibatch = function(row.nums){
+      "Select which rows to use in this iteration, or re-initialize the row.selector"
+      
       if(missing(row.nums)){
         row.selector$select()
       }else{
+        # Re-initialize the row.selector with the new size
         n = length(row.nums)
         row.selector$n.minibatch <<- n
         for(i in 1:n.layers){
@@ -92,7 +99,12 @@ network = setRefClass(
     },
     
     estimateGrad = function(){
+      "Feedforward once per Monte Carlo sample, then calculate the associated
+      gradients by backpropagation.  Finally, average the gradients according
+      to the importance weight of each sample."
+      
       for(i in 1:n.importance.samples){
+        # Concatenate the relevant rows of x with random Monte Carlo samples
         inputs[,,i] <<- cbind(
           x[row.selector$minibatch.ids, ], 
           sampler$sample(nrow = row.selector$n.minibatch)
@@ -107,11 +119,17 @@ network = setRefClass(
     },
     
     updateCoefficients = function(){
+      "Update the weights, biases, and (possibly) other coefficients of
+       each layer in the network (if they exist)."
+      
       for(i in 1:n.layers){
+        # Update the weights and biases in each layer
         layers[[i]]$updateCoefficients(
           dataset.size = dataset.size,
           n.minibatch = row.selector$n.minibatch
         )
+        
+        # Some special layers have additional coefficients to update
         layers[[i]]$nonlinearity$update(
           observed = y[row.selector$minibatch.ids, ],
           predicted = layers[[i]]$outputs, 
@@ -122,6 +140,8 @@ network = setRefClass(
     },
     
     feedForward = function(input, sample.num){
+      "Use the network to generate one Monte Carlo prediction of y given x."
+      
       # First layer gets the specified inputs
       layers[[1]]$forwardPass(input, sample.num)
       # Subsequent layers get their inputs from the layer preceding them
@@ -136,6 +156,8 @@ network = setRefClass(
     },
     
     backprop = function(sample.num){
+      "Backpropagate the errors of one Mone Carlo sample through the network "
+      
       # Final layer gets its error from the loss gradient
       layers[[n.layers]]$backwardPass(
         loss$grad(
@@ -161,9 +183,14 @@ network = setRefClass(
     },
     
     averageSampleGrads = function(){
+      "Combine the gradients found in different Monte Carlo samples according
+       to their importance weights."
+      
       findImportanceWeights()
       for(i in 1:n.layers){
         layers[[i]]$combineSampleGrads(
+          # The first layer gets data from the network inputs; subsequent
+          # layers get inputs from the previous layer.
           inputs = if(i==1){inputs}else{layers[[i - 1]]$outputs},
           weights = importance.weights,     
           n.importance.samples = n.importance.samples
@@ -172,6 +199,9 @@ network = setRefClass(
     },
     
     findImportanceWeights = function(){
+      "Calculate the importance weights for each Monte Carlo sample for each row
+       of the minibatch."
+      
       importance.errors = zeros(row.selector$n.minibatch, n.importance.samples)
       for(i in 1:n.importance.samples){
         importance.errors[ , i] = rowSums(
