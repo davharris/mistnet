@@ -2,7 +2,6 @@
 #'
 #' @description A reference class object for a mistnet \code{network} object.
 #'
-#' @details __
 #'
 #' @field x a numeric matrix of predictor variables.  One row
 #'  per observation, one column per predictive feature.
