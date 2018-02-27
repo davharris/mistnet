@@ -1,6 +1,6 @@
 #' Network
 #'
-#' @description A reference class object for a mistnet \code{network} object.
+#' @description A reference class for mistnet \code{network} objects.
 #'
 #'
 #' @field x a numeric matrix of predictor variables.  One row
